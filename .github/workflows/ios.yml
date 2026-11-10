@@ -30,6 +30,22 @@ jobs:
           if [ -d App.xcworkspace ]; then TARGET="-workspace App.xcworkspace"; else TARGET="-project App.xcodeproj"; fi
           xcodebuild $TARGET -scheme App -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build | tail -n 40
 
+      - name: Capture d'écran sur un iPhone simulé
+        continue-on-error: true
+        run: |
+          APP=$(find ~/Library/Developer/Xcode/DerivedData -maxdepth 6 -path '*Debug-iphonesimulator/App.app' | head -1)
+          DEV=$(xcrun simctl list devices available -j | python3 -c "import json,sys;d=json.load(sys.stdin)['devices'];print([x['udid'] for k,v in sorted(d.items()) if 'iOS' in k for x in v if x['name'].startswith('iPhone')][-1])")
+          xcrun simctl boot "$DEV"; xcrun simctl bootstatus "$DEV" -b
+          xcrun simctl install "$DEV" "$APP"
+          xcrun simctl launch "$DEV" fr.mathisfelicite.mfcquiz
+          sleep 30; xcrun simctl io "$DEV" screenshot capture-1.png
+          sleep 10; xcrun simctl io "$DEV" screenshot capture-2.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: captures-iphone
+          path: capture-*.png
+          if-no-files-found: ignore
+
       # ---- Envoi sur TestFlight : actif seulement quand le compte Apple est prêt ----
       - name: Archive signée + envoi TestFlight
         if: ${{ inputs.testflight }}
