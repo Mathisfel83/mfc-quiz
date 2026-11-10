@@ -556,6 +556,67 @@ function nativeEnable(time,cb){
 }
 function buzz(ok){ var H=plug('Haptics'); if(!H) return; try{ if(ok) H.impact({style:'MEDIUM'}); else H.notification({type:'ERROR'}); }catch(e){} }
 
+/* ---------- formule gratuite / Premium ---------- */
+var TESTER_CODES=['MFC-TESTEUR'];
+function isPrem(){ return !!(st.prem&&st.prem.on); }
+function fq(){ var t=today(); if(!st.fq||st.fq.d!==t){ st.fq={d:t,les:null,quiz:0,rev:0}; } return st.fq; }
+function canLesson(id){
+  if(isPrem()||lDone(id)) return true;
+  var f=fq(); if(!f.les||f.les===id){ f.les=id; save(); return true; }
+  paywall('lesson'); return false;
+}
+function canQuiz(kind,mod){
+  if(isPrem()) return true;
+  var f=fq();
+  if(kind==='lesson'&&(f.les===mod||(!f.les&&!lDone(mod)))){ f.les=mod; save(); return true; }
+  if(kind==='rev'){ if(f.rev<1){ f.rev++; save(); return true; } paywall('rev'); return false; }
+  if(f.quiz<1){ f.quiz++; save(); return true; }
+  paywall('quiz'); return false;
+}
+function paywall(why){
+  var t={lesson:'Tu as déjà commencé ta leçon du jour.',quiz:'Tu as utilisé ton quiz gratuit du jour.',rev:'Tu as utilisé ta révision gratuite du jour.'}[why]||'';
+  sheet('<div style="text-align:center"><div style="font-size:44px">👑</div><h2 class="h1" style="font-size:20px;margin-top:6px">'+t+'</h2><p style="color:var(--muted);font-size:14px;line-height:1.55">En version gratuite, tu as <b style="color:var(--ink)">1 leçon, 1 quiz et 1 révision par jour</b>. Les duels et la Course au sommet restent illimités.<br>Reviens demain, ou passe à <b style="color:var(--gold)">MFC Premium</b> pour tout débloquer.</p></div><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px"><button class="btn gold" data-close data-sx="premium">Découvrir Premium '+IC.arrow+'</button><button class="btn ghost" data-close data-sx="toarena">Jouer aux Défis</button><button class="btn ghost" data-close>Revenir demain</button></div>');
+}
+function premiumView(){
+  setNav(false); avUnmount();
+  var on=isPrem(), h='<div class="screen noNav"><div class="wrap"><div class="top"><button class="iconbtn" data-sx="premclose" aria-label="Fermer">'+IC.x+'</button><span></span><span></span></div>';
+  h+='<div style="text-align:center;margin-top:6px"><div style="font-size:48px">👑</div><div class="mono" style="color:var(--gold)">MFC PREMIUM</div><h1 class="h1" style="font-size:26px;margin-top:6px">Apprends sans limite.<br>Gagne de vraies récompenses.</h1></div>';
+  if(on) h+='<div class="goldcard" style="margin-top:18px;padding:14px 16px;text-align:center;font-weight:700">✅ Premium actif sur ce téléphone'+(st.prem.code?'<div style="font-size:12px;font-weight:500;color:var(--muted);margin-top:4px">Accès testeur offert par Mathis</div>':'')+'</div>';
+  // offres
+  if(!on){
+    h+='<div style="display:flex;flex-direction:column;gap:10px;margin-top:20px">';
+    h+='<button class="goldcard" data-sx="premwant" data-v="annuel" style="padding:16px;text-align:left;position:relative;width:100%"><span class="pill" style="position:absolute;top:-9px;right:14px">–40 %</span><div class="row" style="justify-content:space-between"><b style="font-size:17px">Annuel</b><b style="font-size:17px;color:var(--gold)">34,99 €<span style="font-size:12px;color:var(--muted);font-weight:500"> / an</span></b></div><div style="font-size:12.5px;color:var(--muted);margin-top:4px">Soit 2,92 € par mois · 7 jours d’essai gratuit</div></button>';
+    h+='<button class="glass" data-sx="premwant" data-v="mensuel" style="padding:16px;text-align:left;width:100%"><div class="row" style="justify-content:space-between"><b style="font-size:17px">Mensuel</b><b style="font-size:17px">4,99 €<span style="font-size:12px;color:var(--muted);font-weight:500"> / mois</span></b></div><div style="font-size:12.5px;color:var(--muted);margin-top:4px">Sans engagement</div></button>';
+    h+='</div><div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5">L’abonnement arrive bientôt. Touche l’offre qui t’intéresse pour être prévenu(e) en priorité.</div>';
+  }
+  // comparatif
+  h+='<div class="glass" style="margin-top:22px;padding:6px 16px"><div class="row" style="justify-content:space-between;padding:10px 0;font-size:11px" ><span class="mono" style="color:var(--muted)">CE QUI EST INCLUS</span><span class="mono" style="display:flex;gap:16px"><span style="color:var(--muted);width:52px;text-align:center">GRATUIT</span><span style="color:var(--gold);width:58px;text-align:center">PREMIUM</span></span></div>';
+  [['Leçons','1 / jour','Illimitées'],['Quiz','1 / jour','Illimités'],['Révisions','1 / jour','Illimitées'],['Duels & Course au sommet','Illimités','Illimités'],['Podium & classements','✓','✓'],['Tenues & diplômes de rang','✓','✓'],['Examens & certificats','–','✓ bientôt'],['Récompenses réelles','–','✓ bientôt']].forEach(function(r){ h+='<div class="row" style="justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px"><span style="flex:1">'+r[0]+'</span><span style="display:flex;gap:16px;font-size:12px;text-align:center"><span style="width:52px;color:var(--muted)">'+r[1]+'</span><span style="width:58px;color:var(--gold);font-weight:700">'+r[2]+'</span></span></div>'; });
+  h+='</div>';
+  // récompenses
+  h+='<div class="mono" style="color:var(--muted);margin:24px 0 10px">LES RÉCOMPENSES</div><div style="display:flex;flex-direction:column;gap:10px">';
+  [['🎖️','Dès aujourd’hui','Tenues d’avatar et diplômes à chaque rang, podium de la semaine partagé en story par Mathis.',0],
+   ['🎬','Rang Analyste','Ta question traitée par Mathis dans un Reel, avec mention de ton pseudo.',1],
+   ['💊','Bientôt : compléments alimentaires','Des produits et codes de réduction de marques partenaires pour les meilleurs joueurs Premium.',1],
+   ['👕','Bientôt : vêtements MFC','Tee-shirts et sweats MFC à gagner aux rangs les plus élevés et lors des événements.',1],
+   ['🏆','Bientôt : lots du podium','Chaque semaine, un lot pour le n° 1 du podium Premium.',1],
+   ['🧠','Bientôt : coaching avec Mathis','Une séance de coaching offerte pour les Légendes.',1]].forEach(function(r){ h+='<div class="glass" style="padding:14px 16px;display:flex;gap:12px;align-items:flex-start"><span style="font-size:28px;line-height:1">'+r[0]+'</span><div><b style="font-size:14.5px">'+r[1]+'</b><div style="font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:2px">'+r[2]+'</div></div></div>'; });
+  h+='</div><div style="font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:12px;text-align:center">Les récompenses « bientôt » arrivent progressivement, selon les partenariats. Leur règlement sera publié avant leur lancement.</div>';
+  // code testeur
+  if(!on) h+='<form id="tcf" style="margin-top:22px;display:flex;gap:8px"><input id="tci" class="sxinput" placeholder="Code testeur" autocapitalize="characters" autocomplete="off" style="height:46px;font-size:15px;text-transform:uppercase"><button class="btn ghost" type="submit" style="width:auto;height:46px;padding:0 16px">OK</button></form>';
+  h+='<div style="height:30px"></div></div></div>';
+  view.innerHTML=h;
+  var f=document.getElementById('tcf');
+  if(f) f.addEventListener('submit',function(e){ e.preventDefault(); var v=document.getElementById('tci').value.trim().toUpperCase();
+    if(TESTER_CODES.indexOf(v)>=0){ st.prem={on:1,code:v,d:today()}; save(); confetti(); toast('👑','Premium activé, merci de tester MFC Quiz !',2800); premiumView(); }
+    else toast('❌','Code invalide',2000); });
+}
+function premWant(plan){
+  st.premWant=plan; save();
+  rpc('mfc_interest',{p_plan:plan}).catch(function(){});
+  toast('🔔','C’est noté ! Tu seras prévenu(e) dès que Premium sera disponible.',3000);
+}
+
 /* ---------- actions ---------- */
 document.getElementById('app').addEventListener('click',function(e){
   var b=e.target.closest('[data-sx]'); if(!b) return;
@@ -591,6 +652,9 @@ document.getElementById('app').addEventListener('click',function(e){
   else if(a==='unblock'){ rpc('mfc_unblock',{p_id:id}).then(function(){ var s4=b.closest('.sheet'); if(s4) s4.remove(); blockedSheet(); }).catch(sxErr); }
   else if(a==='unfriend'){ if(!confirm('Retirer ce joueur de tes amis ?')) return; rpc('mfc_remove_friend',{p_id:id}).then(function(){ var s5=b.closest('.sheet'); if(s5) s5.remove(); loadArena(); }).catch(sxErr); }
   else if(a==='blocked') blockedSheet();
+  else if(a==='premium') premiumView();
+  else if(a==='premclose'){ tab=tab==='arena'?'arena':(tab||'home'); render(); }
+  else if(a==='premwant') premWant(b.dataset.v);
   else if(a==='delacc') deleteSheet();
   else if(a==='deletego') deleteAccount(b);
 });
