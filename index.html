@@ -238,6 +238,7 @@ a{color:var(--gold2);text-decoration:none}
 <script src="questions-lot6.js"></script>
 <script src="missions.js"></script>
 <script src="lessons.js"></script>
+<script src="prepa.js"></script>
 <script>
 (function(){
 'use strict';
@@ -486,6 +487,7 @@ function home(){
   if(!st.avatar) h+='<button class="notifcard up d2" data-act="avedit" style="border-style:solid;border-color:rgba(212,175,55,.6);background:linear-gradient(140deg,rgba(212,175,55,.16),rgba(212,175,55,.02))"><span style="font-size:30px">🧍</span><div style="flex:1"><div class="mono" style="color:var(--gold);font-size:10px">NOUVEAU</div><div style="font-size:15px;font-weight:700">Crée ton avatar 3D</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Il gagne des tenues à chaque nouveau rang</div></div>'+IC.arrow+'</button>';
   h+='<div class="up d3">'+missionHTML()+'</div>';
   if(!st.notif.on && isStandalone() && pushOK()) h+='<button class="notifcard up d3" data-act="notif"><div style="color:var(--gold)">'+IC.bell+'</div><div style="flex:1"><div style="font-size:14px;font-weight:700">Active ton rappel du matin</div><div style="font-size:12px;color:var(--muted);margin-top:2px">2 minutes de quiz pour démarrer la journée</div></div>'+IC.arrow+'</button>';
+  h+='<button class="goldcard up d3" data-sx="prepa" style="margin-top:16px;width:100%;padding:14px 16px;display:flex;gap:12px;align-items:center;text-align:left"><span style="font-size:30px">🎓</span><span style="flex:1"><span class="mono" style="color:var(--gold);font-size:10px">NOUVEAU · PREMIUM</span><br><b style="font-size:15.5px">Prépa STAPS L1 & BPJEPS</b><br><span style="font-size:12.5px;color:var(--muted)">Quiz par matière et examens blancs notés sur 20</span></span>'+IC.arrow+'</button>';
   h+='<div class="mono up d3" style="color:var(--muted);margin:22px 0 10px">LES THÈMES</div><div class="mods">';
   var mods=M.slice(); if(g) mods.sort(function(a,b){ return (g.w[b.id]||1)-(g.w[a.id]||1); });
   mods.forEach(function(m,i){ var p=modProgress(m.id), rec=gm.indexOf(m.id)>=0;
@@ -1345,7 +1347,7 @@ function storySheet(u){
 var rq=null, RQT=20000;
 function runQs(ids,o){
   avUnmount(); setNav(false);
-  rq={qs:ids.map(function(id){ return QBY[id]; }).filter(Boolean).map(function(q){ return {q:q,order:shuffle([0,1,2])}; }),i:0,picked:null,score:0,ms:0,t0:Date.now(),o:o,tm:null};
+  rq={qs:ids.map(function(id){ return QBY[id]; }).filter(Boolean).map(function(q){ return {q:q,order:shuffle([0,1,2])}; }),i:0,picked:null,score:0,ms:0,t0:Date.now(),o:o,tm:null,T:o.timer===undefined?RQT:o.timer};
   drawRq();
 }
 function drawRq(){
@@ -1354,7 +1356,7 @@ function drawRq(){
   for(var s=0;s<n;s++) h+='<div class="seg'+(s<rq.i||(s===rq.i&&ans)?' done':'')+'"></div>';
   h+='</div><span class="chip" style="color:var(--gold)">'+rq.score+'/'+n+'</span></div>';
   h+='<div class="mono" style="color:var(--gold);margin-top:18px">'+esc(rq.o.title)+' · '+(rq.i+1)+'/'+n+'</div>';
-  if(!ans) h+='<div class="sxtime"><i id="rqbar" style="width:100%"></i></div>';
+  if(!ans&&rq.T) h+='<div class="sxtime"><i id="rqbar" style="width:100%"></i></div>';
   h+='<h1 class="h1" style="margin:12px 0 18px">'+esc(q.q)+'</h1>';
   it.order.forEach(function(oi,pos){ var cls='opt'; if(ans){ cls=oi===q.a?'opt good':oi===rq.picked?'opt bad':'opt dim'; }
     h+='<button class="'+cls+'" '+(ans?'disabled':'data-sx="rqpick" data-i="'+oi+'"')+'><span class="l">'+(ans&&oi===q.a?IC.check:ans&&oi===rq.picked?'✕':L[pos])+'</span><span>'+esc(q.o[oi])+'</span></button>'; });
@@ -1362,13 +1364,14 @@ function drawRq(){
     h+='<div class="glass fb"><span style="font-family:var(--head);font-weight:600;font-size:15px;color:'+(right?'var(--good)':'var(--bad)')+'">'+(right?'Bien joué !':rq.picked<0?'Temps écoulé !':'Raté…')+'</span><div style="font-size:14px;line-height:1.55;color:var(--ink2);margin-top:8px">'+esc(q.e)+'</div>'+(src?'<span class="src">Source : '+esc(src.t)+'<br><a href="'+src.u+'" target="_blank" rel="noopener">Voir l’étude '+IC.ext+'</a></span>':'')+'</div><div style="height:14px"></div><button class="btn gold" data-sx="rqnext">'+(rq.i<n-1?'Question suivante':'Voir le résultat')+IC.arrow+'</button>'; }
   h+='</div></div>'; view.innerHTML=h;
   clearInterval(rq.tm);
-  if(!ans){ rq.t0=Date.now(); rq.tm=setInterval(function(){ if(!rq){ return; } var el=Date.now()-rq.t0, b=document.getElementById('rqbar'); if(b) b.style.width=Math.max(0,100-el/RQT*100)+'%'; if(el>=RQT) rqPick(-1); },200); }
+  if(!ans){ rq.t0=Date.now(); if(rq.T) rq.tm=setInterval(function(){ if(!rq){ return; } var el=Date.now()-rq.t0, b=document.getElementById('rqbar'); if(b) b.style.width=Math.max(0,100-el/rq.T*100)+'%'; if(el>=rq.T) rqPick(-1); },200); }
   else { var sc=view.querySelector('.screen'); setTimeout(function(){ sc.scrollTo({top:sc.scrollHeight,behavior:'smooth'}); },120); }
 }
 function rqPick(oi){
   if(!rq||rq.picked!==null) return; clearInterval(rq.tm);
-  var q=rq.qs[rq.i].q; rq.picked=oi; buzz(oi===q.a); rq.ms+=Math.min(RQT,Date.now()-rq.t0);
-  st.answered++; if(oi===q.a){ rq.score++; st.correct++; st.mastered[q.id]=1; delete st.wrong[q.id]; } else st.wrong[q.id]=1;
+  var q=rq.qs[rq.i].q; rq.picked=oi; buzz(oi===q.a); rq.ms+=Math.min(rq.T||9e9,Date.now()-rq.t0);
+  st.answered++; var pp=q.id.indexOf('pp-')===0;
+  if(oi===q.a){ rq.score++; st.correct++; if(pp){ ppSt().m[q.id]=1; } else { st.mastered[q.id]=1; delete st.wrong[q.id]; } } else if(!pp) st.wrong[q.id]=1;
   save(); drawRq();
 }
 function rqEnd(){ var r=rq; clearInterval(r.tm); rq=null; gainXP(r.score*XP_RIGHT); r.o.done(r.score,r.ms); }
@@ -1636,6 +1639,73 @@ function nativeEnable(time,cb){
 }
 function buzz(ok){ var H=plug('Haptics'); if(!H) return; try{ if(ok) H.impact({style:'MEDIUM'}); else H.notification({type:'ERROR'}); }catch(e){} }
 
+/* ---------- Prépa STAPS & BPJEPS ---------- */
+var PP=window.MFC_PREPA||{tracks:[]}, ppNav={t:'staps',s:null,c:null};
+(function(){ var PS=window.MFC_PREPA_SOURCES||{}; for(var k in PS) S[k]=PS[k];
+  PP.tracks.forEach(function(t){ t.subjects.forEach(function(sb){ (sb.chapters||[]).forEach(function(c){ c.qs.forEach(function(q){ QBY[q.id]=q; }); }); }); }); })();
+function ppSt(){ if(!st.pp) st.pp={m:{},best:{},ex:{}}; return st.pp; }
+function ppTrack(id){ return PP.tracks.filter(function(t){ return t.id===id; })[0]; }
+function ppSubj(tid,sid){ var t=ppTrack(tid), sb=t&&t.subjects.filter(function(x){ return x.id===sid; })[0]; if(sb&&sb.ref){ var r=ppTrack(sb.ref).subjects.filter(function(x){ return x.id===sb.id; })[0]; return Object.assign({},r,{name:sb.name}); } return sb; }
+function ppIds(sb){ var a=[]; (sb.chapters||[]).forEach(function(c){ c.qs.forEach(function(q){ a.push(q.id); }); }); return a; }
+function ppProg(ids){ var m=ppSt().m, n=ids.filter(function(i){ return m[i]; }).length; return {n:n,t:ids.length,p:ids.length?Math.round(n/ids.length*100):0}; }
+function ppHead(kicker,title,back){ return '<div class="top"><button class="iconbtn" data-sx="'+back+'" aria-label="Retour">'+IC.back+'</button><span></span>'+(isPrem()?'<span class="chip" style="color:var(--gold);font-size:11px">👑 Premium</span>':'<button class="chip" data-sx="premium" style="color:var(--gold);font-size:11px">👑 Débloquer</button>')+'</div><div class="mono" style="color:var(--gold);margin-top:14px">'+kicker+'</div><h1 class="h1" style="margin-top:4px">'+title+'</h1>'; }
+function prepaView(){
+  setNav(false); avUnmount(); ppNav.s=null; ppNav.c=null;
+  var h='<div class="screen noNav"><div class="wrap">'+ppHead('PRÉPA EXAMENS','Prépa STAPS & BPJEPS','ppclose');
+  h+='<div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-top:6px">Des quiz par matière et un examen blanc noté sur 20, construits à partir de manuels de référence. Chaque bonne réponse rapporte de l’XP.</div>';
+  h+='<div class="seg2" style="margin-top:16px">'+PP.tracks.map(function(t){ return '<button data-sx="pptrack" data-v="'+t.id+'" class="'+(ppNav.t===t.id?'on':'')+'">'+t.e+' '+t.name+'</button>'; }).join('')+'</div>';
+  var t=ppTrack(ppNav.t); h+='<div style="font-size:12.5px;color:var(--silver);margin:10px 2px 4px">'+esc(t.desc)+'</div><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">';
+  t.subjects.forEach(function(x){ var sb=ppSubj(t.id,x.id);
+    if(!sb||sb.soon){ h+='<div class="glass" style="padding:14px 16px;display:flex;gap:12px;align-items:center;opacity:.6"><span style="font-size:28px">'+x.e+'</span><div style="flex:1"><b>'+esc(x.name)+'</b><div style="font-size:12px;color:var(--muted)">'+esc(x.desc)+'</div></div><span class="chip" style="font-size:10.5px">Bientôt</span></div>'; return; }
+    var pr=ppProg(ppIds(sb)), best=ppSt().best[sb.id];
+    h+='<button class="goldcard" data-sx="ppsub" data-id="'+x.id+'" style="padding:14px 16px;display:flex;gap:12px;align-items:center;width:100%;text-align:left"><span style="font-size:30px">'+x.e+'</span><div style="flex:1"><b style="font-size:16px">'+esc(x.name)+'</b><div style="font-size:12px;color:var(--muted)">'+esc(x.desc)+' · '+sb.chapters.length+' chapitres</div><div class="bar" style="height:6px;margin-top:8px"><i style="width:'+pr.p+'%"></i></div><div class="mono" style="font-size:10px;color:var(--gold);margin-top:5px">'+pr.n+'/'+pr.t+' MAÎTRISÉES'+(best!==undefined?' · EXAMEN BLANC : '+String(best).replace('.',',')+'/20':'')+'</div></div>'+IC.arrow+'</button>';
+  });
+  h+='</div><div style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:16px;line-height:1.5">Contenu basé sur le socle commun des programmes. Les programmes varient selon les universités et les organismes de formation : vérifie toujours avec tes cours.</div><div style="height:24px"></div></div></div>';
+  view.innerHTML=h;
+}
+function ppSubView(){
+  var sb=ppSubj(ppNav.t,ppNav.s), pr=ppProg(ppIds(sb)), best=ppSt().best[sb.id];
+  var h='<div class="screen noNav"><div class="wrap">'+ppHead(ppTrack(ppNav.t).name.toUpperCase()+' · '+pr.p+' %',sb.e+' '+esc(sb.name),'ppback');
+  h+='<div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">';
+  sb.chapters.forEach(function(c,i){ var cp=ppProg(c.qs.map(function(q){ return q.id; })), open=isPrem()||c.free;
+    h+='<button class="glass" data-sx="ppch" data-id="'+c.id+'" style="padding:14px 16px;display:flex;gap:12px;align-items:center;width:100%;text-align:left"><span class="mono" style="width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:'+(cp.p===100?'var(--gold);color:#070D1C':'rgba(255,255,255,.06)')+';font-size:12px;flex-shrink:0">'+(cp.p===100?'✓':i+1)+'</span><div style="flex:1"><b style="font-size:14.5px">'+esc(c.t)+'</b><div class="mono" style="font-size:10px;color:var(--muted);margin-top:3px">'+c.qs.length+' QUESTIONS · '+cp.n+'/'+cp.t+' MAÎTRISÉES'+(c.free&&!isPrem()?' · <span style="color:var(--good)">GRATUIT</span>':'')+'</div></div>'+(open?IC.arrow:'🔒')+'</button>'; });
+  h+='</div>';
+  h+='<div class="goldcard" style="margin-top:18px;padding:16px"><div class="row" style="justify-content:space-between"><div><div class="mono" style="color:var(--gold);font-size:10px">EXAMEN BLANC</div><div style="font-size:16px;font-weight:700;margin-top:4px">20 questions · 30 s chacune</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Note sur 20 · +50 XP la 1re fois que tu as la moyenne</div></div><div style="text-align:right"><div class="mono" style="color:var(--muted);font-size:10px">RECORD</div><div style="font-family:var(--head);font-size:22px;font-weight:700;color:var(--gold)">'+(best!==undefined?String(best).replace('.',','):'–')+'<span style="font-size:12px;color:var(--muted)">/20</span></div></div></div><button class="btn gold" data-sx="ppexam" style="margin-top:12px">'+(isPrem()?'Passer l’examen blanc '+IC.arrow:'🔒 Réservé à Premium')+'</button></div>';
+  h+='<div style="height:24px"></div></div></div>'; view.innerHTML=h;
+}
+function ppChView(){
+  var sb=ppSubj(ppNav.t,ppNav.s), c=sb.chapters.filter(function(x){ return x.id===ppNav.c; })[0];
+  var h='<div class="screen noNav"><div class="wrap">'+ppHead(esc(sb.name).toUpperCase()+' · FICHE',esc(c.t),'ppsubback');
+  h+='<div class="glass" style="margin-top:16px;padding:16px;display:flex;flex-direction:column;gap:12px">'+c.k.map(function(k){ return '<div style="display:flex;gap:10px;font-size:14.5px;line-height:1.55"><span style="color:var(--gold)">◆</span><span>'+esc(k)+'</span></div>'; }).join('')+'</div>';
+  var src=S[c.qs[0].s]; if(src) h+='<span class="src" style="display:block;margin-top:12px;font-size:12px;line-height:1.5;color:var(--muted)">Source : '+esc(src.t)+'<br><a href="'+src.u+'" target="_blank" rel="noopener">Ouvrir le chapitre '+IC.ext+'</a></span>';
+  h+='<button class="btn gold" data-sx="ppquiz" style="margin-top:18px">Quiz du chapitre · '+c.qs.length+' questions '+IC.arrow+'</button><div style="height:24px"></div></div></div>';
+  view.innerHTML=h;
+}
+function ppOpenCh(id){
+  var sb=ppSubj(ppNav.t,ppNav.s), c=sb.chapters.filter(function(x){ return x.id===id; })[0];
+  if(!isPrem()&&!c.free){ paywall('prepa'); return; }
+  ppNav.c=id; ppChView();
+}
+function ppQuiz(){
+  var sb=ppSubj(ppNav.t,ppNav.s), c=sb.chapters.filter(function(x){ return x.id===ppNav.c; })[0];
+  runQs(shuffle(c.qs.map(function(q){ return q.id; })),{title:esc(sb.name).toUpperCase(),timer:0,done:function(sc){ ppResult(sc,c.qs.length,false); }});
+}
+function ppExam(){
+  if(!isPrem()){ paywall('prepa'); return; }
+  var sb=ppSubj(ppNav.t,ppNav.s), ids=shuffle(ppIds(sb)).slice(0,20);
+  runQs(ids,{title:'EXAMEN BLANC · '+esc(sb.name).toUpperCase(),timer:30000,done:function(sc){ ppResult(sc,ids.length,true); }});
+}
+function ppResult(sc,n,exam){
+  var sb=ppSubj(ppNav.t,ppNav.s), P=ppSt(), note=Math.round(sc/n*40)/2, bonus=0, rec=false;
+  if(exam){ var b=P.best[sb.id]; if(b===undefined||note>b){ P.best[sb.id]=note; rec=b!==undefined; } if(note>=10&&!P.ex[sb.id]){ P.ex[sb.id]=1; bonus=50; gainXP(50); } save(); }
+  var ment=note>=16?'Très bien':note>=14?'Bien':note>=12?'Assez bien':note>=10?'Passable':'Insuffisant';
+  var h='<div class="screen noNav"><div class="wrap" style="text-align:center;padding-top:24px"><div class="mono" style="color:var(--gold)">'+(exam?'EXAMEN BLANC · '+esc(sb.name).toUpperCase():'QUIZ DU CHAPITRE')+'</div>';
+  h+=exam?'<div style="font-family:var(--head);font-size:64px;font-weight:700;margin-top:18px;color:'+(note>=10?'var(--gold)':'var(--bad)')+'">'+String(note).replace('.',',')+'<span style="font-size:24px;color:var(--muted)">/20</span></div><div style="font-size:18px;font-weight:700">'+ment+(rec?' · nouveau record !':'')+'</div>':'<div style="font-family:var(--head);font-size:56px;font-weight:700;margin-top:18px">'+sc+'/'+n+'</div><div style="font-size:16px;color:var(--muted)">bonnes réponses</div>';
+  h+='<div class="glass" style="margin-top:20px;padding:14px;font-size:14px">+'+(sc*XP_RIGHT+bonus)+' XP'+(bonus?' (dont +50 : première moyenne à l’examen)':'')+'</div>';
+  h+='<div style="display:flex;flex-direction:column;gap:10px;margin-top:22px">'+(exam?'<button class="btn gold" data-sx="ppexam">Repasser l’examen '+IC.arrow+'</button>':'<button class="btn gold" data-sx="ppquiz">Refaire le quiz '+IC.arrow+'</button>')+'<button class="btn ghost" data-sx="ppsubback">Retour à la matière</button></div></div></div>';
+  view.innerHTML=h; if(exam&&note>=10) confetti();
+}
+
 /* ---------- formule gratuite / Premium ---------- */
 var TESTER_CODES=['MFC-TESTEUR'];
 function isPrem(){ return !!(st.prem&&st.prem.on); }
@@ -1654,7 +1724,7 @@ function canQuiz(kind,mod){
   paywall('quiz'); return false;
 }
 function paywall(why){
-  var t={lesson:'Tu as déjà commencé ta leçon du jour.',quiz:'Tu as utilisé ton quiz gratuit du jour.',rev:'Tu as utilisé ta révision gratuite du jour.'}[why]||'';
+  var t={prepa:'La Prépa STAPS & BPJEPS complète est réservée à Premium.',lesson:'Tu as déjà commencé ta leçon du jour.',quiz:'Tu as utilisé ton quiz gratuit du jour.',rev:'Tu as utilisé ta révision gratuite du jour.'}[why]||'';
   sheet('<div style="text-align:center"><div style="font-size:44px">👑</div><h2 class="h1" style="font-size:20px;margin-top:6px">'+t+'</h2><p style="color:var(--muted);font-size:14px;line-height:1.55">En version gratuite, tu as <b style="color:var(--ink)">1 leçon, 1 quiz et 1 révision par jour</b>. Les duels et la Course au sommet restent illimités.<br>Reviens demain, ou passe à <b style="color:var(--gold)">MFC Premium</b> pour tout débloquer.</p></div><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px"><button class="btn gold" data-close data-sx="premium">Découvrir Premium '+IC.arrow+'</button><button class="btn ghost" data-close data-sx="toarena">Jouer aux Défis</button><button class="btn ghost" data-close>Revenir demain</button></div>');
 }
 function premiumView(){
@@ -1671,7 +1741,7 @@ function premiumView(){
   }
   // comparatif
   h+='<div class="glass" style="margin-top:22px;padding:6px 16px"><div class="row" style="justify-content:space-between;padding:10px 0;font-size:11px" ><span class="mono" style="color:var(--muted)">CE QUI EST INCLUS</span><span class="mono" style="display:flex;gap:16px"><span style="color:var(--muted);width:52px;text-align:center">GRATUIT</span><span style="color:var(--gold);width:58px;text-align:center">PREMIUM</span></span></div>';
-  [['Leçons','1 / jour','Illimitées'],['Quiz','1 / jour','Illimités'],['Révisions','1 / jour','Illimitées'],['Duels & Course au sommet','Illimités','Illimités'],['Podium & classements','✓','✓'],['Tenues & diplômes de rang','✓','✓'],['Examens & certificats','–','✓ bientôt'],['Récompenses réelles','–','✓ bientôt']].forEach(function(r){ h+='<div class="row" style="justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px"><span style="flex:1">'+r[0]+'</span><span style="display:flex;gap:16px;font-size:12px;text-align:center"><span style="width:52px;color:var(--muted)">'+r[1]+'</span><span style="width:58px;color:var(--gold);font-weight:700">'+r[2]+'</span></span></div>'; });
+  [['Leçons','1 / jour','Illimitées'],['Quiz','1 / jour','Illimités'],['Révisions','1 / jour','Illimitées'],['Duels & Course au sommet','Illimités','Illimités'],['Podium & classements','✓','✓'],['Tenues & diplômes de rang','✓','✓'],['Prépa STAPS L1 & BPJEPS','1 chapitre','✓ + examens blancs'],['Examens & certificats','–','✓ bientôt'],['Récompenses réelles','–','✓ bientôt']].forEach(function(r){ h+='<div class="row" style="justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px"><span style="flex:1">'+r[0]+'</span><span style="display:flex;gap:16px;font-size:12px;text-align:center"><span style="width:52px;color:var(--muted)">'+r[1]+'</span><span style="width:58px;color:var(--gold);font-weight:700">'+r[2]+'</span></span></div>'; });
   h+='</div>';
   // récompenses
   h+='<div class="mono" style="color:var(--muted);margin:24px 0 10px">LES RÉCOMPENSES</div><div style="display:flex;flex-direction:column;gap:10px">';
@@ -1716,7 +1786,7 @@ document.getElementById('app').addEventListener('click',function(e){
   else if(a==='toarena'){ tab='arena'; render(); }
   else if(a==='rqpick') rqPick(+b.dataset.i);
   else if(a==='rqnext'){ if(rq.i<rq.qs.length-1){ rq.i++; rq.picked=null; drawRq(); } else rqEnd(); }
-  else if(a==='rqquit'){ if(confirm('Abandonner ? Ton score actuel sera envoyé.')) rqEnd(); }
+  else if(a==='rqquit'){ if(confirm('Abandonner ? Tes réponses actuelles seront comptées.')) rqEnd(); }
   else if(a==='roomnew'){ if(rm) roomClose(true); roomCreate(); }
   else if(a==='roomjoin') roomJoinSheet();
   else if(a==='rmshare') shareLink(APP_URL+'?salon='+rm.code,'Rejoins ma Course au sommet sur MFC Quiz ! Code du salon : '+rm.code);
@@ -1733,6 +1803,15 @@ document.getElementById('app').addEventListener('click',function(e){
   else if(a==='unfriend'){ if(!confirm('Retirer ce joueur de tes amis ?')) return; rpc('mfc_remove_friend',{p_id:id}).then(function(){ var s5=b.closest('.sheet'); if(s5) s5.remove(); loadArena(); }).catch(sxErr); }
   else if(a==='blocked') blockedSheet();
   else if(a==='premium') premiumView();
+  else if(a==='prepa') prepaView();
+  else if(a==='ppclose'){ tab='home'; render(); }
+  else if(a==='pptrack'){ ppNav.t=b.dataset.v; prepaView(); }
+  else if(a==='ppsub'){ ppNav.s=id; ppSubView(); }
+  else if(a==='ppback') prepaView();
+  else if(a==='ppsubback') ppSubView();
+  else if(a==='ppch') ppOpenCh(id);
+  else if(a==='ppquiz') ppQuiz();
+  else if(a==='ppexam') ppExam();
   else if(a==='premclose'){ tab=tab==='arena'?'arena':(tab||'home'); render(); }
   else if(a==='premwant') premWant(b.dataset.v);
   else if(a==='delacc') deleteSheet();
