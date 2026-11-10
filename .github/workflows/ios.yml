@@ -11,6 +11,9 @@ on:
     branches: [main]
     paths: ["index.html", "*.js", "assets/**", "toon/**", "vendor/**", "capacitor.config.json", "package.json", "scripts/**", ".github/workflows/ios.yml"]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-15
@@ -40,7 +43,10 @@ jobs:
           xcrun simctl launch "$DEV" fr.mathisfelicite.mfcquiz
           sleep 30; xcrun simctl io "$DEV" screenshot capture-1.png
           sleep 10; xcrun simctl io "$DEV" screenshot capture-2.png
-          for f in capture-*.png; do sips -Z 700 "$f" --out "small-$f" >/dev/null; echo "IMG64:$f:$(base64 -i small-$f | tr -d '\n')"; done
+          mkdir -p /tmp/cap && cp capture-*.png /tmp/cap/ && cd /tmp/cap
+          git init -q && git checkout -q -b ci-captures && git add . 
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "captures $GITHUB_SHA"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" ci-captures
       - uses: actions/upload-artifact@v4
         with:
           name: captures-iphone
