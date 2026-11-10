@@ -174,7 +174,7 @@ function build(cfg) {
   [-1, 1].forEach((sg) => {
     const hp = new THREE.Group(); hp.position.set(sg * legX, hipY + 0.02, 0); root.add(hp);
     const th = mesh(taper(thR1, thR2, thighL), longLeg ? botM : skin); hp.add(th);
-    if (m > 0.35) { const q = mesh(new THREE.SphereGeometry(thR1 * (0.55 + 0.3 * m), 20, 14), (longLeg || thighL > 0) ? botM : skin); q.position.set(sg * 0.005, -thighL * 0.4, thR1 * 0.3); q.scale.set(.9, 1.5, .8); hp.add(q); }
+    if (m > 0.35 && O !== 'labo' && O !== 'toge') { const q = mesh(new THREE.SphereGeometry(thR1 * (0.55 + 0.3 * m), 20, 14), (longLeg || thighL > 0) ? botM : skin); q.position.set(sg * 0.005, -thighL * 0.4, thR1 * 0.3); q.scale.set(.9, 1.5, .8); hp.add(q); }
     if (!longLeg) { const sh = mesh(taper(thR1 * 1.05 + m * 0.012, thR1 * 0.96 + m * 0.012, thighL * 0.5), botM); hp.add(sh); }
     const kn = new THREE.Group(); kn.position.y = -thighL; hp.add(kn);
     const shin = mesh(taper(shR1, shR2, shinL), longLeg ? botM : skin); shin.position.z = -0.004; kn.add(shin);
