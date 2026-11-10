@@ -430,6 +430,7 @@ function notifMsg(r){
 
 /* ---------- icônes ---------- */
 var IC = {
+  medal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l-2 6h-4z"/><circle cx="12" cy="15" r="6"/><path d="M12 12.2l.9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2L9.1 14.3l2-.3z"/></svg>',
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
   rev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
   rank:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>',
@@ -458,7 +459,7 @@ function setNav(show){
   if(!show) return;
   var wrong=Object.keys(st.wrong).length;
   nav.className='nav n5';
-  var items=[['home','Apprendre',IC.home],['body','Mon corps',IC.body],['rev','Révisions',IC.rev],['arena','Défis',IC.rank],['me','Profil',IC.user]];
+  var items=[['home','Apprendre',IC.home],['rank','Rangs',IC.medal],['rev','Révisions',IC.rev],['arena','Défis',IC.rank],['me','Profil',IC.user]];
   nav.innerHTML = items.map(function(it){
     return '<button data-tab="'+it[0]+'" class="'+(tab===it[0]?'on':'')+'">'+it[2]+(it[0]==='rev'&&wrong?'<span class="badge">'+wrong+'</span>':'')+it[1]+'</button>';
   }).join('');
@@ -515,7 +516,7 @@ view.addEventListener('click',function(e){
   else if(a==='avme'){ tab='me'; render(); }
   else if(a==='avedit') avatarEditor({back:'avback',kicker:'TON AVATAR',title:'Personnalise ton avatar',cta:'Enregistrer',onDone:function(){ tab=st.onboarded?'me':'home'; render(); toast('✨','Avatar enregistré !',2000); }});
   else if(a==='avback'){ tab='me'; render(); }
-  else if(a==='avwear'){ var o=AV_OUTFITS[+b.dataset.id]; st.avatar=Object.assign(avCfg(),{outfit:o.id,diploma:o.r}); save(); avSnap(function(){ tab='me'; render(); toast(o.e,'<b>'+o.n+'</b> enfilée !',2400); }); }
+  else if(a==='avwear'){ var o=AV_OUTFITS[+b.dataset.id]; st.avatar=Object.assign(avCfg(),{outfit:o.id,diploma:o.r}); save(); var back=tab==='rank'?'rank':'me'; avSnap(function(){ tab=back; render(); toast(o.e,'<b>'+o.n+'</b> enfilée !',2400); }); }
   else if(a==='goal') goalSheet();
   else if(a==='freezeinfo') freezeSheet();
   else if(a==='mod') modView(b.dataset.id);
@@ -945,16 +946,43 @@ function revisions(){
 
 /* ---------- rangs ---------- */
 function ranks(){
-  var rk=rankOf(st.xp);
+  var rk=rankOf(st.xp), cfg=avCfg(), cur=AV_OUTFITS.filter(function(o){ return o.id===cfg.outfit; })[0]||AV_OUTFITS[0];
   var h='<div class="screen"><div class="wrap"><div class="up row" style="justify-content:space-between"><div><div class="mono" style="color:var(--muted)">TA PROGRESSION</div><h1 class="h1" style="margin-top:4px">Rangs</h1></div><span class="chip" style="color:var(--gold)">'+fmt(st.xp)+' XP</span></div>';
-  h+='<div class="glass up d1" style="margin-top:14px;padding:14px 16px;font-size:13px;color:var(--ink2);line-height:1.5">'+IC.bolt.replace('width="20" height="20"','width="16" height="16" style="vertical-align:-3px;color:var(--gold)"')+' 10 XP par bonne réponse · +20 XP pour un sans-faute</div>';
-  h+='<div style="margin-top:14px">';
-  RANKS.forEach(function(r,i){
-    var done=st.xp>=r.xp, cur=i===rk.i;
-    h+='<div class="'+(cur?'goldcard':'glass')+' up d'+Math.min(7,i+2)+'" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:10px;border-radius:18px"><div style="width:42px;height:42px;flex-shrink:0;border-radius:13px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;'+(done?'background:var(--gold);color:#070D1C':'border:1px dashed #3A4A6B;color:var(--muted)')+'">'+(done?IC.check:(r.xp>=1000?(r.xp/1000)+'K':r.xp))+'</div><div style="flex:1"><div style="font-size:15px;font-weight:600'+(done?'':';color:var(--silver)')+'">'+r.n+(cur?' <span class="mono" style="color:var(--gold);font-size:10px">· TOI</span>':'')+'</div><div style="font-size:12px;color:var(--muted)">'+r.r+'</div></div><span class="mono" style="color:var(--muted);font-size:10px">'+fmt(r.xp)+' XP</span></div>';
+  // héros : avatar + rang actuel
+  h+='<div class="goldcard up d1" style="margin-top:14px;padding:0;overflow:hidden"><div class="avstage" id="avstage" style="height:36vh;max-height:340px;border:0;border-radius:0;background:transparent"><div class="avload">Chargement de la 3D…</div></div>';
+  h+='<div style="padding:4px 18px 18px;text-align:center"><div class="mono" style="color:var(--gold);font-size:10px">RANG '+(rk.i+1)+' / '+RANKS.length+'</div><div style="font-family:var(--head);font-size:30px;font-weight:700;margin:4px 0 2px">'+rk.r.n+'</div><div style="font-size:13px;color:var(--muted)">'+cur.e+' '+cur.n+'</div>';
+  if(rk.next){ var pc=Math.round((st.xp-rk.r.xp)/(rk.next.xp-rk.r.xp)*100);
+    h+='<div class="bar" style="margin-top:14px;height:10px"><i style="width:'+pc+'%"></i></div><div class="row" style="justify-content:space-between;margin-top:8px;font-size:12.5px"><span style="color:var(--silver)">Encore <b style="color:var(--gold)">'+fmt(rk.next.xp-st.xp)+' XP</b></span><span class="mono" style="color:var(--muted);font-size:11px">'+fmt(st.xp)+' / '+fmt(rk.next.xp)+'</span></div>'; }
+  else h+='<div style="margin-top:12px;font-size:14px;color:var(--gold);font-weight:700">👑 Rang maximum atteint !</div>';
+  h+='</div></div>';
+  // prochaine récompense
+  if(rk.next){ var no=AV_OUTFITS[rk.i+1];
+    h+='<div class="glass up d2" style="margin-top:14px;padding:14px;display:flex;gap:14px;align-items:center"><div style="position:relative;width:96px;height:106px;flex-shrink:0;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.04)"><img data-rth="'+(rk.i+1)+'" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.55) saturate(.7)"><span style="position:absolute;right:6px;bottom:6px;font-size:18px">🔒</span></div><div style="flex:1"><div class="mono" style="color:var(--gold);font-size:10px">PROCHAINE RÉCOMPENSE · '+rk.next.n.toUpperCase()+'</div><div style="font-size:16px;font-weight:700;margin-top:4px">'+(no?no.e+' '+no.n:'')+'</div><div style="font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.45">'+rk.next.r+'</div></div></div>'; }
+  // parcours des rangs
+  h+='<div class="mono up d3" style="color:var(--muted);margin:22px 0 10px">TOUS LES RANGS</div><div style="display:flex;flex-direction:column;gap:10px">';
+  RANKS.forEach(function(r,i){ var done=st.xp>=r.xp, now=i===rk.i, o=AV_OUTFITS[i], worn=o&&o.id===cfg.outfit;
+    h+='<div class="'+(now?'goldcard':'glass')+' up d'+Math.min(7,i+3)+'" style="display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:20px'+(done?'':';opacity:.8')+'"><div style="position:relative;width:70px;height:78px;flex-shrink:0;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.04)"><img data-rth="'+i+'" alt="" style="width:100%;height:100%;object-fit:cover'+(done?'':';filter:brightness(.45) saturate(.6)')+'">'+(done?'':'<span style="position:absolute;right:4px;bottom:4px;font-size:14px">🔒</span>')+'</div>';
+    h+='<div style="flex:1;min-width:0"><div style="font-size:15.5px;font-weight:700">'+r.n+(now?' <span class="mono" style="color:var(--gold);font-size:10px">· TOI</span>':'')+'</div><div style="font-size:12px;color:var(--muted);line-height:1.4;margin-top:2px">'+r.r+'</div><div class="mono" style="font-size:10px;color:'+(done?'var(--good)':'var(--silver)')+';margin-top:4px">'+(done?'✓ DÉBLOQUÉ':fmt(r.xp)+' XP')+'</div></div>';
+    if(done&&o) h+=worn?'<span class="chip" style="font-size:11px;color:var(--gold)">Portée</span>':'<button class="chip" data-act="avwear" data-id="'+i+'" style="font-size:11px">Porter</button>';
+    h+='</div>'; });
+  h+='</div>';
+  // comment gagner des XP
+  h+='<div class="glass up d7" style="margin-top:22px;padding:16px"><div class="mono" style="color:var(--gold);font-size:10px;margin-bottom:10px">COMMENT GAGNER DES XP</div>';
+  [['✅','Bonne réponse','+10'],['🎯','Quiz sans faute','+20'],['📖','Leçon terminée (1re fois)','+30'],['🌱','Mission du jour','+15'],['⚔️','Duel gagné','+20'],['🏔️','Course au sommet : bonne réponse','+5 à +15'],['🚩','Course au sommet gagnée','+50']].forEach(function(x){ h+='<div class="row" style="justify-content:space-between;padding:6px 0;font-size:13.5px;border-top:1px solid var(--line)"><span>'+x[0]+' '+x[1]+'</span><span class="mono" style="color:var(--gold);font-weight:700;white-space:nowrap">'+x[2]+'</span></div>'; });
+  h+='</div></div></div>'; view.innerHTML=h;
+  withAvatar(function(A){
+    var s=document.getElementById('avstage'); if(!s||tab!=='rank') return;
+    A.mount(s,cfg,{mode:'full',onReady:function(){ var l=s.querySelector('.avload'); if(l) l.remove(); rankThumbs(A,cfg); }});
   });
-  h+='</div><button class="btn ghost up d7" data-sx="toarena">← Retour aux défis</button>';
-  h+='</div></div>'; view.innerHTML=h;
+}
+var RTH={};
+function rankThumbs(A,cfg){
+  var base=JSON.stringify(Object.assign({},cfg,{outfit:'',diploma:0})), todo=[];
+  document.querySelectorAll('img[data-rth]').forEach(function(img){ var i=+img.dataset.rth, k=base+i; if(RTH[k]) img.src=RTH[k]; else if(todo.indexOf(i)<0) todo.push(i); });
+  (function next(){
+    if(!todo.length||tab!=='rank') return; var i=todo.shift(), o=AV_OUTFITS[i]; if(!o) return next();
+    A.snapshot(Object.assign({},cfg,{outfit:o.id,diploma:o.r}),'full',180).then(function(u){ RTH[base+i]=u; document.querySelectorAll('img[data-rth="'+i+'"]').forEach(function(im){ im.src=u; }); next(); }).catch(next);
+  })();
 }
 
 /* ---------- profil ---------- */
