@@ -315,17 +315,4 @@ end $$;
 
 -- ---------- Droits : seules les personnes connectées peuvent appeler les fonctions ----------
 revoke execute on all functions in schema public from public, anon;
-grant execute on function
-  public.mfc_me(text, integer, text, text),
-  public.mfc_board(text, boolean, integer),
-  public.mfc_add_friend(text),
-  public.mfc_remove_friend(uuid),
-  public.mfc_friends(),
-  public.mfc_duel_create(uuid, text, jsonb),
-  public.mfc_duel_play(uuid, integer, integer),
-  public.mfc_duels(),
-  public.mfc_room_create(jsonb),
-  public.mfc_room_get(text, integer),
-  public.mfc_room_join(text),
-  public.mfc_room_act(text, integer, jsonb)
-to authenticated;
+grant execute on all functions in schema public to authenticated;
