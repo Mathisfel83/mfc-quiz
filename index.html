@@ -148,7 +148,7 @@ a{color:var(--gold2);text-decoration:none}
 .notifcard{margin-top:14px;padding:14px 16px;border-radius:20px;border:1px dashed rgba(212,175,55,.5);background:rgba(212,175,55,.06);display:flex;gap:12px;align-items:center;text-align:left;width:100%}
 .avstage{position:relative;height:44vh;min-height:300px;max-height:460px;margin-top:12px;border-radius:26px;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,rgba(212,175,55,.2),rgba(60,110,255,.08) 45%,rgba(5,10,22,0) 72%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));border:1px solid var(--line)}
 .avstage canvas{position:absolute;inset:0}
-.avload{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+.avload{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;z-index:1;pointer-events:none}
 .avhint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:1.2px;color:var(--silver);opacity:.75;pointer-events:none}
 .avquick{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:8px;z-index:2}
 .avquick button{width:40px;height:40px;border-radius:13px;background:rgba(14,22,42,.7);border:1px solid var(--line);font-size:18px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
@@ -608,9 +608,9 @@ function confetti(){
 
 
 /* ---------- avatar 3D ---------- */
-var AV_DEFAULT={sex:'h',frame:1,cm:178,kg:74,mus:45,skin:'#E2AE84',eyes:'#5B3A1E',hair:'court',hairColor:'#2A1A10',beard:'non',top:'tshirt',topColor:'#14233F',bottom:'short',bottomColor:'#0B0F18',shoes:'#F2F2F2',outfit:'base',diploma:0};
+var AV_DEFAULT={sex:'h',frame:1,cm:178,kg:74,mus:45,skin:'#D9A98A',eyes:'#5B3A1E',hair:'court',hairColor:'#2A1A10',beard:'non',top:'tshirt',topColor:'#14233F',bottom:'short',bottomColor:'#0B0F18',shoes:'#F2F2F2',outfit:'base',diploma:0};
 var AV_OUTFITS=[{id:'base',n:'Ma tenue',r:0,d:'Ta tenue personnalisée',e:'👕'},{id:'casquette',n:'Casquette MFC',r:1,d:'Bleu nuit et or, sur ta tenue',e:'🧢'},{id:'or',n:'Survêtement Or',r:2,d:'Noir intégral, bandes dorées',e:'✨'},{id:'labo',n:'Blouse de labo',r:3,d:'Le look du scientifique du sport',e:'🥼'},{id:'toge',n:'Toge de diplômé',r:4,d:'Toge, étole dorée et mortier',e:'🎓'},{id:'legende',n:'Armure de Légende',r:5,d:'Or massif, cape et couronne',e:'👑'}];
-var SKINS=['#F6D7C3','#F1C9A5','#E2AE84','#D29A6B','#C68B5E','#A9714A','#8D5A3B','#6B4128','#4E2E1C','#3A2215'];
+var SKINS=['#F0CDB4','#E8B996','#D9A98A','#CB9470','#B98058','#A06A45','#855434','#6B4128','#523020','#3C2216'];
 var EYES=[['#5B3A1E','Marron'],['#7A5230','Noisette'],['#B07A2E','Ambre'],['#3F7A3A','Vert'],['#2E6FB0','Bleu'],['#7F8C99','Gris'],['#1A120C','Noir']];
 var HAIRC=['#1A120C','#2A1A10','#5A3A22','#8B5A2B','#C8873A','#E6C27A','#A0401E','#9C9C9C','#EDEDED','#3D6BFF','#E05A9C'];
 var CLOTH=['#14233F','#0B0F18','#F2F2F2','#D4AF37','#8E1020','#2F6B3F','#4F8BFF','#E05A5A','#9AA4B5','#F08C5A','#7A4FD6'];
@@ -621,8 +621,10 @@ function avCfg(){ return Object.assign({},AV_DEFAULT,st.avatar||{}); }
 function avImg(kind){ try{ return localStorage.getItem('mfcq_av_'+kind)||''; }catch(e){ return ''; } }
 function avSnap(cb){
   withAvatar(function(A){
-    try{ var c=avCfg(); localStorage.setItem('mfcq_av_face',A.snapshot(c,'portrait',180)); localStorage.setItem('mfcq_av_full',A.snapshot(c,'full',360)); }catch(e){}
-    if(cb) cb();
+    var c=avCfg();
+    A.snapshot(c,'portrait',200).then(function(u){ try{ localStorage.setItem('mfcq_av_face',u); }catch(e){} return A.snapshot(c,'full',360); })
+     .then(function(u){ try{ localStorage.setItem('mfcq_av_full',u); }catch(e){} if(cb) cb(); })
+     .catch(function(){ if(cb) cb(); });
   });
 }
 function musWord(v){ return v<20?'Fin':v<45?'Tonique':v<70?'Athlétique':v<88?'Musclé':'Bodybuilder'; }
@@ -638,7 +640,7 @@ function avatarEditor(o){
   h+='</div></div><div class="avcta"><button class="btn gold" data-ed="done">'+(o.cta||'Valider mon avatar')+' '+IC.arrow+'</button></div>';
   view.innerHTML=h; setNav(false);
   edTabs(); edPanel();
-  withAvatar(function(A){ var s=document.getElementById('avstage'); if(!s||!ed) return; var l=s.querySelector('.avload'); if(l) l.remove(); A.mount(s,ed.cfg,{mode:'full'}); });
+  withAvatar(function(A){ var s=document.getElementById('avstage'); if(!s||!ed) return; A.mount(s,ed.cfg,{mode:'full',onReady:function(){ var l=s.querySelector('.avload'); if(l) l.remove(); }}); });
 }
 function edTabs(){
   var T=[['corps','Corps'],['peau','Peau'],['visage','Visage'],['cheveux','Cheveux'],['haut','Haut'],['bas','Bas'],['tenues','Tenues 🏆']];
@@ -665,7 +667,7 @@ function edPanel(){
     h+=lab('COIFFURE')+'<div class="grid2">'+HAIRS.map(function(x){ return '<button data-ed="set" data-k="hair" data-v="'+x[0]+'" class="'+(c.hair===x[0]?'on':'')+'">'+x[1]+'</button>'; }).join('')+'</div>';
     h+=lab('COULEUR')+sw('hairColor',HAIRC);
   } else if(ed.tab==='haut'){
-    h+=lab('STYLE')+seg('top',[['tshirt','T-shirt'],['debardeur','Débardeur'],['sweat','Sweat']]);
+    h+=lab('STYLE')+seg('top',c.sex==='f'?[['tshirt','T-shirt'],['debardeur','Débardeur'],['brassiere','Brassière'],['sweat','Sweat']]:[['tshirt','T-shirt'],['debardeur','Débardeur'],['sweat','Sweat']]);
     h+=lab('COULEUR')+sw('topColor',CLOTH);
     if(c.outfit!=='base'&&c.outfit!=='casquette') h+='<div class="avnote">Ta tenue de rang est équipée : repasse sur « Ma tenue » dans l’onglet Tenues pour voir ces réglages.</div>';
   } else if(ed.tab==='bas'){
@@ -691,7 +693,7 @@ function edAct(b){
   if(a==='locked'){ var r=RANKS[+b.dataset.v]; toast('🔒','Débloqué au rang <b>'+r.n+'</b> : encore '+fmt(Math.max(0,r.xp-st.xp))+' XP.',2600); return; }
   if(a==='set'){
     var k=b.dataset.k, v=b.dataset.v; if(k==='frame'||k==='diploma') v=+v;
-    ed.cfg[k]=v; if(k==='sex'&&v==='f') ed.cfg.beard='non';
+    ed.cfg[k]=v; if(k==='sex'&&v==='f') ed.cfg.beard='non'; if(k==='sex'&&v==='h'&&ed.cfg.top==='brassiere') ed.cfg.top='debardeur';
     if(A){ A.update(ed.cfg); if(k==='outfit') A.anim('cheer',1400); if(k==='sex'||k==='frame') A.anim('flex',1200); if(k==='hair'||k==='hairColor'||k==='beard'||k==='eyes') A.anim('wave',1200); }
     edPanel(); return;
   }
@@ -705,9 +707,9 @@ view.addEventListener('input',function(e){
   var k=r.dataset.k; ed.cfg[k]=+r.value;
   var id=k==='cm'?'lv_TAILLE':k==='kg'?'lv_POIDS':'lv_MUSCULATURE', el=document.getElementById(id);
   if(el) el.textContent=k==='cm'?r.value+' cm':k==='kg'?r.value+' kg':musWord(+r.value);
-  if(window.MFCAvatar) window.MFCAvatar.update(ed.cfg);
+  if(window.MFCAvatar) window.MFCAvatar.update(ed.cfg,true);
 });
-view.addEventListener('change',function(e){ var r=e.target.closest('[data-ed=range]'); if(r&&r.dataset.k==='mus'&&window.MFCAvatar) window.MFCAvatar.anim('flex',1600); });
+view.addEventListener('change',function(e){ var r=e.target.closest('[data-ed=range]'); if(!r||!ed||!window.MFCAvatar) return; window.MFCAvatar.update(ed.cfg); if(r.dataset.k==='mus') window.MFCAvatar.anim('flex',1800); });
 view.addEventListener('click',function(e){ var b=e.target.closest('[data-ed]'); if(!b||!ed||b.tagName==='INPUT') return; edAct(b); });
 function avatarCard(){
   var img=avImg('face');
@@ -873,7 +875,7 @@ function profile(){
   h+='<button data-act="reset" class="row" style="width:100%;justify-content:space-between;font-size:15px;color:var(--bad)"><span>Effacer ma progression</span></button>';
   h+='</div><div style="text-align:center;margin-top:22px"><img src="assets/logo-full.png" alt="MFC – Mathis Félicité Coaching" style="width:170px;opacity:.85"><div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5">Contenu éducatif, ne remplace pas l’avis d’un médecin.<br>Ta progression est enregistrée sur ce téléphone.</div></div>';
   h+='</div></div>'; view.innerHTML=h;
-  withAvatar(function(A){ var s=document.getElementById('avstage'); if(!s||tab!=='me') return; var l=s.querySelector('.avload'); if(l) l.remove(); A.mount(s,avCfg(),{mode:'full'}); });
+  withAvatar(function(A){ var s=document.getElementById('avstage'); if(!s||tab!=='me') return; A.mount(s,avCfg(),{mode:'full',onReady:function(){ var l=s.querySelector('.avload'); if(l) l.remove(); }}); });
 }
 function sheet(inner){
   var s=document.createElement('div'); s.className='sheet'; s.innerHTML='<div>'+inner+'</div>';

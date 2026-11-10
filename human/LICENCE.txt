@@ -1,0 +1,2 @@
+Modèle humain, cibles de morphologie, squelette, poids et yeux : MakeHuman (makehumancommunity/makehuman), licence CC0 1.0.
+https://github.com/makehumancommunity/makehuman — LICENSE.ASSETS.md
