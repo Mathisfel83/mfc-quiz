@@ -108,6 +108,48 @@ a{color:var(--gold2);text-decoration:none}
 .list>*{padding:12px 0;border-bottom:1px solid rgba(201,206,214,.08)}
 .list>*:last-child{border-bottom:0}
 .wrap{max-width:520px;margin:0 auto}
+.nav.n5{grid-template-columns:repeat(5,1fr)}
+.nav.n5 button{font-size:10px}
+.toast{position:absolute;left:16px;right:16px;top:calc(var(--sat) + 12px);z-index:40;padding:14px 16px;border-radius:18px;background:rgba(14,22,42,.95);border:1px solid rgba(212,175,55,.5);box-shadow:0 12px 40px rgba(0,0,0,.55);font-size:14px;line-height:1.45;display:flex;gap:12px;align-items:center;animation:toastIn .45s cubic-bezier(.2,.8,.2,1) both;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.toast.out{animation:toastOut .35s ease both}
+.toast .ti{font-size:24px;flex-shrink:0}
+.choice{display:flex;align-items:center;gap:14px;width:100%;padding:14px 16px;border-radius:20px;background:var(--glass);border:1px solid rgba(201,206,214,.16);text-align:left;margin-bottom:10px;transition:border-color .2s,background .2s,box-shadow .2s}
+.choice.on{border-color:var(--gold);background:rgba(212,175,55,.12);box-shadow:0 0 26px rgba(212,175,55,.22)}
+.choice .ic{width:46px;height:46px;flex-shrink:0;border-radius:15px;background:rgba(212,175,55,.14);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px}
+.choice .ic svg{width:22px;height:22px}
+.choice b{display:block;font-size:15.5px}
+.choice small{display:block;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.38}
+.choice .tick{margin-left:auto;width:24px;height:24px;flex-shrink:0;border-radius:50%;border:1.5px solid rgba(201,206,214,.3);display:flex;align-items:center;justify-content:center;color:#070D1C}
+.choice.on .tick{background:var(--gold);border-color:var(--gold)}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:7px;height:7px;border-radius:4px;background:rgba(201,206,214,.25);transition:width .3s,background .3s}
+.dots i.on{width:22px;background:var(--gold)}
+.times{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.times button{height:46px;border-radius:14px;background:var(--glass);border:1px solid var(--line);font-family:var(--mono);font-weight:700;font-size:14px;color:var(--silver)}
+.times button.on{background:var(--gold);color:#070D1C;border-color:var(--gold);box-shadow:0 0 18px rgba(212,175,55,.4)}
+.field{display:block;width:100%;height:54px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);font:inherit;font-size:17px;padding:0 16px}
+.field:focus{outline:none;border-color:var(--gold)}
+.mission{position:relative;margin-top:14px;padding:16px;border-radius:24px;background:linear-gradient(140deg,rgba(110,200,150,.16),rgba(110,200,150,.03) 60%);border:1px solid rgba(110,200,150,.42)}
+.mission.done{background:linear-gradient(140deg,rgba(110,200,150,.24),rgba(110,200,150,.06) 60%)}
+.mission .why{font-size:13px;line-height:1.5;color:var(--ink2);margin-top:8px}
+.mission .src2{display:block;font-size:11.5px;color:var(--muted);margin-top:6px}
+.mbtns{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px}
+.mbtn{height:46px;border-radius:15px;font-weight:700;font-size:14.5px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 14px}
+.mbtn.go{background:var(--good);color:#06140C}
+.mbtn.alt{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--silver);font-weight:600;font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:1px;background:rgba(212,175,55,.18);color:var(--gold)}
+.bodysvg{width:100%;max-width:400px;display:block;margin:0 auto;overflow:visible}
+.bodysvg .zone{cursor:pointer}
+.bodysvg .zone .g{opacity:var(--p);transition:opacity .6s}
+.bodysvg .zone.rec .g{animation:zp 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.bodysvg .lbl{font-family:Inter,system-ui,sans-serif;font-size:10.5px;fill:#C9CED6}
+.bodysvg .pct{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;fill:#D4AF37}
+.bodysvg .scan{animation:scan 4s ease-in-out infinite}
+.notifcard{margin-top:14px;padding:14px 16px;border-radius:20px;border:1px dashed rgba(212,175,55,.5);background:rgba(212,175,55,.06);display:flex;gap:12px;align-items:center;text-align:left;width:100%}
+@keyframes toastIn{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-24px)}}
+@keyframes zp{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+@keyframes scan{0%{transform:translateY(0);opacity:0}15%{opacity:.8}85%{opacity:.8}100%{transform:translateY(330px);opacity:0}}
 @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40px,40px) scale(1.15)}}
 @keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
@@ -156,6 +198,7 @@ a{color:var(--gold2);text-decoration:none}
 <script src="questions-lot4.js"></script>
 <script src="questions-lot5.js"></script>
 <script src="questions-lot6.js"></script>
+<script src="missions.js"></script>
 <script>
 (function(){
 'use strict';
@@ -173,15 +216,17 @@ var PER_QUIZ = 5, XP_RIGHT = 10, XP_PERFECT = 20;
 
 /* ---------- sauvegarde locale ---------- */
 var KEY='mfcq_v1';
-function blank(){ return {xp:0,answered:0,correct:0,mastered:{},wrong:{},days:[],best:0,name:'',quizzes:0,lastDaily:''}; }
+function blank(){ return {xp:0,answered:0,correct:0,mastered:{},wrong:{},days:[],best:0,name:'',quizzes:0,lastDaily:'',onboarded:0,goal:'',level:'',freezes:0,frozen:[],mission:null,missionLog:{},missionsDone:0,notif:{on:0,time:'08:00',key:''}}; }
 var st;
 try{ st = JSON.parse(localStorage.getItem(KEY)) || blank(); }catch(e){ st = blank(); }
 var b0=blank(); for(var k in b0){ if(st[k]===undefined) st[k]=b0[k]; }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
 
 function today(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function dkey(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function activeSet(){ var set={}; st.days.concat(st.frozen||[]).forEach(function(d){set[d]=1;}); return set; }
 function streak(){
-  var set={}; st.days.forEach(function(d){set[d]=1;});
+  var set=activeSet();
   var n=0, d=new Date();
   if(!set[today()]){ d.setDate(d.getDate()-1); }
   while(true){ var k=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); if(set[k]){n++; d.setDate(d.getDate()-1);} else break; }
@@ -192,6 +237,155 @@ function modProgress(id){ var qs=Q.filter(function(q){return q.m===id;}); var m=
 function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 function fmt(n){ return n.toLocaleString('fr-FR'); }
 function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+
+/* ---------- objectifs & personnalisation ---------- */
+var GOALS = {
+  perte:  {n:'Perdre du gras', e:'🔥', d:'Déficit calorique, alimentation, sommeil : ce qui marche vraiment', w:{nutrition:3,sommeil:2,sante:2,cardio:1.5,recup:1.3,muscle:1.5}, tags:['deficit','prot','sante']},
+  muscle: {n:'Prendre du muscle', e:'💪', d:'Hypertrophie, protéines, récupération, programmation', w:{muscle:3,nutrition:2.5,recup:2,sommeil:1.6,sante:1,cardio:0.8}, tags:['hyper','prot']},
+  endu:   {n:'Progresser en endurance', e:'🏃', d:'Course, vélo, trail : cœur, glucides, blessures', w:{cardio:3,nutrition:2,recup:2,sommeil:1.6,muscle:1,sante:1}, tags:['endu']},
+  physio: {n:'Comprendre mon corps', e:'🧠', d:'Déjà sportif : ce qui se passe à l’intérieur quand tu t’entraînes', w:{muscle:2,cardio:2,recup:2,nutrition:1.6,sommeil:1.6,sante:1}, tags:['physio']},
+  sante:  {n:'Être en forme et en santé', e:'🌿', d:'Bouger, bien dormir, bien manger, vivre longtemps', w:{sante:3,sommeil:2,cardio:2,nutrition:2,muscle:1.5,recup:1}, tags:['sante']}
+};
+var LEVELS = {
+  debut:    {n:'Je débute', d:'Peu ou pas de sport pour l’instant', e:'🌱'},
+  regulier: {n:'Je m’entraîne de temps en temps', d:'1 à 2 séances par semaine', e:'⚡'},
+  confirme: {n:'Je m’entraîne régulièrement', d:'3 séances ou plus, je veux aller plus loin', e:'🏆'}
+};
+var TAGS = {
+  physio:/VO2|lactate|noyau|fibre|glycog|hormone|mitochond|\bMETs?\b|oxyd|ATP|synthèse|mélatonine|cortisol|testost|insuline|ghréline|leptine|inflamm|carnosine|tendon|hypertroph|myonucl/i,
+  deficit:/déficit|calori|perte de (poids|graisse)|perdre|maigr|régime|graisse|satiét|kcal|ultra-transf/i,
+  prot:/protéine/i,
+  hyper:/hypertroph|prise de muscle|masse musculaire|séries|répétition|charge|force/i,
+  endu:/course|coureur|marathon|endurance|vélo|cardio|VO2|footing|fractionn|glucides/i,
+  sante:/mortalit|risque|diabète|dépress|anxi|osseu|cancer|santé|sédentar|pas par jour|OMS/i
+};
+function weightOf(q){
+  var g=GOALS[st.goal]; if(!g) return 1;
+  var w=g.w[q.m]||1, txt=q.q+' '+q.e, bonus=0;
+  g.tags.forEach(function(t){ if(TAGS[t].test(txt)) bonus+=1; });
+  if(st.level==='confirme' && TAGS.physio.test(txt)) bonus+=0.6;
+  if(st.level==='debut' && TAGS.sante.test(txt)) bonus+=0.4;
+  return w*(1+Math.min(bonus,2)*1.2);
+}
+function wpick(pool,n,cap,per){
+  var out=[], p=pool.slice(); per=per||{};
+  while(out.length<n && p.length){
+    var tot=0, ws=p.map(function(q){ var w=(per[q.m]>=cap)?0.001:weightOf(q); tot+=w; return w; });
+    var r=Math.random()*tot, i=0; for(;i<p.length-1;i++){ r-=ws[i]; if(r<=0) break; }
+    out.push(p[i]); per[p[i].m]=(per[p[i].m]||0)+1; p.splice(i,1);
+  }
+  return out;
+}
+function goalMods(){ var g=GOALS[st.goal]; if(!g) return []; return Object.keys(g.w).sort(function(a,b){return g.w[b]-g.w[a];}).slice(0,2); }
+
+/* ---------- missions du jour ---------- */
+var MI = window.MFC_MISSIONS||[], MIBY={}; MI.forEach(function(m){ MIBY[m.id]=m; });
+function chooseMission(exclude){
+  var recent={}, d=new Date();
+  for(var i=0;i<6;i++){ var k=dkey(d); if(st.missionLog[k]) recent[st.missionLog[k]]=1; d.setDate(d.getDate()-1); }
+  var pool=MI.filter(function(m){ return m.id!==exclude && !recent[m.id] && !(m.lv&&m.lv.indexOf(st.level)>=0); });
+  if(!pool.length) pool=MI.filter(function(m){ return m.id!==exclude; });
+  var tot=0, ws=pool.map(function(m){ var w=(m.g.indexOf(st.goal)>=0?(m.g[0]===st.goal?4:3):1); tot+=w; return w; });
+  var r=Math.random()*tot, i=0; for(;i<pool.length-1;i++){ r-=ws[i]; if(r<=0) break; }
+  return pool[i];
+}
+function todayMission(){
+  if(!MI.length) return null;
+  if(!st.mission || st.mission.d!==today() || !MIBY[st.mission.id]){
+    var m=chooseMission(); st.mission={d:today(),id:m.id,done:0,swap:0}; st.missionLog[today()]=m.id;
+    var ks=Object.keys(st.missionLog); if(ks.length>40) delete st.missionLog[ks[0]];
+    save();
+  }
+  return MIBY[st.mission.id];
+}
+function missionHTML(cls){
+  var m=todayMission(); if(!m) return '';
+  var done=st.mission.done, src=S[m.s];
+  var h='<div class="mission '+(done?'done ':'')+(cls||'')+'"><div class="row" style="justify-content:space-between"><span class="mono" style="color:var(--good);font-size:10px">MISSION DU JOUR · +15 XP</span>'+(done?'<span class="pill" style="background:rgba(110,200,150,.2);color:var(--good)">ACCOMPLIE ✓</span>':'')+'</div>';
+  h+='<div style="font-size:16px;font-weight:700;line-height:1.35;margin-top:6px">'+esc(m.t)+'</div>';
+  h+='<div class="why"><b style="color:var(--good)">Pourquoi ?</b> '+esc(m.w)+'</div>';
+  if(src) h+='<a class="src2" href="'+src.u+'" target="_blank" rel="noopener">Source : '+esc((src.t.match(/^.*?\(\d{4}\)/)||[src.t.split('.')[0]])[0])+' '+IC.ext+'</a>';
+  if(!done) h+='<div class="mbtns"><button class="mbtn go" data-act="mdone">'+IC.check+' C’est fait</button>'+(st.mission.swap?'':'<button class="mbtn alt" data-act="mswap">Autre mission</button>')+'</div>';
+  h+='</div>';
+  return h;
+}
+
+/* ---------- série & gels ---------- */
+function recordDay(){
+  var was=!!activeSet()[today()];
+  if(st.days.indexOf(today())<0) st.days.push(today());
+  if(st.days.length>400) st.days=st.days.slice(-400);
+  var sk=streak(); if(sk>st.best) st.best=sk;
+  if(!was && sk>0 && sk%7===0 && st.freezes<2){ st.freezes++; save(); return true; }
+  save(); return false;
+}
+function checkFreeze(){
+  var set=activeSet(); if(set[today()]) return;
+  var d=new Date(); d.setDate(d.getDate()-1); var gap=[];
+  while(!set[dkey(d)] && gap.length<4){ gap.push(dkey(d)); d.setDate(d.getDate()-1); }
+  if(!gap.length || !set[dkey(d)]) return;
+  if(gap.length<=st.freezes){
+    st.freezes-=gap.length; st.frozen=(st.frozen||[]).concat(gap).slice(-60); save();
+    setTimeout(function(){ toast('🧊','<b>'+(gap.length>1?'Tes gels de série ont':'Ton gel de série a')+' sauvé ta série !</b><br>'+streak()+' jours, toujours en vie. Fais ton quiz aujourd’hui pour la prolonger.'); },900);
+  }
+}
+function toast(icon,html,ms){
+  var old=document.querySelector('.toast'); if(old) old.remove();
+  var t=document.createElement('div'); t.className='toast'; t.innerHTML='<span class="ti">'+icon+'</span><div>'+html+'</div>';
+  t.addEventListener('click',function(){ t.remove(); });
+  document.getElementById('app').appendChild(t);
+  setTimeout(function(){ t.classList.add('out'); setTimeout(function(){ t.remove(); },400); }, ms||4200);
+}
+
+/* ---------- notifications ---------- */
+var VAPID='BAs9xJaFQqybnKXO8GCvswUKS4pced8EZ_f2eLLfNRA2_r1_28W2plEntFd4TGQ5vkmpO9vkAkHzhd9Ji9hUfbY', PUSH_API='';
+function isStandalone(){ return window.navigator.standalone===true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches); }
+function pushOK(){ return ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window); }
+function b64u(s){ var pad='='.repeat((4-s.length%4)%4), b=atob((s+pad).replace(/-/g,'+').replace(/_/g,'/')), a=new Uint8Array(b.length); for(var i=0;i<b.length;i++) a[i]=b.charCodeAt(i); return a; }
+function fmtTime(t){ var p=t.split(':'); return (+p[0])+'h'+(p[1]==='00'?'':p[1]); }
+function syncPush(sub){
+  if(!PUSH_API || !sub) return;
+  try{ fetch(PUSH_API+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sub:sub.toJSON?sub.toJSON():sub,time:st.notif.time,tz:Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Paris',name:st.name||''})}).catch(function(){}); }catch(e){}
+}
+function subscribe(reg){
+  return reg.pushManager.getSubscription().then(function(s){
+    if(s && st.notif.key===VAPID) return s;
+    return (s?s.unsubscribe():Promise.resolve()).then(function(){ return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID)}); });
+  });
+}
+function enableNotif(time,cb){
+  st.notif.time=time; save();
+  if(!pushOK()){ cb(isStandalone()?'unsupported':'install'); return; }
+  var ask=Notification.requestPermission(function(){});
+  Promise.resolve(ask).then(function(p){
+    p=p||Notification.permission;
+    if(p!=='granted'){ st.notif.on=0; save(); cb('denied'); return; }
+    st.notif.on=1; save();
+    navigator.serviceWorker.ready.then(function(reg){
+      reg.showNotification('Rappel activé ✅',{body:'Rendez-vous chaque jour à '+fmtTime(time)+' pour tes 2 minutes de quiz.',icon:'assets/icon-192.png',badge:'assets/icon-192.png',tag:'mfc-welcome'});
+      return subscribe(reg).then(function(sub){ st.notif.key=VAPID; save(); syncPush(sub); });
+    }).catch(function(){});
+    cb('ok');
+  });
+}
+function disableNotif(){
+  st.notif.on=0; save();
+  if(!pushOK()) return;
+  navigator.serviceWorker.ready.then(function(reg){ return reg.pushManager.getSubscription(); }).then(function(s){
+    if(!s) return; if(PUSH_API) fetch(PUSH_API+'/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:s.endpoint})}).catch(function(){}); s.unsubscribe();
+  }).catch(function(){});
+}
+function refreshPush(){
+  if(!st.notif.on || !pushOK() || Notification.permission!=='granted') return;
+  navigator.serviceWorker.ready.then(function(reg){ return subscribe(reg); }).then(function(sub){ st.notif.key=VAPID; save(); syncPush(sub); }).catch(function(){});
+}
+function notifMsg(r){
+  if(r==='install') return 'Pour recevoir les rappels, installe d’abord MFC Quiz sur ton écran d’accueil (Safari → Partager → « Sur l’écran d’accueil »), puis active-les depuis l’app.';
+  if(r==='denied') return 'Notifications refusées. Pour les activer : Réglages iPhone → Notifications → MFC Quiz.';
+  if(r==='unsupported') return 'Ton téléphone ne prend pas en charge les notifications web. Mets à jour iOS (16.4 minimum).';
+  return '';
+}
 
 /* ---------- icônes ---------- */
 var IC = {
@@ -210,6 +404,9 @@ var IC = {
   food:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-3-3-8-1-8 4 0 6 4 10 8 10s8-4 8-10c0-5-5-7-8-4z"/><path d="M12 7c0-2 1-4 3-5"/></svg>',
   moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
   recup:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 22v-6M4.9 4.9l4.2 4.2M19.1 19.1l-4.2-4.2M2 12h6M22 12h-6M4.9 19.1l4.2-4.2M19.1 4.9l-4.2 4.2"/></svg>',
+  body:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.5"/><path d="M5 9l7 1.5L19 9M12 10.5V15M12 15l-3 6.5M12 15l3 6.5"/></svg>',
+  bell:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>',
+  back:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
   pulse:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>'
 };
 
@@ -219,7 +416,8 @@ function setNav(show){
   nav.style.display = show ? 'grid' : 'none';
   if(!show) return;
   var wrong=Object.keys(st.wrong).length;
-  var items=[['home','Apprendre',IC.home],['rev','Révisions',IC.rev],['rank','Rangs',IC.rank],['me','Profil',IC.user]];
+  nav.className='nav n5';
+  var items=[['home','Apprendre',IC.home],['body','Mon corps',IC.body],['rev','Révisions',IC.rev],['rank','Rangs',IC.rank],['me','Profil',IC.user]];
   nav.innerHTML = items.map(function(it){
     return '<button data-tab="'+it[0]+'" class="'+(tab===it[0]?'on':'')+'">'+it[2]+(it[0]==='rev'&&wrong?'<span class="badge">'+wrong+'</span>':'')+it[1]+'</button>';
   }).join('');
@@ -227,22 +425,25 @@ function setNav(show){
 nav.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; tab=b.dataset.tab; render(); });
 function render(){
   quiz=null;
-  if(tab==='home') home(); else if(tab==='rev') revisions(); else if(tab==='rank') ranks(); else profile();
+  if(tab==='home') home(); else if(tab==='body') bodyView(); else if(tab==='rev') revisions(); else if(tab==='rank') ranks(); else profile();
   setNav(true);
 }
 
 /* ---------- accueil ---------- */
 function home(){
-  var rk=rankOf(st.xp), sk=streak(), next=rk.next;
+  var rk=rankOf(st.xp), sk=streak(), next=rk.next, g=GOALS[st.goal], gm=goalMods();
   var pct = next ? Math.min(100,Math.round((st.xp-rk.r.xp)/(next.xp-rk.r.xp)*100)) : 100;
   var dailyDone = st.lastDaily===today();
   var h='<div class="screen"><div class="wrap">';
-  h+='<div class="row up" style="justify-content:space-between;margin-bottom:16px"><div class="row"><div class="glass" style="width:56px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center"><img src="assets/logo-mark.png" alt="MFC" style="width:42px"></div><div><div class="mono" style="color:var(--muted)">CULTIVE TON CORPS</div><div style="font-family:var(--head);font-weight:600;font-size:17px">'+(st.name?'Salut '+esc(st.name):'MFC Quiz')+'</div></div></div><span class="chip">'+IC.flame+sk+'</span></div>';
+  h+='<div class="row up" style="justify-content:space-between;margin-bottom:16px"><div class="row"><div class="glass" style="width:56px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center"><img src="assets/logo-mark.png" alt="MFC" style="width:42px"></div><div><div class="mono" style="color:var(--muted)">'+(g?esc(g.n.toUpperCase()):'CULTIVE TON CORPS')+'</div><div style="font-family:var(--head);font-weight:600;font-size:17px">'+(st.name?'Salut '+esc(st.name):'MFC Quiz')+'</div></div></div><div class="row" style="gap:6px">'+(st.freezes?'<span class="chip" data-act="freezeinfo" style="padding:7px 9px">🧊'+st.freezes+'</span>':'')+'<span class="chip" data-act="freezeinfo">'+IC.flame+sk+'</span></div></div>';
   h+='<div class="goldcard up d1" style="padding:16px;display:flex;flex-direction:column;gap:10px"><div class="row" style="justify-content:space-between"><div><div class="mono" style="color:var(--silver);font-size:10px">TON RANG</div><div style="font-family:var(--head);font-size:21px;font-weight:600">'+rk.r.n+'</div></div><div style="font-family:var(--mono);font-weight:700;font-size:18px;color:var(--gold);text-shadow:0 0 18px rgba(212,175,55,.45)">'+fmt(st.xp)+' XP</div></div><div class="bar"><i style="width:'+pct+'%"></i></div><div style="font-size:13px;color:var(--ink2)">'+(next?'Encore <b style="color:var(--gold)">'+fmt(next.xp-st.xp)+' XP</b> pour devenir <b>'+next.n+'</b>':'Rang maximum atteint !')+'</div></div>';
-  h+='<button class="up d2" data-act="daily" style="margin-top:14px;width:100%;text-align:left;padding:18px;border-radius:24px;background:linear-gradient(140deg,rgba(60,110,255,.22),rgba(60,110,255,.04) 60%);border:1px solid rgba(110,150,255,.45);display:flex;align-items:center;gap:14px"><div style="width:48px;height:48px;border-radius:16px;background:var(--gold);color:#070D1C;display:flex;align-items:center;justify-content:center;flex-shrink:0;'+(dailyDone?'':'animation:pulse 1.8s ease-out infinite')+'">'+IC.bolt+'</div><div style="flex:1"><div class="mono" style="color:#9DB8FF">DÉFI DU JOUR · 5 QUESTIONS</div><div style="font-size:16px;font-weight:700;margin-top:2px">'+(dailyDone?'Défi réussi aujourd’hui ✓':'Mélange de tous les thèmes')+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">'+(dailyDone?'Tu peux le refaire pour t’entraîner':'Garde ta série de jours en vie')+'</div></div>'+IC.arrow+'</button>';
+  h+='<button class="up d2" data-act="daily" style="margin-top:14px;width:100%;text-align:left;padding:18px;border-radius:24px;background:linear-gradient(140deg,rgba(60,110,255,.22),rgba(60,110,255,.04) 60%);border:1px solid rgba(110,150,255,.45);display:flex;align-items:center;gap:14px"><div style="width:48px;height:48px;border-radius:16px;background:var(--gold);color:#070D1C;display:flex;align-items:center;justify-content:center;flex-shrink:0;'+(dailyDone?'':'animation:pulse 1.8s ease-out infinite')+'">'+IC.bolt+'</div><div style="flex:1"><div class="mono" style="color:#9DB8FF">DÉFI DU JOUR · 5 QUESTIONS</div><div style="font-size:16px;font-weight:700;margin-top:2px">'+(dailyDone?'Défi réussi aujourd’hui ✓':(g?'Adapté à ton objectif '+g.e:'Mélange de tous les thèmes'))+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">'+(dailyDone?'Refais-en un pour t’entraîner':(sk?'Garde ta série de '+sk+' jour'+(sk>1?'s':'')+' en vie':'Lance ta série de jours'))+'</div></div>'+IC.arrow+'</button>';
+  h+='<div class="up d3">'+missionHTML()+'</div>';
+  if(!st.notif.on && isStandalone() && pushOK()) h+='<button class="notifcard up d3" data-act="notif"><div style="color:var(--gold)">'+IC.bell+'</div><div style="flex:1"><div style="font-size:14px;font-weight:700">Active ton rappel du matin</div><div style="font-size:12px;color:var(--muted);margin-top:2px">2 minutes de quiz pour démarrer la journée</div></div>'+IC.arrow+'</button>';
   h+='<div class="mono up d3" style="color:var(--muted);margin:22px 0 10px">LES THÈMES</div><div class="mods">';
-  M.forEach(function(m,i){ var p=modProgress(m.id);
-    h+='<button class="mod glass up d'+Math.min(7,i+3)+'" data-act="mod" data-id="'+m.id+'"><div class="ic">'+IC[m.icon]+'</div><b>'+m.name+'</b><small>'+m.desc+'</small><div class="mono" style="color:var(--muted);font-size:10px">'+p.m+'/'+p.t+' MAÎTRISÉES</div><div class="bar"><i style="width:'+p.p+'%"></i></div></button>';
+  var mods=M.slice(); if(g) mods.sort(function(a,b){ return (g.w[b.id]||1)-(g.w[a.id]||1); });
+  mods.forEach(function(m,i){ var p=modProgress(m.id), rec=gm.indexOf(m.id)>=0;
+    h+='<button class="mod glass up d'+Math.min(7,i+3)+'" data-act="mod" data-id="'+m.id+'"'+(rec?' style="border-color:rgba(212,175,55,.45)"':'')+'><div class="row" style="justify-content:space-between;align-items:flex-start"><div class="ic">'+IC[m.icon]+'</div>'+(rec?'<span class="pill">POUR TOI</span>':'')+'</div><b>'+m.name+'</b><small>'+m.desc+'</small><div class="mono" style="color:var(--muted);font-size:10px">'+p.m+'/'+p.t+' MAÎTRISÉES</div><div class="bar"><i style="width:'+p.p+'%"></i></div></button>';
   });
   h+='</div><div style="margin-top:18px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5">'+Q.length+' questions, toutes reliées à une source scientifique.<br>De nouvelles questions arrivent régulièrement.</div>';
   h+='</div></div>';
@@ -251,7 +452,13 @@ function home(){
 view.addEventListener('click',function(e){
   var b=e.target.closest('[data-act]'); if(!b) return;
   var a=b.dataset.act;
+  if(a.indexOf('ob')===0 && ob){ obAct(a,b.dataset.id); return; }
   if(a==='daily') startQuiz('daily');
+  else if(a==='mdone') missionDone();
+  else if(a==='mswap'){ var m=chooseMission(st.mission.id); st.mission={d:today(),id:m.id,done:0,swap:1}; st.missionLog[today()]=m.id; save(); render(); }
+  else if(a==='notif') notifSheet();
+  else if(a==='goal') goalSheet();
+  else if(a==='freezeinfo') freezeSheet();
   else if(a==='mod') startQuiz('mod',b.dataset.id);
   else if(a==='rev') startQuiz('rev');
   else if(a==='close') { tab=quiz&&quiz.from||tab; render(); }
@@ -265,12 +472,25 @@ view.addEventListener('click',function(e){
   else if(a==='reset') resetSheet();
 });
 
+function missionDone(){
+  if(!st.mission||st.mission.done) return;
+  st.mission.done=1; st.missionsDone++; var before=rankOf(st.xp).r.n; st.xp+=15; var fr=recordDay(); save();
+  if(quiz){ var el=view.querySelector('.mission'); if(el) el.outerHTML=missionHTML(); } else render();
+  confetti();
+  var up=rankOf(st.xp).r.n!==before;
+  toast('✅','<b>Mission accomplie, +15 XP !</b><br>'+(up?'Nouveau rang : '+rankOf(st.xp).r.n+' 🎉':fr?'Bonus : tu gagnes un gel de série 🧊':'La science, c’est mieux appliquée.'),3200);
+}
 /* ---------- quiz ---------- */
 function pickQuestions(kind,mod){
   var pool;
   if(kind==='mod') pool=Q.filter(function(q){return q.m===mod;});
   else if(kind==='rev') pool=Object.keys(st.wrong).map(function(id){return QBY[id];}).filter(Boolean);
-  else pool=Q;
+  else {
+    var un=Q.filter(function(q){return !st.mastered[q.id];}), per={};
+    var out=wpick(un,PER_QUIZ,2,per);
+    if(out.length<PER_QUIZ) out=out.concat(wpick(Q.filter(function(q){return st.mastered[q.id];}),PER_QUIZ-out.length,2,per));
+    return shuffle(out);
+  }
   // priorité aux questions pas encore maîtrisées
   var fresh=shuffle(pool.filter(function(q){return !st.mastered[q.id];})), old=shuffle(pool.filter(function(q){return st.mastered[q.id];}));
   return fresh.concat(old).slice(0,PER_QUIZ);
@@ -321,10 +541,8 @@ function nextQ(){
   if(perfect) quiz.xp+=XP_PERFECT;
   var before=rankOf(st.xp).r.n;
   st.xp+=quiz.xp; st.quizzes++;
-  if(st.days.indexOf(today())<0) st.days.push(today());
-  if(st.days.length>400) st.days=st.days.slice(-400);
   if(quiz.kind==='daily') st.lastDaily=today();
-  var sk=streak(); if(sk>st.best) st.best=sk;
+  var gotFreeze=recordDay(), sk=streak();
   save();
   var rk=rankOf(st.xp), up=rk.r.n!==before;
   var off=Math.round(327*(1-quiz.score/n));
@@ -337,6 +555,8 @@ function nextQ(){
   h+='<div class="up d3" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left"><div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">XP GAGNÉS</div><div style="font-family:var(--head);font-size:20px;font-weight:600;color:var(--gold)">+'+quiz.xp+'</div>'+(perfect?'<div style="font-size:11px;color:var(--muted)">dont +'+XP_PERFECT+' bonus sans-faute</div>':'')+'</div><div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">SÉRIE</div><div style="font-family:var(--head);font-size:20px;font-weight:600">'+sk+' jour'+(sk>1?'s':'')+'</div></div></div>';
   if(rk.next){ var p=Math.round((st.xp-rk.r.xp)/(rk.next.xp-rk.r.xp)*100);
     h+='<div class="goldcard up d4" style="margin-top:12px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:8px"><div class="row" style="justify-content:space-between;font-size:13px"><b>Prochain rang : '+rk.next.n+'</b><span class="mono" style="color:var(--gold)">'+fmt(st.xp)+' / '+fmt(rk.next.xp)+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div><span style="font-size:12px;color:var(--silver)">'+rk.next.r+'</span></div>'; }
+  if(gotFreeze) h+='<div class="glass up d4" style="margin-top:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;text-align:left;border-color:rgba(110,160,255,.5)"><span style="font-size:26px">🧊</span><div style="font-size:13.5px;line-height:1.45"><b>'+sk+' jours de série : tu gagnes un gel !</b><br><span style="color:var(--muted)">Il protégera ta série si tu rates un jour.</span></div></div>';
+  if(todayMission() && !st.mission.done) h+='<div class="up d5" style="text-align:left">'+missionHTML()+'</div>';
   h+='<div class="up d5" style="display:flex;flex-direction:column;gap:10px;margin-top:22px"><button class="btn gold" data-act="again">Encore 5 questions '+IC.arrow+'</button><button class="btn ghost" data-act="home">Retour à l’accueil</button></div>';
   h+='</div></div>';
   view.innerHTML=h;
@@ -347,6 +567,116 @@ function confetti(){
   var cols=['#D4AF37','#F3D98A','#C9CED6','#ffffff','#6EA0FF'];
   for(var i=0;i<60;i++){ var p=document.createElement('i'); p.style.left=Math.random()*100+'%'; p.style.background=cols[i%cols.length]; p.style.animationDelay=(Math.random()*0.8)+'s'; p.style.animationDuration=(2+Math.random()*1.5)+'s'; p.style.transform='rotate('+Math.random()*360+'deg)'; c.appendChild(p); }
   document.getElementById('app').appendChild(c); setTimeout(function(){ c.remove(); },4200);
+}
+
+
+/* ---------- mon corps ---------- */
+function bodyView(){
+  var P={}, tot=0, all=0; M.forEach(function(m){ var p=modProgress(m.id); P[m.id]=p.p; tot+=p.m; all+=p.t; });
+  var gm=goalMods(), glob=all?Math.round(tot/all*100):0;
+  function z(id){ return 'class="zone'+(gm.indexOf(id)>=0?' rec':'')+'" data-act="mod" data-id="'+id+'" style="--p:'+(0.22+0.78*P[id]/100).toFixed(2)+'"'; }
+  function glow(cx,cy,r){ return '<circle class="g" cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="url(#zg)"/><circle cx="'+cx+'" cy="'+cy+'" r="'+(r*0.28).toFixed(1)+'" fill="#FFF6D6" opacity=".9"/>'; }
+  function hit(cx,cy,r){ return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="transparent"/>'; }
+  function lbl(x,y,anchor,name,id,lx,ly){
+    return '<g '+z(id).replace('class="zone','class="zone lblz')+'><line x1="'+(anchor==='end'?x+4:x-4)+'" y1="'+(y-4)+'" x2="'+lx+'" y2="'+ly+'" stroke="rgba(212,175,55,.45)" stroke-width="1" stroke-dasharray="2 3"/><text class="lbl" x="'+x+'" y="'+(y-8)+'" text-anchor="'+anchor+'">'+name+'</text><text class="pct" x="'+x+'" y="'+(y+7)+'" text-anchor="'+anchor+'">'+P[id]+' %</text><rect x="'+(anchor==='end'?x-80:x)+'" y="'+(y-22)+'" width="80" height="34" fill="transparent"/></g>';
+  }
+  var svg='<svg class="bodysvg" viewBox="0 0 300 380" role="img" aria-label="Carte de ton corps : chaque zone s’allume quand tu maîtrises le thème">';
+  svg+='<defs><radialGradient id="zg"><stop offset="0" stop-color="#FFF4C8"/><stop offset=".3" stop-color="#F3D98A" stop-opacity=".95"/><stop offset=".65" stop-color="#D4AF37" stop-opacity=".45"/><stop offset="1" stop-color="#D4AF37" stop-opacity="0"/></radialGradient>';
+  svg+='<linearGradient id="bodyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22355E"/><stop offset="1" stop-color="#0E1830"/></linearGradient>';
+  svg+='<linearGradient id="scang" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6EA0FF" stop-opacity="0"/><stop offset="1" stop-color="#6EA0FF" stop-opacity=".55"/></linearGradient>';
+  svg+='<clipPath id="bclip"><circle cx="150" cy="48" r="24"/><rect x="141" y="68" width="18" height="16"/><path d="M108 86 Q150 76 192 86 Q206 90 204 108 L192 168 Q186 196 176 206 L124 206 Q114 196 108 168 L96 108 Q94 90 108 86Z"/><path d="M100 92 Q86 96 82 116 L70 186 Q66 210 74 226 Q82 230 86 222 L96 160 L106 118Z"/><path d="M200 92 Q214 96 218 116 L230 186 Q234 210 226 226 Q218 230 214 222 L204 160 L194 118Z"/><path d="M124 204 L148 206 L146 290 L142 356 Q140 366 128 366 Q120 364 122 354 L120 290 Q116 240 124 204Z"/><path d="M176 204 L152 206 L154 290 L158 356 Q160 366 172 366 Q180 364 178 354 L180 290 Q184 240 176 204Z"/></clipPath></defs>';
+  // aura santé
+  svg+='<g '+z('sante')+'><ellipse class="g" cx="150" cy="200" rx="112" ry="184" fill="none" stroke="#D4AF37" stroke-width="2" stroke-dasharray="2 7" style="filter:drop-shadow(0 0 6px rgba(212,175,55,.8))"/><ellipse cx="150" cy="200" rx="112" ry="184" fill="none" stroke="transparent" stroke-width="22"/></g>';
+  // silhouette
+  svg+='<g fill="url(#bodyg)" stroke="rgba(201,206,214,.4)" stroke-width="1.2" stroke-linejoin="round"><circle cx="150" cy="48" r="24"/><rect x="141" y="66" width="18" height="18" rx="6"/><path d="M108 86 Q150 76 192 86 Q206 90 204 108 L192 168 Q186 196 176 206 L124 206 Q114 196 108 168 L96 108 Q94 90 108 86Z"/><path d="M100 92 Q86 96 82 116 L70 186 Q66 210 74 226 Q82 230 86 222 L96 160 L106 118Z"/><path d="M200 92 Q214 96 218 116 L230 186 Q234 210 226 226 Q218 230 214 222 L204 160 L194 118Z"/><path d="M124 204 L148 206 L146 290 L142 356 Q140 366 128 366 Q120 364 122 354 L120 290 Q116 240 124 204Z"/><path d="M176 204 L152 206 L154 290 L158 356 Q160 366 172 366 Q180 364 178 354 L180 290 Q184 240 176 204Z"/></g>';
+  svg+='<g clip-path="url(#bclip)" style="pointer-events:none"><rect class="scan" x="40" y="10" width="220" height="26" fill="url(#scang)"/></g>';
+  // zones
+  svg+='<g '+z('sommeil')+'>'+glow(150,44,24)+hit(150,44,26)+'</g>';
+  svg+='<g '+z('cardio')+'>'+glow(164,112,20)+hit(164,112,20)+'</g>';
+  svg+='<g '+z('nutrition')+'>'+glow(148,160,24)+hit(148,160,22)+'</g>';
+  svg+='<g '+z('muscle')+'>'+glow(90,140,17)+glow(210,140,17)+glow(134,248,18)+glow(166,248,18)+hit(90,140,18)+hit(210,140,18)+hit(134,248,18)+hit(166,248,18)+'</g>';
+  svg+='<g '+z('recup')+'>'+glow(134,300,14)+glow(166,300,14)+hit(134,300,14)+hit(166,300,14)+'</g>';
+  // labels
+  svg+=lbl(6,40,'start','Sommeil','sommeil',128,44);
+  svg+=lbl(6,140,'start','Le muscle','muscle',74,140);
+  svg+=lbl(6,300,'start','Récupération','recup',120,300);
+  svg+=lbl(294,100,'end','Cœur & endurance','cardio',182,110);
+  svg+=lbl(294,168,'end','Nutrition','nutrition',170,162);
+  svg+=lbl(294,330,'end','Sport & santé','sante',236,300);
+  svg+='</svg>';
+  var h='<div class="screen"><div class="wrap"><div class="up row" style="justify-content:space-between"><div><div class="mono" style="color:var(--muted)">TON CORPS S’ALLUME QUAND TU APPRENDS</div><h1 class="h1" style="margin-top:4px">Mon corps</h1></div><span class="chip" style="color:var(--gold)">'+glob+' %</span></div>';
+  h+='<div class="glass up d1" style="margin-top:14px;padding:14px 8px 8px;position:relative;overflow:hidden">'+svg+'<div style="text-align:center;font-size:12px;color:var(--muted);padding:4px 10px 6px">Touche une zone pour réviser ce thème</div></div>';
+  h+='<div class="glass list up d2" style="margin-top:14px;padding:4px 16px">';
+  var mods=M.slice().sort(function(a,b){ return P[b.id]-P[a.id]; });
+  mods.forEach(function(m){ var p=modProgress(m.id), rec=gm.indexOf(m.id)>=0;
+    h+='<button data-act="mod" data-id="'+m.id+'" style="width:100%;text-align:left;display:flex;flex-direction:column;gap:7px"><div class="row" style="justify-content:space-between;width:100%"><span style="font-size:14.5px;font-weight:600">'+m.name+(rec?' <span class="pill" style="margin-left:4px">POUR TOI</span>':'')+'</span><span class="mono" style="color:var(--gold);font-size:12px">'+p.m+'/'+p.t+'</span></div><div class="bar" style="height:6px;width:100%"><i style="width:'+p.p+'%"></i></div></button>';
+  });
+  h+='</div><div style="font-size:12px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5">Une question est « maîtrisée » dès que tu y réponds juste.<br>Objectif : un corps 100 % allumé.</div>';
+  h+='</div></div>'; view.innerHTML=h;
+}
+
+/* ---------- bienvenue (onboarding) ---------- */
+var ob=null, TIMES=['06:30','07:00','07:30','08:00','08:30','09:00','12:30','19:00'];
+function startOnboarding(){ ob={step:0,name:st.name||'',goal:st.goal||'',level:st.level||'',time:st.notif.time||'08:00',msg:''}; setNav(false); drawOb(); }
+function drawOb(){
+  var n=5, h='<div class="screen noNav"><div class="wrap" style="min-height:100%;display:flex;flex-direction:column">';
+  h+='<div class="row" style="justify-content:space-between;height:44px">'+(ob.step>0?'<button class="iconbtn" data-act="obback" aria-label="Retour">'+IC.back+'</button>':'<span></span>')+'<div class="dots">';
+  for(var i=0;i<n;i++) h+='<i class="'+(i===ob.step?'on':'')+'"></i>';
+  h+='</div><span style="width:44px"></span></div>';
+  if(ob.step===0){
+    h+='<div style="text-align:center;margin-top:5vh" class="up"><img src="assets/logo-full.png" alt="MFC – Mathis Félicité Coaching" style="width:220px;filter:drop-shadow(0 10px 30px rgba(212,175,55,.25))"></div>';
+    h+='<h1 class="h1 up d1" style="text-align:center;margin-top:22px;font-size:24px">Bienvenue sur<br><span style="color:var(--gold2)">MFC Quiz</span></h1>';
+    h+='<p class="up d2" style="text-align:center;color:var(--ink2);font-size:15px;line-height:1.55;margin:12px 6px 26px">La science du sport en 2 minutes par jour.<br>Chaque réponse est tirée d’une étude scientifique.</p>';
+    h+='<form id="obf" class="up d3"><label for="obn" class="mono" style="color:var(--muted)">COMMENT ON T’APPELLE ?</label><input id="obn" class="field" maxlength="20" autocomplete="given-name" placeholder="Ton prénom" value="'+esc(ob.name)+'" style="margin:8px 0 16px"><button class="btn gold" type="submit">C’est parti '+IC.arrow+'</button></form>';
+  } else if(ob.step===1){
+    h+='<div class="up" style="margin-top:14px"><div class="mono" style="color:var(--gold)">ÉTAPE 1 / 3</div><h1 class="h1" style="margin:6px 0 6px">'+(ob.name?esc(ob.name)+', quel':'Quel')+' est ton objectif ?</h1><p style="color:var(--muted);font-size:14px;line-height:1.5;margin:0 0 16px">Tes quiz et tes missions du jour s’adapteront à ce que tu veux.</p></div>';
+    Object.keys(GOALS).forEach(function(k,i){ var g=GOALS[k];
+      h+='<button class="choice up d'+(i+1)+(ob.goal===k?' on':'')+'" data-act="obgoal" data-id="'+k+'"><span class="ic">'+g.e+'</span><span><b>'+g.n+'</b><small>'+g.d+'</small></span><span class="tick">'+(ob.goal===k?IC.check.replace('width="18" height="18"','width="14" height="14"'):'')+'</span></button>';
+    });
+  } else if(ob.step===2){
+    h+='<div class="up" style="margin-top:14px"><div class="mono" style="color:var(--gold)">ÉTAPE 2 / 3</div><h1 class="h1" style="margin:6px 0 6px">Où en es-tu côté sport ?</h1><p style="color:var(--muted);font-size:14px;line-height:1.5;margin:0 0 16px">Pour te proposer des missions à ta portée.</p></div>';
+    Object.keys(LEVELS).forEach(function(k,i){ var l=LEVELS[k];
+      h+='<button class="choice up d'+(i+1)+(ob.level===k?' on':'')+'" data-act="oblevel" data-id="'+k+'"><span class="ic">'+l.e+'</span><span><b>'+l.n+'</b><small>'+l.d+'</small></span><span class="tick">'+(ob.level===k?IC.check.replace('width="18" height="18"','width="14" height="14"'):'')+'</span></button>';
+    });
+  } else if(ob.step===3){
+    h+='<div class="up" style="margin-top:14px"><div class="mono" style="color:var(--gold)">ÉTAPE 3 / 3</div><h1 class="h1" style="margin:6px 0 6px">Ton rappel du matin ☀️</h1><p style="color:var(--muted);font-size:14px;line-height:1.5;margin:0 0 16px">Une notification par jour : « Tes 2 minutes de quiz pour démarrer la journée plus cultivé ». À quelle heure ?</p></div>';
+    h+='<div class="times up d1">'; TIMES.forEach(function(t){ h+='<button data-act="obtime" data-id="'+t+'" class="'+(ob.time===t?'on':'')+'">'+fmtTime(t)+'</button>'; }); h+='</div>';
+    h+='<div class="glass up d2" style="margin-top:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start"><div style="color:var(--gold);margin-top:2px">'+IC.bell+'</div><div style="font-size:13.5px;line-height:1.5;color:var(--ink2)">'+(ob.msg?esc(ob.msg):'Un seul rappel par jour, jamais plus. Tu pourras changer l’heure ou couper le rappel à tout moment dans ton Profil.')+'</div></div>';
+  } else {
+    var g=GOALS[ob.goal], gm=Object.keys(g.w).sort(function(a,b){return g.w[b]-g.w[a];}).slice(0,3).map(function(id){ return M.filter(function(m){return m.id===id;})[0].name; });
+    h+='<div style="text-align:center;margin-top:4vh" class="up"><div style="font-size:64px;line-height:1;filter:drop-shadow(0 0 30px rgba(212,175,55,.5))">'+g.e+'</div><h1 class="h1" style="margin-top:16px;font-size:23px">Ton parcours est prêt'+(ob.name?', '+esc(ob.name):'')+' !</h1></div>';
+    h+='<div class="goldcard up d1" style="margin-top:22px;padding:16px 18px"><div class="mono" style="color:var(--silver);font-size:10px">TON OBJECTIF</div><div style="font-family:var(--head);font-size:17px;font-weight:600;margin-top:3px">'+g.n+'</div><div style="font-size:13px;color:var(--ink2);margin-top:8px;line-height:1.5">Priorité à : <b style="color:var(--gold2)">'+gm.join(' · ')+'</b>. Les autres thèmes restent dans le mélange, pour une culture complète.</div></div>';
+    h+='<div class="up d2" style="display:grid;gap:10px;margin-top:12px">';
+    [['⚡','Un défi de 5 questions par jour','Adapté à ton objectif, avec la source de chaque réponse'],['✅','Une mission concrète par jour','Une action simple, prouvée par la science, pour passer à la pratique'],['🧊','1 gel de série offert','Il protège ta série si tu rates un jour. Gagne-en un tous les 7 jours']].forEach(function(x){
+      h+='<div class="glass" style="padding:13px 14px;display:flex;gap:12px;align-items:center"><span style="font-size:24px">'+x[0]+'</span><div><div style="font-size:14.5px;font-weight:700">'+x[1]+'</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4">'+x[2]+'</div></div></div>';
+    });
+    h+='</div>';
+  }
+  h+='<div style="flex:1;min-height:24px"></div>';
+  if(ob.step===1||ob.step===2){ var ok=ob.step===1?!!ob.goal:!!ob.level; h+='<button class="btn gold" data-act="obnext" '+(ok?'':'disabled style="opacity:.4"')+'>Continuer '+IC.arrow+'</button>'; }
+  if(ob.step===3){
+    if(!isStandalone()) h+='<button class="btn gold" data-act="obnext">Continuer '+IC.arrow+'</button><div style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.45">Les rappels s’activent une fois l’app installée sur ton écran d’accueil.</div>';
+    else h+='<button class="btn gold" data-act="obnotif">'+IC.bell.replace('width="22" height="22"','width="20" height="20"')+' Activer mon rappel à '+fmtTime(ob.time)+'</button><button class="btn ghost" data-act="obnext" style="margin-top:10px">Plus tard</button>';
+  }
+  if(ob.step===4) h+='<button class="btn gold up d3" data-act="obdone">Lancer mon premier défi '+IC.arrow+'</button>';
+  h+='</div></div>';
+  view.innerHTML=h;
+  if(ob.step===0){ var f=document.getElementById('obf'); f.addEventListener('submit',function(e){ e.preventDefault(); ob.name=document.getElementById('obn').value.trim().slice(0,20); ob.step=1; drawOb(); }); }
+}
+function obAct(a,id){
+  if(a==='obback'){ ob.step=Math.max(0,ob.step-1); ob.msg=''; drawOb(); }
+  else if(a==='obgoal'){ ob.goal=id; drawOb(); setTimeout(function(){ if(ob&&ob.step===1){ ob.step=2; drawOb(); } },380); }
+  else if(a==='oblevel'){ ob.level=id; drawOb(); setTimeout(function(){ if(ob&&ob.step===2){ ob.step=3; drawOb(); } },380); }
+  else if(a==='obtime'){ ob.time=id; drawOb(); }
+  else if(a==='obnext'){ if(ob.step===1&&!ob.goal||ob.step===2&&!ob.level) return; ob.step++; ob.msg=''; drawOb(); }
+  else if(a==='obnotif'){ enableNotif(ob.time,function(r){ if(r==='ok'){ ob.step=4; drawOb(); } else { ob.msg=notifMsg(r); drawOb(); } }); }
+  else if(a==='obdone'){
+    var first=!st.onboarded;
+    st.name=ob.name; st.goal=ob.goal; st.level=ob.level; st.notif.time=ob.time;
+    if(first){ st.freezes=Math.max(st.freezes,1); }
+    st.onboarded=1; st.mission=null; save(); ob=null; tab='home';
+    startQuiz('daily');
+  }
 }
 
 /* ---------- révisions ---------- */
@@ -383,9 +713,12 @@ function profile(){
   var acc=st.answered?Math.round(st.correct/st.answered*100):0, mastered=Object.keys(st.mastered).length;
   var h='<div class="screen"><div class="wrap"><div class="up"><div class="mono" style="color:var(--muted)">MFC QUIZ</div><h1 class="h1" style="margin-top:4px">'+(st.name?esc(st.name):'Ton profil')+'</h1></div>';
   h+='<div class="up d1" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">';
-  [['QUESTIONS',fmt(st.answered)],['RÉUSSITE',acc+' %'],['MAÎTRISÉES',mastered+'/'+Q.length],['MEILLEURE SÉRIE',st.best+' j']].forEach(function(x){ h+='<div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">'+x[0]+'</div><div style="font-family:var(--head);font-size:20px;font-weight:600">'+x[1]+'</div></div>'; });
+  [['QUESTIONS',fmt(st.answered)],['RÉUSSITE',acc+' %'],['MAÎTRISÉES',mastered+'/'+Q.length],['MEILLEURE SÉRIE',st.best+' j'],['MISSIONS',fmt(st.missionsDone)],['QUIZ TERMINÉS',fmt(st.quizzes)]].forEach(function(x){ h+='<div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">'+x[0]+'</div><div style="font-family:var(--head);font-size:20px;font-weight:600">'+x[1]+'</div></div>'; });
   h+='</div><div class="glass list up d2" style="margin-top:14px;padding:4px 16px">';
   h+='<button data-act="name" class="row" style="width:100%;justify-content:space-between;font-size:15px"><span>Mon prénom</span><span style="color:var(--muted)">'+(st.name?esc(st.name):'Ajouter')+' ›</span></button>';
+  h+='<button data-act="goal" class="row" style="width:100%;justify-content:space-between;font-size:15px"><span>Mon objectif</span><span style="color:var(--muted);white-space:nowrap">'+(GOALS[st.goal]?GOALS[st.goal].e+' '+GOALS[st.goal].n:'Choisir')+' ›</span></button>';
+  h+='<button data-act="notif" class="row" style="width:100%;justify-content:space-between;font-size:15px"><span>Rappel du matin</span><span style="white-space:nowrap;color:'+(st.notif.on?'var(--gold)':'var(--muted)')+'">'+(st.notif.on?'🔔 '+fmtTime(st.notif.time):'Désactivé')+' ›</span></button>';
+  h+='<button data-act="freezeinfo" class="row" style="width:100%;justify-content:space-between;font-size:15px"><span>Gels de série</span><span style="color:var(--muted)">🧊 '+st.freezes+' / 2 ›</span></button>';
   h+='<button data-act="sources" class="row" style="width:100%;justify-content:space-between;font-size:15px"><span>Nos sources scientifiques</span><span style="color:var(--muted)">'+Object.keys(S).length+' ›</span></button>';
   h+='<button data-act="install" class="row" style="width:100%;justify-content:space-between;font-size:15px"><span>Ajouter à l’écran d’accueil</span><span style="color:var(--muted)">›</span></button>';
   h+='<a href="https://www.instagram.com/mathis.felicite/" target="_blank" rel="noopener" class="row" style="justify-content:space-between;font-size:15px;color:var(--ink)"><span>Suivre Mathis sur Instagram</span><span style="color:var(--muted)">›</span></a>';
@@ -410,8 +743,49 @@ function nameSheet(){
 }
 function resetSheet(){
   sheet('<h2 class="h1" style="font-size:18px">Effacer ta progression ?</h2><p style="color:var(--muted);font-size:14px;line-height:1.5">Tes XP, ton rang, ta série et tes révisions seront remis à zéro. Impossible d’annuler.</p><div style="display:flex;flex-direction:column;gap:10px;margin-top:8px"><button class="btn" id="rz" style="background:rgba(240,140,90,.15);border:1px solid var(--bad);color:var(--bad)">Oui, tout effacer</button><button class="btn ghost" data-close>Annuler</button></div>');
-  document.getElementById('rz').addEventListener('click',function(){ st=blank(); save(); document.querySelector('.sheet').remove(); tab='home'; render(); });
+  document.getElementById('rz').addEventListener('click',function(){ st=blank(); save(); document.querySelector('.sheet').remove(); tab='home'; startOnboarding(); });
 }
+
+function goalSheet(){
+  var h='<div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 class="h1" style="font-size:18px">Ton objectif</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div>';
+  Object.keys(GOALS).forEach(function(k){ var g=GOALS[k]; h+='<button class="choice'+(st.goal===k?' on':'')+'" data-goal="'+k+'"><span class="ic">'+g.e+'</span><span><b>'+g.n+'</b><small>'+g.d+'</small></span></button>'; });
+  h+='<div class="mono" style="color:var(--muted);margin:16px 0 10px">TON NIVEAU</div>';
+  Object.keys(LEVELS).forEach(function(k){ var l=LEVELS[k]; h+='<button class="choice'+(st.level===k?' on':'')+'" data-level="'+k+'"><span class="ic">'+l.e+'</span><span><b>'+l.n+'</b><small>'+l.d+'</small></span></button>'; });
+  sheet(h);
+  var s=document.querySelector('.sheet');
+  s.addEventListener('click',function(e){
+    var b=e.target.closest('[data-goal],[data-level]'); if(!b) return;
+    if(b.dataset.goal){ st.goal=b.dataset.goal; } else { st.level=b.dataset.level; }
+    if(st.mission && !st.mission.done) st.mission=null;
+    save(); s.querySelectorAll('[data-goal]').forEach(function(x){ x.classList.toggle('on',x.dataset.goal===st.goal); }); s.querySelectorAll('[data-level]').forEach(function(x){ x.classList.toggle('on',x.dataset.level===st.level); });
+    render(); toast(GOALS[st.goal]?GOALS[st.goal].e:'✅','Parcours mis à jour : tes prochains quiz et missions s’adaptent.',2600);
+  });
+}
+function notifSheet(){
+  var cur=st.notif.time||'08:00', msg='';
+  function draw(){
+    var h='<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 class="h1" style="font-size:18px">Rappel du matin</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div>';
+    h+='<p style="font-size:14px;color:var(--ink2);line-height:1.5;margin:0 0 14px">Une notification par jour pour tes 2 minutes de quiz. Choisis l’heure :</p><div class="times">';
+    TIMES.forEach(function(t){ h+='<button data-time="'+t+'" class="'+(cur===t?'on':'')+'">'+fmtTime(t)+'</button>'; });
+    h+='</div>';
+    if(msg) h+='<div class="glass" style="margin-top:14px;padding:12px 14px;font-size:13px;line-height:1.5;color:var(--ink2)">'+esc(msg)+'</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:10px;margin-top:16px"><button class="btn gold" data-n="on">'+(st.notif.on?'Enregistrer : '+fmtTime(cur):'Activer mon rappel à '+fmtTime(cur))+'</button>'+(st.notif.on?'<button class="btn ghost" data-n="off">Couper le rappel</button>':'')+'</div>';
+    return h;
+  }
+  sheet(draw());
+  var s=document.querySelector('.sheet'), box=s.firstChild;
+  s.addEventListener('click',function(e){
+    var t=e.target.closest('[data-time]'), n=e.target.closest('[data-n]');
+    if(t){ cur=t.dataset.time; box.innerHTML=draw(); }
+    else if(n&&n.dataset.n==='off'){ disableNotif(); s.remove(); render(); toast('🔕','Rappel coupé.',2200); }
+    else if(n){ enableNotif(cur,function(r){ if(r==='ok'){ s.remove(); render(); toast('🔔','Rappel programmé chaque jour à <b>'+fmtTime(cur)+'</b>.',3000); } else { msg=notifMsg(r); box.innerHTML=draw(); } }); }
+  });
+}
+function freezeSheet(){
+  var sk=streak();
+  sheet('<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 class="h1" style="font-size:18px">Ta série '+IC.flame+' '+sk+' jour'+(sk>1?'s':'')+'</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><div class="list" style="font-size:14.5px;line-height:1.5;color:var(--ink2)"><div>Fais au moins un quiz ou ta mission du jour chaque jour pour faire grimper ta série. Record : <b style="color:var(--gold)">'+st.best+' jours</b>.</div><div><b>🧊 Gels de série : '+st.freezes+' / 2</b><br>Si tu rates une journée, un gel s’utilise tout seul et ta série est sauvée. Tu gagnes un gel tous les 7 jours de série (2 maximum en réserve).</div></div>');
+}
+
 function installSheet(){
   sheet('<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 class="h1" style="font-size:18px">Installer MFC Quiz</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><div class="list" style="font-size:15px;line-height:1.5;color:var(--ink2)"><div><b style="color:var(--gold)">1.</b> Ouvre cette page dans <b>Safari</b> sur ton iPhone.</div><div><b style="color:var(--gold)">2.</b> Appuie sur le bouton <b>Partager</b> (le carré avec une flèche vers le haut).</div><div><b style="color:var(--gold)">3.</b> Choisis <b>« Sur l’écran d’accueil »</b>, puis <b>Ajouter</b>.</div><div>L’icône MFC Quiz apparaît avec tes autres applis, s’ouvre en plein écran et marche même hors connexion.</div></div>');
 }
@@ -419,7 +793,7 @@ function installSheet(){
 /* ---------- démarrage ---------- */
 var sp=document.getElementById('splash');
 var seen=false; try{ seen=sessionStorage.getItem('mfcq_splash')==='1'; }catch(e){}
-render();
+if(st.onboarded) { checkFreeze(); render(); refreshPush(); } else startOnboarding();
 setTimeout(function(){ sp.classList.add('out'); setTimeout(function(){ sp.remove(); },700); try{ sessionStorage.setItem('mfcq_splash','1'); }catch(e){} }, seen?600:3600);
 sp.addEventListener('click',function(){ sp.classList.add('out'); setTimeout(function(){ sp.remove(); },700); });
 if('serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
