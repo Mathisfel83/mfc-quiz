@@ -2,7 +2,10 @@
 /* ---------- Défis : classements, amis, duels, Course au sommet ---------- */
 var SB_URL='https://eodjnceukxokexwwocxm.supabase.co', SB_KEY='sb_publishable_FfpXSXENiQUmQY3hYIcplQ_TVtj_3I7';
 try{ var _sbo=localStorage.getItem('mfcq_sburl'); if(_sbo) SB_URL=_sbo; }catch(e){}
-var APP_URL=location.origin+location.pathname;
+var NATIVE=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+function plug(n){ return NATIVE&&window.Capacitor.Plugins?window.Capacitor.Plugins[n]:null; }
+var WEB_URL='https://mathisfel83.github.io/mfc-quiz/';
+var APP_URL=NATIVE?WEB_URL:location.origin+location.pathname;
 var sbP=null;
 function sbSess(){ try{ return JSON.parse(localStorage.getItem('mfcq_sb')||'null'); }catch(e){ return null; } }
 function sbSave(s){ try{ if(s) localStorage.setItem('mfcq_sb',JSON.stringify(s)); else localStorage.removeItem('mfcq_sb'); }catch(e){} }
@@ -80,6 +83,7 @@ function untilFreeze(){
   return d?d+' j '+h+' h':h?h+' h '+(m%60)+' min':(m%60)+' min';
 }
 function shareLink(url,text){
+  var SH=plug('Share'); if(SH) return SH.share({title:'MFC Quiz',text:text,url:url}).catch(function(){});
   if(navigator.share) return navigator.share({title:'MFC Quiz',text:text,url:url}).catch(function(){});
   try{ navigator.clipboard.writeText(text+' '+url); toast('📋','Lien copié !',2000); }catch(e){ toast('🔗',esc(url),5000); }
 }
@@ -136,7 +140,7 @@ function boardRows(b,meId){
   if(!b) return '<div style="padding:18px;text-align:center;color:var(--muted);font-size:13px">Chargement…</div>';
   if(!b.rows.length) return '<div style="padding:18px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5">'+(b.kind==='all'?'Personne pour l’instant.':'Personne n’a encore gagné d’XP cette semaine.<br>Fais un quiz pour prendre la tête !')+'</div>';
   var wk=b.kind!=='all', h='', inTop=false;
-  b.rows.forEach(function(p,i){ var me=p.id===meId; if(me) inTop=true; h+='<div class="sxrow'+(me?' me':'')+'"><span class="sxmed">'+medal(i)+'</span>'+faceH(p,38)+'<span class="n">'+esc(p.pseudo)+(me?' <span class="mono" style="color:var(--gold);font-size:10px">· TOI</span>':'')+'</span><span class="v">'+fmt(wk?p.wxp:p.xp)+' XP</span></div>'; });
+  b.rows.forEach(function(p,i){ var me=p.id===meId; if(me) inTop=true; ppl[p.id]=p; h+='<div class="sxrow'+(me?' me':'')+'"'+(me?'':' data-sx="player" data-id="'+p.id+'" style="cursor:pointer"')+'><span class="sxmed">'+medal(i)+'</span>'+faceH(p,38)+'<span class="n">'+esc(p.pseudo)+(me?' <span class="mono" style="color:var(--gold);font-size:10px">· TOI</span>':'')+'</span><span class="v">'+fmt(wk?p.wxp:p.xp)+' XP</span></div>'; });
   if(!inTop&&b.pos) h+='<div class="sxrow me"><span class="sxmed mono" style="font-size:12px;color:var(--gold)">'+b.pos+'</span>'+faceH(st.soc,38)+'<span class="n">'+esc(st.pseudo)+' <span class="mono" style="color:var(--gold);font-size:10px">· TOI</span></span><span class="v">'+fmt(b.me)+' XP</span></div>';
   return h;
 }
@@ -169,7 +173,7 @@ function drawArena(){
   h+='<div class="row" style="justify-content:space-between;margin:22px 0 10px"><span class="mono" style="color:var(--muted)">MES AMIS'+(ar.fl?' · '+ar.fl.length:'')+'</span><button class="chip" data-sx="addfr" style="color:var(--gold);font-size:12px">+ Ajouter</button></div>';
   h+='<div class="glass" style="padding:14px 16px;display:flex;align-items:center;gap:12px"><div style="flex:1"><div class="mono" style="color:var(--muted);font-size:10px">MON CODE AMI</div><div style="font-family:var(--head);font-size:22px;letter-spacing:4px;color:var(--gold)">'+esc(so.code||'······')+'</div></div><button class="btn gold" data-sx="sharecode" style="width:auto;height:44px;padding:0 16px;font-size:14px">Partager</button></div>';
   if(ar.fl&&ar.fl.length){ h+='<div class="glass" style="margin-top:10px;padding:6px">';
-    ar.fl.forEach(function(f){ h+='<div class="sxrow">'+faceH(f,38)+'<span class="n">'+esc(f.pseudo)+'<br><span style="font-size:12px;font-weight:500;color:var(--muted)">'+fmt(f.wxp)+' XP cette semaine · '+rankOf(f.xp).r.n+'</span></span><button class="chip" data-sx="duelnew" data-id="'+f.id+'" style="font-size:12px">⚔️ Défier</button></div>'; });
+    ar.fl.forEach(function(f){ ppl[f.id]=f; h+='<div class="sxrow" data-sx="player" data-id="'+f.id+'">'+faceH(f,38)+'<span class="n">'+esc(f.pseudo)+'<br><span style="font-size:12px;font-weight:500;color:var(--muted)">'+fmt(f.wxp)+' XP cette semaine · '+rankOf(f.xp).r.n+'</span></span><button class="chip" data-sx="duelnew" data-id="'+f.id+'" style="font-size:12px">⚔️ Défier</button></div>'; });
     h+='</div>'; }
   else if(ar.fl) h+='<div style="font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5;text-align:center">Envoie ton code à tes proches : ils t’ajoutent en un geste avec le lien.</div>';
   h+='<button class="glass row" data-sx="ranks" style="width:100%;margin-top:22px;padding:14px 16px;justify-content:space-between;font-size:15px"><span>🎖️ Rangs et récompenses</span><span style="color:var(--muted)">›</span></button>';
@@ -247,6 +251,8 @@ function storyImg(b){
 function storySheet(u){
   sheet('<div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 class="h1" style="font-size:18px">Ton image story</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><img src="'+u+'" alt="Podium de la semaine" style="width:62%;display:block;margin:0 auto;border-radius:18px;border:1px solid var(--line)"><div style="font-size:12.5px;color:var(--muted);text-align:center;margin:10px 0 14px">Si le bouton ne marche pas : appuie longuement sur l’image, puis « Enregistrer dans Photos ».</div><button class="btn gold" id="stsh">Partager / enregistrer '+IC.arrow+'</button>');
   document.getElementById('stsh').addEventListener('click',function(){
+    var FS=plug('Filesystem'), SH=plug('Share');
+    if(FS&&SH){ FS.writeFile({path:'podium-mfc-quiz.png',data:u.split(',')[1],directory:'CACHE'}).then(function(r){ return SH.share({files:[r.uri]}); }).catch(function(){}); return; }
     fetch(u).then(function(r){ return r.blob(); }).then(function(bl){
       var f=new File([bl],'podium-mfc-quiz.png',{type:'image/png'});
       if(navigator.canShare&&navigator.canShare({files:[f]})) return navigator.share({files:[f]}).catch(function(){});
@@ -281,7 +287,7 @@ function drawRq(){
 }
 function rqPick(oi){
   if(!rq||rq.picked!==null) return; clearInterval(rq.tm);
-  var q=rq.qs[rq.i].q; rq.picked=oi; rq.ms+=Math.min(RQT,Date.now()-rq.t0);
+  var q=rq.qs[rq.i].q; rq.picked=oi; buzz(oi===q.a); rq.ms+=Math.min(RQT,Date.now()-rq.t0);
   st.answered++; if(oi===q.a){ rq.score++; st.correct++; st.mastered[q.id]=1; delete st.wrong[q.id]; } else st.wrong[q.id]=1;
   save(); drawRq();
 }
@@ -410,7 +416,7 @@ function roomAct(a,v){
   if(!rm) return; var s=rm.s, c=s.players[s.turn], mine=c&&c.id===rm.me;
   if(a==='start'){ if(s.players.length<2) return; var ns=cl(s); ns.status='play'; ns.players=shuffle(ns.players).map(function(p){ p.pos=0; p.miss=0; p.gone=false; return p; }); ns.turn=0; ns.round=1; ns.used=[]; ns.winner=null; nextTurn(ns); ns.turn=0; ns.round=1; roomPush(ns); }
   else if(a==='diff'&&mine&&s.phase==='choose'){ var n2=cl(s), d=+v; n2.diff=d; n2.qid=pickQ(n2,d); n2.used.push(n2.qid); n2.order=shuffle([0,1,2]); n2.phase='answer'; roomPush(n2); }
-  else if(a==='ans'&&mine&&s.phase==='answer'){ var r=resolve(s,+v); if(r.ok) gainXP(DN[r.diff][2]); st.answered++; if(r.ok) st.correct++; save(); roomPush(r); }
+  else if(a==='ans'&&mine&&s.phase==='answer'){ var r=resolve(s,+v); buzz(r.ok); if(r.ok) gainXP(DN[r.diff][2]); st.answered++; if(r.ok) st.correct++; save(); roomPush(r); }
 }
 function roomQuit(){
   if(!rm) return;
@@ -495,6 +501,61 @@ function roomReward(s){
   st.roomSeen[k]=1; var won=s.winner===rm.me; gainXP(won?50:15); if(won) confetti();
 }
 
+/* ---------- fiche joueur : signaler, bloquer ---------- */
+var ppl={};
+function isFriend(id){ return (ar.fl||[]).some(function(f){ return f.id===id; }); }
+function playerSheet(id){
+  var p=ppl[id]; if(!p) return; var fr=isFriend(id);
+  sheet('<div class="row" style="justify-content:flex-end"><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><div style="text-align:center;margin-top:-10px">'+faceH(p,84)+'<h2 class="h1" style="font-size:20px;margin-top:10px">'+esc(p.pseudo)+'</h2><div class="mono" style="color:var(--muted);margin-top:4px">'+rankOf(p.xp||0).r.n.toUpperCase()+' · '+fmt(p.xp||0)+' XP</div></div><div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">'+
+    (fr?'<button class="btn gold" data-close data-sx="duelnew" data-id="'+id+'">⚔️ Défier en duel</button><button class="btn ghost" data-sx="unfriend" data-id="'+id+'">Retirer de mes amis</button>':'')+
+    '<button class="btn ghost" data-sx="report" data-id="'+id+'">🚩 Signaler</button><button class="btn ghost" data-sx="block" data-id="'+id+'" style="color:var(--bad)">🚫 Bloquer</button></div><div style="font-size:12px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.5">Un joueur bloqué disparaît de tes classements et ne peut plus t’ajouter ni te défier.</div>');
+}
+function reportSheet(id){
+  var p=ppl[id]||{pseudo:'ce joueur'};
+  sheet('<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 class="h1" style="font-size:18px">Signaler '+esc(p.pseudo)+'</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><div style="display:flex;flex-direction:column;gap:8px">'+
+    [['pseudo','Pseudo choquant ou insultant'],['avatar','Avatar inapproprié'],['triche','Triche aux classements'],['autre','Autre comportement']].map(function(r){ return '<button class="btn ghost" data-sx="reportgo" data-id="'+id+'" data-v="'+r[0]+'" style="justify-content:flex-start;padding:0 16px">'+r[1]+'</button>'; }).join('')+
+    '</div><div style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5">Ton signalement est anonyme pour l’autre joueur. Mathis l’examine et peut suspendre le compte.</div>');
+}
+function blockedSheet(){
+  sheet('<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 class="h1" style="font-size:18px">Joueurs bloqués</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><div id="blk" style="color:var(--muted);font-size:13px">Chargement…</div>');
+  rpc('mfc_blocked',{}).then(function(l){ var el=document.getElementById('blk'); if(!el) return;
+    el.innerHTML=l.length?l.map(function(p){ return '<div class="sxrow"><span class="n">'+esc(p.pseudo)+'</span><button class="chip" data-sx="unblock" data-id="'+p.id+'">Débloquer</button></div>'; }).join(''):'Aucun joueur bloqué.';
+  }).catch(function(e){ var el=document.getElementById('blk'); if(el) el.textContent=e.message; });
+}
+function deleteSheet(){
+  sheet('<h2 class="h1" style="font-size:18px">Supprimer ton compte de joueur ?</h2><p style="color:var(--muted);font-size:14px;line-height:1.55">Ton pseudo, ton avatar, tes amis, tes duels et ta place dans les classements seront <b style="color:var(--ink)">définitivement supprimés</b> de nos serveurs. Impossible d’annuler.</p><p style="color:var(--muted);font-size:13px;line-height:1.5">Tes leçons et ta progression restent sur ce téléphone. Pour les effacer aussi, utilise « Effacer ma progression ».</p><div style="display:flex;flex-direction:column;gap:10px;margin-top:8px"><button class="btn" data-sx="deletego" style="background:rgba(240,140,90,.15);border:1px solid var(--bad);color:var(--bad)">Oui, supprimer mon compte</button><button class="btn ghost" data-close>Annuler</button></div>');
+}
+function deleteAccount(btn){
+  btn.textContent='Suppression…';
+  var done=function(){ sbSave(null); st.pseudo=''; st.soc=null; st.faceH=''; st.duelSeen={}; st.roomSeen={}; save(); ar={kind:'week',fr:false,b:null,fl:null,du:null,load:0}; var s=document.querySelector('.sheet'); if(s) s.remove(); render(); toast('🗑️','Ton compte de joueur a été supprimé.',3000); };
+  if(!sbSess()) return done();
+  rpc('mfc_delete_me',{}).then(done).catch(function(e){ btn.textContent='Oui, supprimer mon compte'; sxErr(e); });
+}
+
+/* ---------- natif : rappels locaux, vibrations ---------- */
+var NMSG=[['☀️ Tes 2 minutes de science','Démarre la journée un peu plus cultivé : 5 questions, c’est parti.'],['🧠 Le quiz du jour t’attend','2 minutes pour comprendre un peu mieux ton corps.'],['🔥 Ta série compte sur toi','Un défi de 5 questions et ta série continue.'],['💪 Petit entraînement… de cerveau','Tes 2 minutes de quiz avant le café ?'],['✅ Nouvelle mission du jour','Une action simple, prouvée par la science. Viens la découvrir.'],['⚡ 2 minutes, 50 XP à prendre','Ton défi du jour est prêt.']];
+function nativeSchedule(){
+  var LN=plug('LocalNotifications'); if(!LN) return Promise.resolve();
+  return LN.getPending().then(function(r){ var ids=(r.notifications||[]).map(function(n){ return {id:n.id}; }); return ids.length?LN.cancel({notifications:ids}):null; }).then(function(){
+    if(!st.notif.on) return;
+    var p=st.notif.time.split(':'), now=new Date(), list=[];
+    for(var d=0;d<30;d++){
+      var t=new Date(now.getFullYear(),now.getMonth(),now.getDate()+d,+p[0],+p[1],0);
+      if(t<=now) continue; if(d===0&&st.lastDaily===today()) continue;
+      var m=NMSG[(t.getDate()+d)%NMSG.length]; list.push({id:100+d,title:m[0],body:m[1],schedule:{at:t,allowWhileIdle:true}});
+    }
+    return LN.schedule({notifications:list});
+  }).catch(function(){});
+}
+function nativeEnable(time,cb){
+  var LN=plug('LocalNotifications'); st.notif.time=time; save();
+  LN.requestPermissions().then(function(r){
+    if(r.display!=='granted'){ st.notif.on=0; save(); cb('denied'); return; }
+    st.notif.on=1; save(); nativeSchedule(); cb('ok');
+  }).catch(function(){ cb('denied'); });
+}
+function buzz(ok){ var H=plug('Haptics'); if(!H) return; try{ if(ok) H.impact({style:'MEDIUM'}); else H.notification({type:'ERROR'}); }catch(e){} }
+
 /* ---------- actions ---------- */
 document.getElementById('app').addEventListener('click',function(e){
   var b=e.target.closest('[data-sx]'); if(!b) return;
@@ -523,6 +584,15 @@ document.getElementById('app').addEventListener('click',function(e){
   else if(a==='rmans') roomAct('ans',b.dataset.i);
   else if(a==='rmquit') roomQuit();
   else if(a==='rmleave') roomClose();
+  else if(a==='player') playerSheet(id);
+  else if(a==='report'){ var s1=b.closest('.sheet'); if(s1) s1.remove(); reportSheet(id); }
+  else if(a==='reportgo'){ rpc('mfc_report',{p_id:id,p_reason:b.dataset.v}).then(function(){ var s2=b.closest('.sheet'); if(s2) s2.remove(); toast('🚩','Merci, ton signalement a été envoyé.',2600); }).catch(sxErr); }
+  else if(a==='block'){ if(!confirm('Bloquer ce joueur ?')) return; rpc('mfc_block',{p_id:id}).then(function(){ var s3=b.closest('.sheet'); if(s3) s3.remove(); toast('🚫','Joueur bloqué.',2200); if(tab==='arena') loadArena(); }).catch(sxErr); }
+  else if(a==='unblock'){ rpc('mfc_unblock',{p_id:id}).then(function(){ var s4=b.closest('.sheet'); if(s4) s4.remove(); blockedSheet(); }).catch(sxErr); }
+  else if(a==='unfriend'){ if(!confirm('Retirer ce joueur de tes amis ?')) return; rpc('mfc_remove_friend',{p_id:id}).then(function(){ var s5=b.closest('.sheet'); if(s5) s5.remove(); loadArena(); }).catch(sxErr); }
+  else if(a==='blocked') blockedSheet();
+  else if(a==='delacc') deleteSheet();
+  else if(a==='deletego') deleteAccount(b);
 });
 (function(){
   try{ var u=new URLSearchParams(location.search), am=u.get('ami'), sa=u.get('salon');
@@ -531,6 +601,7 @@ document.getElementById('app').addEventListener('click',function(e){
 })();
 function bootSocial(){
   if(st.pend&&st.onboarded){ tab='arena'; }
+  if(NATIVE){ nativeSchedule(); document.addEventListener('visibilitychange',function(){ if(!document.hidden) nativeSchedule(); }); }
   if(st.pseudo&&navigator.onLine) sbSync().then(function(){ pendingLinks(); }).catch(function(){});
 }
 /* ==/SOCIAL== */

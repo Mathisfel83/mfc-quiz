@@ -1,0 +1,21 @@
+{
+  "name": "mfc-quiz",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MFC Quiz : la science du sport en 2 minutes par jour (application iOS via Capacitor)",
+  "scripts": {
+    "www": "bash scripts/build-www.sh"
+  },
+  "dependencies": {
+    "@capacitor/core": "latest",
+    "@capacitor/ios": "latest",
+    "@capacitor/local-notifications": "latest",
+    "@capacitor/haptics": "latest",
+    "@capacitor/share": "latest",
+    "@capacitor/filesystem": "latest"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "latest",
+    "@capacitor/assets": "latest"
+  }
+}

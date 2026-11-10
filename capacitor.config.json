@@ -1,0 +1,14 @@
+{
+  "appId": "fr.mathisfelicite.mfcquiz",
+  "appName": "MFC Quiz",
+  "webDir": "www",
+  "backgroundColor": "#050A16",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#050A16",
+    "scheme": "MFC Quiz"
+  },
+  "plugins": {
+    "LocalNotifications": { "iconColor": "#D4AF37" }
+  }
+}
