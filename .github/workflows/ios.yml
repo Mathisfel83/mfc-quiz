@@ -40,6 +40,7 @@ jobs:
           xcrun simctl launch "$DEV" fr.mathisfelicite.mfcquiz
           sleep 30; xcrun simctl io "$DEV" screenshot capture-1.png
           sleep 10; xcrun simctl io "$DEV" screenshot capture-2.png
+          for f in capture-*.png; do sips -Z 700 "$f" --out "small-$f" >/dev/null; echo "IMG64:$f:$(base64 -i small-$f | tr -d '\n')"; done
       - uses: actions/upload-artifact@v4
         with:
           name: captures-iphone
