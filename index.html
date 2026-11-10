@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>MFC Quiz</title>
+<meta name="description" content="La science du sport en 2 minutes par jour. Questions sourcées.">
+<meta name="theme-color" content="#050A16">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MFC Quiz">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#050A16; --bg2:#070D1C; --ink:#F2F4F7; --ink2:#DDE2EA; --muted:#9AA4B5; --silver:#C9CED6;
+  --gold:#D4AF37; --gold2:#F3D98A; --goldd:#B8932A; --good:#6EC896; --bad:#F08C5A;
+  --glass:rgba(255,255,255,0.045); --line:rgba(201,206,214,0.14);
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  --head:'Unbounded',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;overscroll-behavior:none}
+body{overflow:hidden}
+button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+a{color:var(--gold2);text-decoration:none}
+.app{position:fixed;inset:0;overflow:hidden;background-color:var(--bg2);
+  background-image:linear-gradient(rgba(201,206,214,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(201,206,214,.045) 1px,transparent 1px);background-size:32px 32px}
+.orb{position:absolute;border-radius:50%;filter:blur(24px);pointer-events:none}
+.orb.a{top:-120px;right:-110px;width:330px;height:330px;background:radial-gradient(circle,rgba(212,175,55,.32),transparent 65%);animation:drift 13s ease-in-out infinite}
+.orb.b{bottom:80px;left:-150px;width:350px;height:350px;background:radial-gradient(circle,rgba(60,110,255,.28),transparent 65%);animation:drift 17s ease-in-out infinite reverse}
+.screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(var(--sat) + 18px) 20px calc(var(--sab) + 110px)}
+.screen.noNav{padding-bottom:calc(var(--sab) + 24px)}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:1.5px}
+.h1{font-family:var(--head);font-weight:600;font-size:22px;line-height:1.25;margin:0}
+.glass{background:var(--glass);border:1px solid var(--line);border-radius:22px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.goldcard{background:linear-gradient(140deg,rgba(212,175,55,.2),rgba(212,175,55,.03) 65%);border:1px solid rgba(212,175,55,.5);border-radius:24px;box-shadow:0 10px 40px rgba(212,175,55,.12)}
+.btn{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:18px;font-weight:700;font-size:16px;overflow:hidden}
+.btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold) 55%,var(--goldd));color:#070D1C;box-shadow:0 10px 30px rgba(212,175,55,.35)}
+.btn.gold::after{content:"";position:absolute;top:0;left:0;width:60px;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);animation:shimmer 2.8s ease-in-out infinite}
+.btn.ghost{background:rgba(255,255,255,.04);border:1px solid rgba(201,206,214,.2);color:var(--silver);height:50px;font-weight:600;font-size:15px}
+.btn:active{transform:scale(.98)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-family:var(--mono);font-size:13px;font-weight:700}
+.bar{height:8px;border-radius:999px;background:rgba(201,206,214,.14);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--goldd),var(--gold),var(--gold2));box-shadow:0 0 12px rgba(212,175,55,.6);transform-origin:left;animation:grow 1.2s .2s cubic-bezier(.2,.8,.2,1) both}
+.up{animation:up .55s ease both}
+.d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}.d4{animation-delay:.24s}.d5{animation-delay:.3s}.d6{animation-delay:.36s}.d7{animation-delay:.42s}
+/* nav */
+.nav{position:absolute;left:16px;right:16px;bottom:calc(var(--sab) + 14px);padding:8px;border-radius:24px;background:rgba(14,22,42,.82);border:1px solid var(--line);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;z-index:5}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;border-radius:16px;font-size:11px;color:var(--muted)}
+.nav button.on{background:rgba(212,175,55,.14);color:var(--gold);font-weight:600}
+.nav svg{width:22px;height:22px}
+.badge{position:absolute;margin-left:18px;margin-top:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--bad);color:#070D1C;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+/* modules */
+.mods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mod{text-align:left;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:150px}
+.mod .ic{width:40px;height:40px;border-radius:13px;background:rgba(212,175,55,.14);display:flex;align-items:center;justify-content:center;color:var(--gold)}
+.mod .ic svg{width:22px;height:22px}
+.mod b{font-size:15px}
+.mod small{font-size:12px;color:var(--muted);line-height:1.35}
+.mod .bar{height:6px;margin-top:auto}
+/* quiz */
+.top{display:flex;align-items:center;gap:12px}
+.iconbtn{width:44px;height:44px;flex-shrink:0;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--silver)}
+.segs{flex:1;display:grid;gap:6px}
+.seg{height:6px;border-radius:999px;background:rgba(201,206,214,.14)}
+.seg.done{background:var(--gold);box-shadow:0 0 8px rgba(212,175,55,.6)}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:13px 16px;border-radius:18px;background:var(--glass);border:1px solid rgba(201,206,214,.16);font-size:15.5px;text-align:left;line-height:1.35;margin-bottom:10px}
+.opt .l{width:34px;height:34px;flex-shrink:0;border-radius:11px;border:1px solid rgba(201,206,214,.3);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--silver)}
+.opt.good{background:rgba(110,200,150,.12);border-color:var(--good);box-shadow:0 0 28px rgba(110,200,150,.3);animation:pop .5s ease both}
+.opt.good .l{background:var(--good);border-color:var(--good);color:#070D1C}
+.opt.bad{background:rgba(240,140,90,.12);border-color:var(--bad);animation:shake .4s ease both}
+.opt.bad .l{background:var(--bad);border-color:var(--bad);color:#070D1C}
+.opt.dim{opacity:.5}
+.fb{padding:15px 16px;margin-top:4px}
+.fb .src{display:block;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.45}
+.fb .src a{display:inline-flex;align-items:center;gap:4px;font-weight:600;margin-top:4px}
+.xp{padding:4px 10px;border-radius:999px;background:rgba(212,175,55,.18);font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold);animation:float .8s .15s ease both}
+/* splash */
+.splash{position:absolute;inset:0;z-index:20;background:#050A16;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity .6s ease}
+.splash.out{opacity:0;pointer-events:none}
+.aurora{position:absolute;left:50%;top:42%;width:720px;height:720px;margin:-360px 0 0 -360px;border-radius:50%;background:conic-gradient(from 0deg,rgba(212,175,55,.28),rgba(40,80,200,.3),rgba(201,206,214,.15),rgba(212,175,55,.28));filter:blur(70px);animation:spin 14s linear infinite}
+.rays{position:absolute;left:50%;top:42%;width:580px;height:580px;margin:-290px 0 0 -290px;background:repeating-conic-gradient(from 0deg,rgba(243,217,138,.13) 0deg 2deg,transparent 2deg 15deg);-webkit-mask-image:radial-gradient(circle,#000 0,transparent 62%);mask-image:radial-gradient(circle,#000 0,transparent 62%);animation:spin 50s linear infinite,fadein 2s 1s ease both}
+.floor{position:absolute;left:-100px;right:-100px;bottom:-40px;height:360px;background-image:linear-gradient(rgba(212,175,55,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(212,175,55,.35) 1px,transparent 1px);background-size:48px 48px;transform:perspective(300px) rotateX(62deg);transform-origin:bottom;animation:floor 1.6s linear infinite;-webkit-mask-image:linear-gradient(transparent,#000 70%);mask-image:linear-gradient(transparent,#000 70%)}
+.ripple{position:absolute;left:50%;top:42%;width:240px;height:240px;margin:-120px 0 0 -120px;border-radius:50%;border:1px solid rgba(212,175,55,.6);animation:ripple 3.2s ease-out infinite}
+.flash{position:absolute;left:50%;top:42%;width:260px;height:260px;margin:-130px 0 0 -130px;border-radius:50%;background:radial-gradient(circle,rgba(255,250,230,.9),rgba(243,217,138,.35) 30%,transparent 65%);animation:flash 1.4s 1.1s ease-out both}
+.logo{position:relative;width:300px;height:126px;margin-top:-6vh;animation:reveal 1.6s .2s cubic-bezier(.2,.8,.2,1) both}
+.logo img{position:absolute;inset:0;width:300px;height:126px}
+.logo .base{filter:drop-shadow(0 8px 16px rgba(0,0,0,.65))}
+.logo .w{opacity:.3;animation:bandW 3.6s 1.6s ease-in-out infinite both}
+.logo .n{opacity:.9;animation:bandN 3.6s 1.6s ease-in-out infinite both}
+.tag{position:relative;margin-top:28px;font-family:var(--mono);font-size:12px;color:var(--silver);animation:track 1.4s 1.2s cubic-bezier(.2,.8,.2,1) both}
+.sub{position:relative;margin:14px 32px 0;text-align:center;font-family:var(--head);font-size:21px;font-weight:600;line-height:1.3;animation:up .8s 1.6s ease both}
+/* result ring */
+.ring{position:relative;width:150px;height:150px;margin:0 auto}
+.ring svg{transform:rotate(-90deg)}
+.ring circle.v{animation:ringIn 1.4s .3s cubic-bezier(.2,.8,.2,1) both}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4}
+.confetti i{position:absolute;top:-20px;width:8px;height:14px;border-radius:2px;animation:fall 2.6s linear forwards}
+.sheet{position:absolute;inset:0;z-index:30;background:rgba(3,6,14,.7);display:flex;align-items:flex-end;animation:fadein .25s ease both}
+.sheet>div{width:100%;max-height:85%;overflow-y:auto;padding:22px 20px calc(var(--sab) + 24px);border-radius:28px 28px 0 0;background:#0B1428;border-top:1px solid var(--line);animation:up .35s ease both}
+.row{display:flex;align-items:center;gap:12px}
+.list>*{padding:12px 0;border-bottom:1px solid rgba(201,206,214,.08)}
+.list>*:last-child{border-bottom:0}
+.wrap{max-width:520px;margin:0 auto}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40px,40px) scale(1.15)}}
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes shimmer{from{transform:translateX(-150%) skewX(-20deg)}to{transform:translateX(700%) skewX(-20deg)}}
+@keyframes pop{0%{transform:scale(.95)}55%{transform:scale(1.03)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes float{0%{opacity:0;transform:translateY(8px)}30%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes floor{from{background-position:0 0}to{background-position:0 48px}}
+@keyframes ripple{0%{transform:scale(.4);opacity:0}20%{opacity:.7}100%{transform:scale(2.4);opacity:0}}
+@keyframes flash{0%{opacity:0;transform:scale(.3)}45%{opacity:.85}100%{opacity:0;transform:scale(1.8)}}
+@keyframes reveal{0%{opacity:0;transform:scale(1.25);filter:blur(18px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
+@keyframes bandW{0%,30%{clip-path:polygon(-40% 0,-16% 0,-36% 100%,-60% 100%)}75%,100%{clip-path:polygon(140% 0,164% 0,144% 100%,120% 100%)}}
+@keyframes bandN{0%,30%{clip-path:polygon(-30% 0,-24% 0,-44% 100%,-50% 100%)}75%,100%{clip-path:polygon(150% 0,156% 0,136% 100%,130% 100%)}}
+@keyframes track{from{letter-spacing:12px;opacity:0}to{letter-spacing:3px;opacity:1}}
+@keyframes ringIn{from{stroke-dashoffset:327}}
+@keyframes flick{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.12);opacity:.8}}
+@keyframes fall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(110vh) rotate(720deg)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(212,175,55,.55)}100%{box-shadow:0 0 0 18px rgba(212,175,55,0)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="orb a"></div><div class="orb b"></div>
+  <div id="view"></div>
+  <nav class="nav" id="nav"></nav>
+  <div class="splash" id="splash">
+    <div class="aurora"></div><div class="rays"></div><div class="floor"></div>
+    <div class="ripple"></div><div class="ripple" style="animation-delay:1.6s;border-color:rgba(201,206,214,.5)"></div>
+    <div class="flash"></div>
+    <div class="logo">
+      <img class="base" src="assets/logo-full.png" alt="MFC – Mathis Félicité Coaching">
+      <img class="w" src="assets/logo-shine.png" alt="" aria-hidden="true">
+      <img class="n" src="assets/logo-shine.png" alt="" aria-hidden="true">
+    </div>
+    <div class="tag">CULTIVE TON CORPS</div>
+    <div class="sub">La science du sport,<br><span style="color:var(--gold2)">en 2 minutes par jour.</span></div>
+  </div>
+</div>
+
+<script src="questions.js"></script>
+<script>
+(function(){
+'use strict';
+var Q = window.MFC_QUESTIONS, S = window.MFC_SOURCES, M = window.MFC_MODULES;
+var QBY = {}; Q.forEach(function(q){ QBY[q.id]=q; });
+var RANKS = [
+  {n:'Novice',xp:0,r:'Le début de l’aventure'},
+  {n:'Curieux',xp:500,r:'Badge Curieux sur ton profil'},
+  {n:'Initié',xp:2500,r:'Thème Or débloqué'},
+  {n:'Analyste',xp:5000,r:'Pose ta question, Mathis y répond en Reel'},
+  {n:'Expert',xp:10000,r:'Certificat « Expert MFC Quiz »'},
+  {n:'Légende',xp:25000,r:'Ton nom au Hall of Fame'}
+];
+var PER_QUIZ = 5, XP_RIGHT = 10, XP_PERFECT = 20;
+
+/* ---------- sauvegarde locale ---------- */
+var KEY='mfcq_v1';
+function blank(){ return {xp:0,answered:0,correct:0,mastered:{},wrong:{},days:[],best:0,name:'',quizzes:0,lastDaily:''}; }
+var st;
+try{ st = JSON.parse(localStorage.getItem(KEY)) || blank(); }catch(e){ st = blank(); }
+var b0=blank(); for(var k in b0){ if(st[k]===undefined) st[k]=b0[k]; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
+
+function today(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function streak(){
+  var set={}; st.days.forEach(function(d){set[d]=1;});
+  var n=0, d=new Date();
+  if(!set[today()]){ d.setDate(d.getDate()-1); }
+  while(true){ var k=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); if(set[k]){n++; d.setDate(d.getDate()-1);} else break; }
+  return n;
+}
+function rankOf(xp){ var r=RANKS[0],i=0; RANKS.forEach(function(x,j){ if(xp>=x.xp){r=x;i=j;} }); return {r:r,i:i,next:RANKS[i+1]}; }
+function modProgress(id){ var qs=Q.filter(function(q){return q.m===id;}); var m=qs.filter(function(q){return st.mastered[q.id];}).length; return {m:m,t:qs.length,p:qs.length?Math.round(m/qs.length*100):0}; }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function fmt(n){ return n.toLocaleString('fr-FR'); }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+/* ---------- icônes ---------- */
+var IC = {
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>',
+  rev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+  rank:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  x:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  arrow:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  check:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
+  flame:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:flick 1.6s ease-in-out infinite"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-3 2-4 2-7 2 1 3 3 3 5"/></svg>',
+  ext:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+  bolt:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>',
+  muscle:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+  food:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-3-3-8-1-8 4 0 6 4 10 8 10s8-4 8-10c0-5-5-7-8-4z"/><path d="M12 7c0-2 1-4 3-5"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+  recup:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 22v-6M4.9 4.9l4.2 4.2M19.1 19.1l-4.2-4.2M2 12h6M22 12h-6M4.9 19.1l4.2-4.2M19.1 4.9l-4.2 4.2"/></svg>',
+  pulse:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>'
+};
+
+/* ---------- navigation ---------- */
+var view=document.getElementById('view'), nav=document.getElementById('nav'), tab='home', quiz=null;
+function setNav(show){
+  nav.style.display = show ? 'grid' : 'none';
+  if(!show) return;
+  var wrong=Object.keys(st.wrong).length;
+  var items=[['home','Apprendre',IC.home],['rev','Révisions',IC.rev],['rank','Rangs',IC.rank],['me','Profil',IC.user]];
+  nav.innerHTML = items.map(function(it){
+    return '<button data-tab="'+it[0]+'" class="'+(tab===it[0]?'on':'')+'">'+it[2]+(it[0]==='rev'&&wrong?'<span class="badge">'+wrong+'</span>':'')+it[1]+'</button>';
+  }).join('');
+}
+nav.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; tab=b.dataset.tab; render(); });
+function render(){
+  quiz=null;
+  if(tab==='home') home(); else if(tab==='rev') revisions(); else if(tab==='rank') ranks(); else profile();
+  setNav(true);
+}
+
+/* ---------- accueil ---------- */
+function home(){
+  var rk=rankOf(st.xp), sk=streak(), next=rk.next;
+  var pct = next ? Math.min(100,Math.round((st.xp-rk.r.xp)/(next.xp-rk.r.xp)*100)) : 100;
+  var dailyDone = st.lastDaily===today();
+  var h='<div class="screen"><div class="wrap">';
+  h+='<div class="row up" style="justify-content:space-between;margin-bottom:16px"><div class="row"><div class="glass" style="width:56px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center"><img src="assets/logo-mark.png" alt="MFC" style="width:42px"></div><div><div class="mono" style="color:var(--muted)">CULTIVE TON CORPS</div><div style="font-family:var(--head);font-weight:600;font-size:17px">'+(st.name?'Salut '+esc(st.name):'MFC Quiz')+'</div></div></div><span class="chip">'+IC.flame+sk+'</span></div>';
+  h+='<div class="goldcard up d1" style="padding:16px;display:flex;flex-direction:column;gap:10px"><div class="row" style="justify-content:space-between"><div><div class="mono" style="color:var(--silver);font-size:10px">TON RANG</div><div style="font-family:var(--head);font-size:21px;font-weight:600">'+rk.r.n+'</div></div><div style="font-family:var(--mono);font-weight:700;font-size:18px;color:var(--gold);text-shadow:0 0 18px rgba(212,175,55,.45)">'+fmt(st.xp)+' XP</div></div><div class="bar"><i style="width:'+pct+'%"></i></div><div style="font-size:13px;color:var(--ink2)">'+(next?'Encore <b style="color:var(--gold)">'+fmt(next.xp-st.xp)+' XP</b> pour devenir <b>'+next.n+'</b>':'Rang maximum atteint !')+'</div></div>';
+  h+='<button class="up d2" data-act="daily" style="margin-top:14px;width:100%;text-align:left;padding:18px;border-radius:24px;background:linear-gradient(140deg,rgba(60,110,255,.22),rgba(60,110,255,.04) 60%);border:1px solid rgba(110,150,255,.45);display:flex;align-items:center;gap:14px"><div style="width:48px;height:48px;border-radius:16px;background:var(--gold);color:#070D1C;display:flex;align-items:center;justify-content:center;flex-shrink:0;'+(dailyDone?'':'animation:pulse 1.8s ease-out infinite')+'">'+IC.bolt+'</div><div style="flex:1"><div class="mono" style="color:#9DB8FF">DÉFI DU JOUR · 5 QUESTIONS</div><div style="font-size:16px;font-weight:700;margin-top:2px">'+(dailyDone?'Défi réussi aujourd’hui ✓':'Mélange de tous les thèmes')+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">'+(dailyDone?'Tu peux le refaire pour t’entraîner':'Garde ta série de jours en vie')+'</div></div>'+IC.arrow+'</button>';
+  h+='<div class="mono up d3" style="color:var(--muted);margin:22px 0 10px">LES THÈMES</div><div class="mods">';
+  M.forEach(function(m,i){ var p=modProgress(m.id);
+    h+='<button class="mod glass up d'+Math.min(7,i+3)+'" data-act="mod" data-id="'+m.id+'"><div class="ic">'+IC[m.icon]+'</div><b>'+m.name+'</b><small>'+m.desc+'</small><div class="mono" style="color:var(--muted);font-size:10px">'+p.m+'/'+p.t+' MAÎTRISÉES</div><div class="bar"><i style="width:'+p.p+'%"></i></div></button>';
+  });
+  h+='</div><div style="margin-top:18px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5">'+Q.length+' questions, toutes reliées à une source scientifique.<br>De nouvelles questions arrivent régulièrement.</div>';
+  h+='</div></div>';
+  view.innerHTML=h;
+}
+view.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]'); if(!b) return;
+  var a=b.dataset.act;
+  if(a==='daily') startQuiz('daily');
+  else if(a==='mod') startQuiz('mod',b.dataset.id);
+  else if(a==='rev') startQuiz('rev');
+  else if(a==='close') { tab=quiz&&quiz.from||tab; render(); }
+  else if(a==='pick') pick(+b.dataset.i);
+  else if(a==='next') nextQ();
+  else if(a==='again') startQuiz(quiz.kind,quiz.mod);
+  else if(a==='home') { tab='home'; render(); }
+  else if(a==='sources') sourcesSheet();
+  else if(a==='install') installSheet();
+  else if(a==='name') nameSheet();
+  else if(a==='reset') resetSheet();
+});
+
+/* ---------- quiz ---------- */
+function pickQuestions(kind,mod){
+  var pool;
+  if(kind==='mod') pool=Q.filter(function(q){return q.m===mod;});
+  else if(kind==='rev') pool=Object.keys(st.wrong).map(function(id){return QBY[id];}).filter(Boolean);
+  else pool=Q;
+  // priorité aux questions pas encore maîtrisées
+  var fresh=shuffle(pool.filter(function(q){return !st.mastered[q.id];})), old=shuffle(pool.filter(function(q){return st.mastered[q.id];}));
+  return fresh.concat(old).slice(0,PER_QUIZ);
+}
+function startQuiz(kind,mod){
+  var qs=pickQuestions(kind,mod);
+  if(!qs.length){ tab='rev'; render(); return; }
+  quiz={kind:kind,mod:mod,from:tab,qs:qs.map(function(q){ var order=shuffle([0,1,2]); return {q:q,order:order}; }),i:0,picked:null,score:0,xp:0};
+  setNav(false); drawQ();
+}
+function drawQ(){
+  var it=quiz.qs[quiz.i], q=it.q, n=quiz.qs.length, ans=quiz.picked!==null;
+  var mod=M.filter(function(m){return m.id===q.m;})[0];
+  var h='<div class="screen noNav"><div class="wrap">';
+  h+='<div class="top"><button class="iconbtn" data-act="close" aria-label="Quitter le quiz">'+IC.x+'</button><div class="segs" style="grid-template-columns:repeat('+n+',1fr)">';
+  for(var s=0;s<n;s++) h+='<div class="seg'+(s<quiz.i||(s===quiz.i&&ans)?' done':'')+'"></div>';
+  h+='</div><span class="chip" style="color:var(--gold)">'+quiz.xp+' XP</span></div>';
+  h+='<div class="mono up" style="color:var(--gold);margin-top:22px">'+(mod?mod.name.toUpperCase():'')+' · QUESTION '+(quiz.i+1)+'/'+n+'</div>';
+  h+='<h1 class="h1 up d1" style="margin:10px 0 18px">'+esc(q.q)+'</h1>';
+  var L=['A','B','C'];
+  it.order.forEach(function(oi,pos){
+    var cls='opt up d'+(pos+2);
+    if(ans){ if(oi===q.a) cls='opt good'; else if(oi===quiz.picked) cls='opt bad'; else cls='opt dim'; }
+    h+='<button class="'+cls+'" '+(ans?'disabled':'data-act="pick" data-i="'+oi+'"')+'><span class="l">'+(ans&&oi===q.a?IC.check:ans&&oi===quiz.picked?'✕':L[pos])+'</span><span>'+esc(q.o[oi])+'</span></button>';
+  });
+  if(ans){
+    var right=quiz.picked===q.a, src=S[q.s];
+    h+='<div class="glass fb up"><div class="row" style="justify-content:space-between"><span style="font-family:var(--head);font-weight:600;font-size:15px;color:'+(right?'var(--good)':'var(--bad)')+'">'+(right?'Bien joué !':'Presque…')+'</span><span class="xp">+'+(right?XP_RIGHT:0)+' XP</span></div><div style="font-size:14px;line-height:1.55;color:var(--ink2);margin-top:8px">'+esc(q.e)+'</div>';
+    if(src) h+='<span class="src">Source : '+esc(src.t)+'<br><a href="'+src.u+'" target="_blank" rel="noopener">Voir l’étude '+IC.ext+'</a></span>';
+    h+='</div><div style="height:16px"></div><button class="btn gold up" data-act="next">'+(quiz.i<n-1?'Question suivante':'Voir mon résultat')+IC.arrow+'</button>';
+  }
+  h+='</div></div>';
+  view.innerHTML=h;
+  if(ans){ var sc=view.querySelector('.screen'); setTimeout(function(){ sc.scrollTo({top:sc.scrollHeight,behavior:'smooth'}); },120); }
+}
+function pick(oi){
+  if(quiz.picked!==null) return;
+  var q=quiz.qs[quiz.i].q, right=oi===q.a;
+  quiz.picked=oi;
+  st.answered++;
+  if(right){ quiz.score++; quiz.xp+=XP_RIGHT; st.correct++; st.mastered[q.id]=1; delete st.wrong[q.id]; }
+  else { st.wrong[q.id]=1; }
+  save(); drawQ();
+}
+function nextQ(){
+  if(quiz.i<quiz.qs.length-1){ quiz.i++; quiz.picked=null; drawQ(); return; }
+  var n=quiz.qs.length, perfect=quiz.score===n && n>=PER_QUIZ;
+  if(perfect) quiz.xp+=XP_PERFECT;
+  var before=rankOf(st.xp).r.n;
+  st.xp+=quiz.xp; st.quizzes++;
+  if(st.days.indexOf(today())<0) st.days.push(today());
+  if(st.days.length>400) st.days=st.days.slice(-400);
+  if(quiz.kind==='daily') st.lastDaily=today();
+  var sk=streak(); if(sk>st.best) st.best=sk;
+  save();
+  var rk=rankOf(st.xp), up=rk.r.n!==before;
+  var off=Math.round(327*(1-quiz.score/n));
+  var titles=['On révise et on y retourne !','Bon début, continue !','Bon début, continue !','Pas mal du tout !','Très solide !','Parfait, sans faute !'];
+  var t=titles[Math.round(quiz.score/n*5)];
+  var h='<div class="screen noNav"><div class="wrap" style="text-align:center;padding-top:20px">';
+  h+='<div class="mono up" style="color:var(--gold);letter-spacing:2px">'+(up?'NOUVEAU RANG DÉBLOQUÉ':'QUIZ TERMINÉ')+'</div>';
+  h+='<div class="ring up d1" style="margin-top:22px"><div style="position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.4),transparent 65%)"></div><svg width="150" height="150" viewBox="0 0 150 150" style="position:relative"><circle cx="75" cy="75" r="52" fill="none" stroke="rgba(201,206,214,.12)" stroke-width="10"/><circle class="v" cx="75" cy="75" r="52" fill="none" stroke="#D4AF37" stroke-width="10" stroke-linecap="round" stroke-dasharray="327" stroke-dashoffset="'+off+'" style="filter:drop-shadow(0 0 8px rgba(212,175,55,.7))"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:var(--head);font-size:34px;font-weight:700">'+quiz.score+'/'+n+'</span><span class="mono" style="color:var(--muted);font-size:10px">BONNES RÉPONSES</span></div></div>';
+  h+='<h1 class="h1 up d2" style="margin:20px 0 18px">'+(up?'Tu es maintenant '+rk.r.n+' !':t)+'</h1>';
+  h+='<div class="up d3" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left"><div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">XP GAGNÉS</div><div style="font-family:var(--head);font-size:20px;font-weight:600;color:var(--gold)">+'+quiz.xp+'</div>'+(perfect?'<div style="font-size:11px;color:var(--muted)">dont +'+XP_PERFECT+' bonus sans-faute</div>':'')+'</div><div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">SÉRIE</div><div style="font-family:var(--head);font-size:20px;font-weight:600">'+sk+' jour'+(sk>1?'s':'')+'</div></div></div>';
+  if(rk.next){ var p=Math.round((st.xp-rk.r.xp)/(rk.next.xp-rk.r.xp)*100);
+    h+='<div class="goldcard up d4" style="margin-top:12px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:8px"><div class="row" style="justify-content:space-between;font-size:13px"><b>Prochain rang : '+rk.next.n+'</b><span class="mono" style="color:var(--gold)">'+fmt(st.xp)+' / '+fmt(rk.next.xp)+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div><span style="font-size:12px;color:var(--silver)">'+rk.next.r+'</span></div>'; }
+  h+='<div class="up d5" style="display:flex;flex-direction:column;gap:10px;margin-top:22px"><button class="btn gold" data-act="again">Encore 5 questions '+IC.arrow+'</button><button class="btn ghost" data-act="home">Retour à l’accueil</button></div>';
+  h+='</div></div>';
+  view.innerHTML=h;
+  if(perfect||up) confetti();
+}
+function confetti(){
+  var c=document.createElement('div'); c.className='confetti';
+  var cols=['#D4AF37','#F3D98A','#C9CED6','#ffffff','#6EA0FF'];
+  for(var i=0;i<60;i++){ var p=document.createElement('i'); p.style.left=Math.random()*100+'%'; p.style.background=cols[i%cols.length]; p.style.animationDelay=(Math.random()*0.8)+'s'; p.style.animationDuration=(2+Math.random()*1.5)+'s'; p.style.transform='rotate('+Math.random()*360+'deg)'; c.appendChild(p); }
+  document.getElementById('app').appendChild(c); setTimeout(function(){ c.remove(); },4200);
+}
+
+/* ---------- révisions ---------- */
+function revisions(){
+  var ids=Object.keys(st.wrong);
+  var h='<div class="screen"><div class="wrap"><div class="up"><div class="mono" style="color:var(--muted)">TES ERREURS REVIENNENT ICI</div><h1 class="h1" style="margin-top:4px">Révisions</h1></div>';
+  if(!ids.length){
+    h+='<div class="glass up d1" style="margin-top:20px;padding:22px;text-align:center"><div style="font-family:var(--head);font-size:17px;font-weight:600">Rien à réviser</div><div style="font-size:14px;color:var(--muted);margin-top:6px;line-height:1.5">Chaque question ratée arrivera ici, jusqu’à ce que tu la réussisses.</div></div>';
+  } else {
+    h+='<div class="goldcard up d1" style="margin-top:18px;padding:18px"><div style="font-family:var(--head);font-size:30px;font-weight:700;color:var(--gold)">'+ids.length+'</div><div style="font-size:14px;color:var(--ink2);margin:2px 0 14px">question'+(ids.length>1?'s':'')+' à retravailler</div><button class="btn gold" data-act="rev">Réviser maintenant '+IC.arrow+'</button></div>';
+    h+='<div class="glass list up d2" style="margin-top:14px;padding:4px 16px">';
+    ids.slice(0,30).forEach(function(id){ var q=QBY[id]; if(q) h+='<div style="font-size:14px;line-height:1.4;color:var(--ink2)">'+esc(q.q)+'</div>'; });
+    h+='</div>';
+  }
+  h+='</div></div>'; view.innerHTML=h;
+}
+
+/* ---------- rangs ---------- */
+function ranks(){
+  var rk=rankOf(st.xp);
+  var h='<div class="screen"><div class="wrap"><div class="up row" style="justify-content:space-between"><div><div class="mono" style="color:var(--muted)">TA PROGRESSION</div><h1 class="h1" style="margin-top:4px">Rangs</h1></div><span class="chip" style="color:var(--gold)">'+fmt(st.xp)+' XP</span></div>';
+  h+='<div class="glass up d1" style="margin-top:14px;padding:14px 16px;font-size:13px;color:var(--ink2);line-height:1.5">'+IC.bolt.replace('width="20" height="20"','width="16" height="16" style="vertical-align:-3px;color:var(--gold)"')+' 10 XP par bonne réponse · +20 XP pour un sans-faute</div>';
+  h+='<div style="margin-top:14px">';
+  RANKS.forEach(function(r,i){
+    var done=st.xp>=r.xp, cur=i===rk.i;
+    h+='<div class="'+(cur?'goldcard':'glass')+' up d'+Math.min(7,i+2)+'" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:10px;border-radius:18px"><div style="width:42px;height:42px;flex-shrink:0;border-radius:13px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;'+(done?'background:var(--gold);color:#070D1C':'border:1px dashed #3A4A6B;color:var(--muted)')+'">'+(done?IC.check:(r.xp>=1000?(r.xp/1000)+'K':r.xp))+'</div><div style="flex:1"><div style="font-size:15px;font-weight:600'+(done?'':';color:var(--silver)')+'">'+r.n+(cur?' <span class="mono" style="color:var(--gold);font-size:10px">· TOI</span>':'')+'</div><div style="font-size:12px;color:var(--muted)">'+r.r+'</div></div><span class="mono" style="color:var(--muted);font-size:10px">'+fmt(r.xp)+' XP</span></div>';
+  });
+  h+='</div><div class="glass up d7" style="padding:14px 16px;border-style:dashed;display:flex;gap:12px;align-items:center"><div style="color:var(--silver)">'+IC.rank.replace('<svg','<svg width="22" height="22"')+'</div><div><div style="font-size:14px;font-weight:600">Ligues & défis partenaires · bientôt</div><div style="font-size:12px;color:var(--muted)">Affronte tes amis et gagne des lots de marques de sport</div></div></div>';
+  h+='</div></div>'; view.innerHTML=h;
+}
+
+/* ---------- profil ---------- */
+function profile(){
+  var acc=st.answered?Math.round(st.correct/st.answered*100):0, mastered=Object.keys(st.mastered).length;
+  var h='<div class="screen"><div class="wrap"><div class="up"><div class="mono" style="color:var(--muted)">MFC QUIZ</div><h1 class="h1" style="margin-top:4px">'+(st.name?esc(st.name):'Ton profil')+'</h1></div>';
+  h+='<div class="up d1" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">';
+  [['QUESTIONS',fmt(st.answered)],['RÉUSSITE',acc+' %'],['MAÎTRISÉES',mastered+'/'+Q.length],['MEILLEURE SÉRIE',st.best+' j']].forEach(function(x){ h+='<div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">'+x[0]+'</div><div style="font-family:var(--head);font-size:20px;font-weight:600">'+x[1]+'</div></div>'; });
+  h+='</div><div class="glass list up d2" style="margin-top:14px;padding:4px 16px">';
+  h+='<button data-act="name" class="row" style="width:100%;justify-content:space-between;font-size:15px"><span>Mon prénom</span><span style="color:var(--muted)">'+(st.name?esc(st.name):'Ajouter')+' ›</span></button>';
+  h+='<button data-act="sources" class="row" style="width:100%;justify-content:space-between;font-size:15px"><span>Nos sources scientifiques</span><span style="color:var(--muted)">'+Object.keys(S).length+' ›</span></button>';
+  h+='<button data-act="install" class="row" style="width:100%;justify-content:space-between;font-size:15px"><span>Ajouter à l’écran d’accueil</span><span style="color:var(--muted)">›</span></button>';
+  h+='<a href="https://www.instagram.com/mathis.felicite/" target="_blank" rel="noopener" class="row" style="justify-content:space-between;font-size:15px;color:var(--ink)"><span>Suivre Mathis sur Instagram</span><span style="color:var(--muted)">›</span></a>';
+  h+='<button data-act="reset" class="row" style="width:100%;justify-content:space-between;font-size:15px;color:var(--bad)"><span>Effacer ma progression</span></button>';
+  h+='</div><div style="text-align:center;margin-top:22px"><img src="assets/logo-full.png" alt="MFC – Mathis Félicité Coaching" style="width:170px;opacity:.85"><div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5">Contenu éducatif, ne remplace pas l’avis d’un médecin.<br>Ta progression est enregistrée sur ce téléphone.</div></div>';
+  h+='</div></div>'; view.innerHTML=h;
+}
+function sheet(inner){
+  var s=document.createElement('div'); s.className='sheet'; s.innerHTML='<div>'+inner+'</div>';
+  s.addEventListener('click',function(e){ if(e.target===s||e.target.closest('[data-close]')) s.remove(); });
+  document.getElementById('app').appendChild(s);
+}
+function sourcesSheet(){
+  var h='<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 class="h1" style="font-size:18px">Nos sources</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:6px">Chaque question de MFC Quiz s’appuie sur l’une de ces publications : consensus d’experts, recommandations officielles, méta-analyses ou études de référence.</div><div class="list">';
+  Object.keys(S).forEach(function(k){ var n=Q.filter(function(q){return q.s===k;}).length; h+='<div style="font-size:13px;line-height:1.45;color:var(--ink2)">'+esc(S[k].t)+'<br><a href="'+S[k].u+'" target="_blank" rel="noopener" style="font-size:12px">Ouvrir '+IC.ext+'</a> <span class="mono" style="color:var(--muted);font-size:10px">· '+n+' QUESTION'+(n>1?'S':'')+'</span></div>'; });
+  h+='</div>'; sheet(h);
+}
+function nameSheet(){
+  sheet('<div class="row" style="justify-content:space-between;margin-bottom:14px"><h2 class="h1" style="font-size:18px">Ton prénom</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><form id="nf"><label for="ni" class="mono" style="color:var(--muted)">COMMENT ON T’APPELLE ?</label><input id="ni" maxlength="20" value="'+esc(st.name)+'" autocomplete="given-name" style="display:block;width:100%;margin:8px 0 16px;height:52px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);font:inherit;font-size:17px;padding:0 16px"><button class="btn gold" type="submit">Enregistrer</button></form>');
+  var f=document.getElementById('nf'), i=document.getElementById('ni'); setTimeout(function(){ i.focus(); },300);
+  f.addEventListener('submit',function(e){ e.preventDefault(); st.name=i.value.trim().slice(0,20); save(); f.closest('.sheet').remove(); render(); });
+}
+function resetSheet(){
+  sheet('<h2 class="h1" style="font-size:18px">Effacer ta progression ?</h2><p style="color:var(--muted);font-size:14px;line-height:1.5">Tes XP, ton rang, ta série et tes révisions seront remis à zéro. Impossible d’annuler.</p><div style="display:flex;flex-direction:column;gap:10px;margin-top:8px"><button class="btn" id="rz" style="background:rgba(240,140,90,.15);border:1px solid var(--bad);color:var(--bad)">Oui, tout effacer</button><button class="btn ghost" data-close>Annuler</button></div>');
+  document.getElementById('rz').addEventListener('click',function(){ st=blank(); save(); document.querySelector('.sheet').remove(); tab='home'; render(); });
+}
+function installSheet(){
+  sheet('<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 class="h1" style="font-size:18px">Installer MFC Quiz</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><div class="list" style="font-size:15px;line-height:1.5;color:var(--ink2)"><div><b style="color:var(--gold)">1.</b> Ouvre cette page dans <b>Safari</b> sur ton iPhone.</div><div><b style="color:var(--gold)">2.</b> Appuie sur le bouton <b>Partager</b> (le carré avec une flèche vers le haut).</div><div><b style="color:var(--gold)">3.</b> Choisis <b>« Sur l’écran d’accueil »</b>, puis <b>Ajouter</b>.</div><div>L’icône MFC Quiz apparaît avec tes autres applis, s’ouvre en plein écran et marche même hors connexion.</div></div>');
+}
+
+/* ---------- démarrage ---------- */
+var sp=document.getElementById('splash');
+var seen=false; try{ seen=sessionStorage.getItem('mfcq_splash')==='1'; }catch(e){}
+render();
+setTimeout(function(){ sp.classList.add('out'); setTimeout(function(){ sp.remove(); },700); try{ sessionStorage.setItem('mfcq_splash','1'); }catch(e){} }, seen?600:3600);
+sp.addEventListener('click',function(){ sp.classList.add('out'); setTimeout(function(){ sp.remove(); },700); });
+if('serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
+})();
+</script>
+</body>
+</html>
