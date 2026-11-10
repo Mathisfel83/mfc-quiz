@@ -175,7 +175,7 @@ declare u uuid := mfc_uid(); o mfc_profiles;
 begin
   select * into o from mfc_profiles where code = upper(btrim(p_code));
   if not found then raise exception 'Aucun joueur avec ce code'; end if;
-  if o.id = u then raise exception 'C''est ton propre code 😉'; end if;
+  if o.id = u then raise exception 'C''est ton propre code'; end if;
   if not exists (select 1 from mfc_profiles where id = u) then raise exception 'Profil introuvable'; end if;
   if (select count(*) from mfc_friends where a = u) >= 200 then raise exception 'Tu as déjà 200 amis'; end if;
   insert into mfc_friends (a, b) values (u, o.id), (o.id, u) on conflict do nothing;
