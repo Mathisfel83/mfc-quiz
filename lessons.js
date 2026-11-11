@@ -11,7 +11,9 @@ window.MFC_LESSONS = [
   { id: 'mu-memoire', m: 'muscle', e: '🧬', t: 'La mémoire musculaire', i: 'Pourquoi reprend-on plus vite du muscle qu’on a déjà eu ? Une piste se cache dans les noyaux des fibres musculaires.', k: ['muscle|bruusgaard2010'] },
   { id: 'mu-cardio', m: 'muscle', e: '🤝', t: 'Cardio et muscu : compatibles ?', i: 'On entend souvent que le cardio « fait fondre le muscle ». Une méta-analyse a regroupé des dizaines d’études pour vérifier.', k: ['muscle|schumann2022'] },
   { id: 'mu-seche', m: 'muscle', e: '✂️', t: 'Perdre du gras sans perdre de muscle', i: 'Perdre du poids trop vite ou faire des abdos « pour le ventre » : deux erreurs classiques. Voici ce que montrent les études.', k: ['muscle|garthe2011', 'nutrition|garthe2011', 'muscle|vispute2011'] },
-
+  { id: 'mu-echec2', m: 'muscle', e: '🧱', t: 'Faut-il aller jusqu’à l’échec ?', i: 'Pousser chaque série jusqu’à ne plus pouvoir bouger la barre : indispensable ou inutile ? Une grande méta-analyse de 2023 répond.', k: ['muscle|refalo2023'] },
+  { id: 'mu-ischios', m: 'muscle', e: '🦵', t: 'Leg curl : assis ou allongé ?', i: 'Le même exercice, deux positions. Une étude a mesuré laquelle fait le plus grossir les ischio-jambiers… et pourquoi.', k: ['muscle|maeo2021'] },
+  { id: 'mu-progres', m: 'muscle', e: '🔁', t: 'Progresser sans ajouter de poids', i: 'Ajouter des kilos, c’est la progression classique. Mais ajouter des répétitions, est-ce que ça marche aussi ?', k: ['muscle|plotkin2022'] },
   /* ---------- CŒUR & ENDURANCE ---------- */
   { id: 'ca-fcmax', m: 'cardio', e: '❤️', t: 'Ta fréquence cardiaque max', i: 'La fréquence cardiaque maximale (FC max) sert à calculer tes zones d’entraînement. Mais la formule la plus connue est-elle la bonne ?', k: ['cardio|tanaka2001'] },
   { id: 'ca-vo2', m: 'cardio', e: '🫁', t: 'La VO2max et comment l’améliorer', i: 'La VO2max mesure la quantité maximale d’oxygène que ton corps peut utiliser. C’est un indicateur clé de ta forme… et elle se travaille.', k: ['cardio|milanovic2015'] },
@@ -19,7 +21,9 @@ window.MFC_LESSONS = [
   { id: 'ca-8020', m: 'cardio', e: '🏃', t: 'S’entraîner comme les pros : le 80/20', i: 'Comment s’entraînent les meilleurs athlètes d’endurance au monde ? Leur répartition tient en deux chiffres.', k: ['cardio|seiler2010'] },
   { id: 'ca-longevite', m: 'cardio', e: '⏳', t: 'Forme cardio et espérance de vie', i: 'Ta capacité cardio ne sert pas qu’à courir vite : c’est aussi un marqueur puissant de santé sur le long terme.', k: ['cardio|mandsager2018', 'cardio|kodama2009'] },
   { id: 'ca-blessures', m: 'cardio', e: '🦵', t: 'Débuter la course sans se blesser', i: 'Tu débutes la course à pied ? Voici ce que disent les chiffres sur les blessures, selon ton niveau.', k: ['cardio|videbaek2015'] },
-
+  { id: 'ca-4x4', m: 'cardio', e: '⏱️', t: 'Les intervalles et la VO2max', i: 'À travail égal, quelle méthode fait le plus progresser ton moteur : le footing lent ou les intervalles ?', k: ['cardio|helgerud2007'] },
+  { id: 'ca-sprint', m: 'cardio', e: '⚡', t: '1 minute qui compte', i: '3 sprints de 20 secondes contre 45 minutes d’endurance : une étude de 12 semaines a comparé les deux.', k: ['cardio|gillen2016'] },
+  { id: 'ca-course', m: 'cardio', e: '🏃', t: 'Courir pour vivre plus longtemps', i: '55 000 adultes suivis pendant 15 ans : combien de course faut-il pour voir une différence sur la mortalité ?', k: ['cardio|lee2014'] },
   /* ---------- NUTRITION ---------- */
   { id: 'nu-proteines', m: 'nutrition', e: '🍳', t: 'Combien de protéines, et quand ?', i: 'Combien de protéines par jour, par repas, et sous quelle forme ? Les réponses de la Société internationale de nutrition du sport (ISSN).', k: ['nutrition|jager2017'] },
   { id: 'nu-glucides', m: 'nutrition', e: '🍝', t: 'Les glucides du sportif', i: 'Les glucides sont le carburant principal des efforts intenses. Tes besoins dépendent surtout de ta charge d’entraînement.', k: ['nutrition|thomas2016'] },
@@ -30,21 +34,24 @@ window.MFC_LESSONS = [
   { id: 'nu-beta', m: 'nutrition', e: '🧪', t: 'La bêta-alanine', i: 'La bêta-alanine est un complément populaire pour les efforts intenses. Comment fonctionne-t-elle, et pour quels efforts ?', k: ['nutrition|trexler2015', 'nutrition|saunders2017'] },
   { id: 'nu-bicar', m: 'nutrition', e: '🧂', t: 'Le bicarbonate de sodium', i: 'Oui, le bicarbonate de la cuisine ! Il est étudié comme aide à la performance pour certains efforts.', k: ['nutrition|grgic2021bicarb'] },
   { id: 'nu-alcool', m: 'nutrition', e: '🍺', t: 'L’alcool après le sport', i: 'Un verre après l’entraînement : quel impact sur tes muscles ? Une étude a mesuré l’effet.', k: ['nutrition|parr2014', 'muscle|parr2014', 'recup|parr2014'] },
-
+  { id: 'nu-repas', m: 'nutrition', e: '🍳', t: 'Les protéines repas par repas', i: '« 30 g maximum par repas » : mythe ou réalité ? Et comment répartir ses protéines dans la journée ?', k: ['nutrition|schoenfeld2018prot'] },
+  { id: 'nu-betterave', m: 'nutrition', e: '🥤', t: 'Jus de betterave et nitrates', i: 'Les nitrates sont l’un des rares compléments à l’effet démontré. Mais pour qui, et à quel point ?', k: ['nutrition|senefeld2020'] },
   /* ---------- SOMMEIL ---------- */
   { id: 'so-duree', m: 'sommeil', e: '🛏️', t: 'Combien d’heures dormir ?', i: 'Combien d’heures de sommeil faut-il vraiment ? Un panel d’experts a fixé des repères selon l’âge.', k: ['sommeil|nsf2015'] },
   { id: 'so-perf', m: 'sommeil', e: '🏀', t: 'Sommeil et performance', i: 'Le sommeil est l’outil de récupération le plus sous-estimé. Voici son effet sur le corps et sur le cerveau.', k: ['sommeil|mah2011', 'sommeil|fullagar2015'] },
   { id: 'so-ennemis', m: 'sommeil', e: '📱', t: 'Café tardif et écrans le soir', i: 'Deux habitudes qui sabotent ton sommeil… souvent sans que tu t’en rendes compte.', k: ['sommeil|drake2013', 'sommeil|chang2015'] },
   { id: 'so-regime', m: 'sommeil', e: '⚖️', t: 'Sommeil et perte de gras', i: 'Tu surveilles ton alimentation pour perdre du gras ? Ton sommeil compte aussi, et beaucoup.', k: ['sommeil|nedeltcheva2010'] },
   { id: 'so-blessures', m: 'sommeil', e: '🩹', t: 'Sommeil et blessures', i: 'Bien dormir protège aussi ton corps des blessures, en particulier chez les jeunes sportifs.', k: ['sommeil|milewski2014'] },
-
+  { id: 'so-nuit', m: 'sommeil', e: '🌙', t: 'Après une mauvaise nuit', i: 'Une nuit courte avant l’entraînement : combien de performance perds-tu, et comment limiter les dégâts ?', k: ['sommeil|craven2022'] },
+  { id: 'so-sieste', m: 'sommeil', e: '😴', t: 'L’art de la sieste', i: 'Combien de temps, à quelle heure, et combien de temps attendre avant de s’entraîner ? Ce que disent 37 études sur les sportifs.', k: ['sommeil|lastella2021'] },
   /* ---------- RÉCUPÉRATION ---------- */
   { id: 're-courbatures', m: 'recup', e: '🤕', t: 'Comprendre les courbatures', i: 'Les courbatures apparaissent après un effort inhabituel. D’où viennent-elles, et comment continuer à s’entraîner avec ?', k: ['recup|cheung2003'] },
   { id: 're-techniques', m: 'recup', e: '🧊', t: 'Les techniques de récup qui marchent', i: 'Massage, froid, compression, récupération active : 99 études comparées pour savoir ce qui fonctionne. Et un piège avec les bains froids.', k: ['recup|dupuy2018', 'recup|roberts2015', 'muscle|roberts2015'] },
   { id: 're-rouleau', m: 'recup', e: '🌀', t: 'Le rouleau de massage', i: 'Le rouleau de massage (foam roller) est partout dans les salles. Que dit la science de ses effets ?', k: ['recup|wiewelhove2019'] },
   { id: 're-etirements', m: 'recup', e: '🤸', t: 'S’étirer avant le sport ?', i: 'S’étirer avant l’effort : bonne ou mauvaise idée ? Tout dépend du type et de la durée de l’étirement.', k: ['recup|behm2016'] },
   { id: 're-prevention', m: 'recup', e: '🛡️', t: 'Prévenir les blessures', i: 'Une blessure coûte des semaines d’entraînement. Quelles méthodes la préviennent vraiment ?', k: ['recup|lauersen2014', 'sante|lauersen2014', 'recup|vandyk2019'] },
-
+  { id: 're-froid', m: 'recup', e: '🧊', t: 'Bain froid et prise de muscle', i: 'Le bain glacé est à la mode. Mais juste après la musculation, peut-il freiner tes gains ?', k: ['recup|pinero2024'] },
+  { id: 're-massage', m: 'recup', e: '💆', t: 'Le massage sert-il à quelque chose ?', i: 'Le massage sportif est partout. Que montre la plus grande méta-analyse sur la performance et la récupération ?', k: ['recup|davis2020'] },
   /* ---------- SPORT & SANTÉ ---------- */
   { id: 'sa-oms', m: 'sante', e: '🌍', t: 'Les recommandations de l’OMS', i: 'Combien d’activité physique faut-il pour être en bonne santé ? L’Organisation mondiale de la santé a fixé des repères pour tous les âges.', k: ['sante|who2020'] },
   { id: 'sa-pas', m: 'sante', e: '👟', t: 'Combien de pas par jour ?', i: '10 000 pas par jour : objectif scientifique ou slogan ? Les études ont tranché.', k: ['sante|paluch2022'] },
@@ -52,5 +59,7 @@ window.MFC_LESSONS = [
   { id: 'sa-muscu', m: 'sante', e: '💪', t: 'Musculation et longévité', i: 'La musculation n’est pas qu’une affaire d’esthétique : elle est liée à la santé et à l’espérance de vie.', k: ['sante|momma2022'] },
   { id: 'sa-os', m: 'sante', e: '🦴', t: 'Des os solides', i: 'Les os aussi s’entraînent. Une étude a testé la musculation lourde chez des femmes aux os fragiles.', k: ['sante|watson2018'] },
   { id: 'sa-moral', m: 'sante', e: '🧠', t: 'Sport et moral', i: 'Le sport agit sur le corps… et sur la tête. Que disent les études sur l’humeur, le stress et l’anxiété ?', k: ['sante|singh2023'] },
-  { id: 'sa-eau', m: 'sante', e: '💧', t: 'Bien s’hydrater', i: 'Combien boire chaque jour, et comment s’hydrater avant, pendant et après l’effort ?', k: ['sante|efsa2010', 'sante|acsm2007', 'cardio|acsm2007'] }
+  { id: 'sa-eau', m: 'sante', e: '💧', t: 'Bien s’hydrater', i: 'Combien boire chaque jour, et comment s’hydrater avant, pendant et après l’effort ?', k: ['sante|efsa2010', 'sante|acsm2007', 'cardio|acsm2007'] },
+  { id: 'sa-escaliers', m: 'sante', e: '🪜', t: 'Les mini-efforts du quotidien', i: 'Monter les escaliers vite, courir après le bus… Ces bouffées d’une minute comptent-elles pour la santé ?', k: ['sante|stamatakis2022'] },
+  { id: 'sa-poigne', m: 'sante', e: '✊', t: 'La force de ta poignée', i: 'Un simple test de force de la main en dit long sur la santé. Une étude sur 500 000 personnes l’a montré.', k: ['sante|celis2018'] }
 ];

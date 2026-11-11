@@ -1,5 +1,5 @@
 /* MFC Quiz — service worker : permet l'utilisation hors-ligne */
-const CACHE = 'mfc-quiz-v16';
+const CACHE = 'mfc-quiz-v17';
 const FILES = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const FILES = [
   './questions-lot4.js',
   './questions-lot5.js',
   './questions-lot6.js',
+  './questions-lot7.js',
   './missions.js',
   './lessons.js', './prepa.js',
   './avatar.js',
