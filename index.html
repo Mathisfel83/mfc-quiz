@@ -243,6 +243,7 @@ a{color:var(--gold2);text-decoration:none}
 <script src="questions-lot8.js"></script>
 <script src="missions.js"></script>
 <script src="lessons.js"></script>
+<script src="parcours.js"></script>
 <script src="prepa.js"></script>
 <script>
 (function(){
@@ -487,6 +488,7 @@ function home(){
   h+='<div class="row up" style="justify-content:space-between;margin-bottom:16px"><div class="row"><button data-act="avme" aria-label="Ma carte">'+avatarCard()+'</button><div><div class="mono" style="color:var(--muted)">'+(g?esc(g.n.toUpperCase()):'CULTIVE TON CORPS')+'</div><div style="font-family:var(--head);font-weight:600;font-size:17px">'+(st.name?'Salut '+esc(st.name):'MFC Quiz')+'</div></div></div><div class="row" style="gap:6px">'+(st.freezes?'<span class="chip" data-act="freezeinfo" style="padding:7px 9px">🧊'+st.freezes+'</span>':'')+'<span class="chip" data-act="freezeinfo">'+IC.flame+sk+'</span></div></div>';
   var LI=lvInfo();
   h+='<button class="goldcard up d1" data-act="tabrank" style="width:100%;text-align:left;padding:16px;display:flex;flex-direction:column;gap:10px"><div class="row" style="justify-content:space-between;width:100%"><div><div class="mono" style="color:var(--silver);font-size:10px">TA CARTE · '+LI.T.n.toUpperCase()+'</div><div style="font-family:var(--head);font-size:21px;font-weight:600">Niveau '+LI.lv+'</div></div><div style="font-family:var(--mono);font-weight:700;font-size:18px;color:var(--gold);text-shadow:0 0 18px rgba(212,175,55,.45)">'+fmt(st.xp)+' XP</div></div><div class="bar" style="width:100%"><i style="width:'+LI.pct+'%"></i></div><div style="font-size:13px;color:var(--ink2)">'+(LI.lv<100?'Encore <b style="color:var(--gold)">'+fmt(LI.left)+' XP</b> pour le niveau '+(LI.lv+1)+(LI.nt?' · carte <b>'+LI.nt.n+'</b> au niveau '+LI.nt.from:''):'Niveau maximum : tu as la carte Icône MFC !')+'</div></button>';
+  h+=pcHomeCard();
   var tl=todayLesson(), tlDone=tl&&lDone(tl.id), nxt=tlDone?recLesson():null, showL=tlDone&&nxt?nxt:tl, nst=Object.keys(studiedSet()).length;
   if(showL) h+='<button class="up d2" data-act="lesson" data-id="'+showL.id+'" style="margin-top:14px;width:100%;text-align:left;padding:18px;border-radius:24px;background:linear-gradient(140deg,rgba(60,110,255,.22),rgba(60,110,255,.04) 60%);border:1px solid rgba(110,150,255,.45);display:flex;align-items:center;gap:14px"><div style="width:52px;height:52px;border-radius:17px;background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:26px;'+(tlDone?'':'animation:pulse 1.8s ease-out infinite')+'">'+showL.e+'</div><div style="flex:1"><div class="mono" style="color:#9DB8FF">'+(tlDone?'LEÇON DU JOUR ✓ · ENCORE UNE ?':'LEÇON DU JOUR')+'</div><div style="font-size:16px;font-weight:700;margin-top:3px;line-height:1.3">'+esc(showL.t)+'</div><div style="font-size:12px;color:var(--muted);margin-top:3px">'+esc(modName(showL.m))+' · cours '+Math.max(2,Math.round((lessonCards(showL).length*15+Math.min(8,showL.qs.length)*12)/60))+' min + quiz'+(tlDone?'':(sk?' · garde ta série de '+sk+' j':' · lance ta série'))+'</div></div>'+IC.arrow+'</button>';
   else h+='<div class="goldcard up d2" style="margin-top:14px;padding:16px"><b>Toutes les leçons sont terminées 🎓</b><div style="font-size:13px;color:var(--ink2);margin-top:4px">De nouvelles leçons arrivent bientôt. En attendant, enchaîne les défis !</div></div>';
@@ -682,8 +684,8 @@ function nextQ(){
   if(quiz.i<quiz.qs.length-1){ quiz.i++; quiz.picked=null; drawQ(); return; }
   var n=quiz.qs.length, perfect=quiz.score===n && n>=PER_QUIZ;
   if(perfect) quiz.xp+=XP_PERFECT;
-  var lesFirst=false;
-  if(quiz.kind==='lesson'){ var prevL=st.lessons[quiz.mod]; lesFirst=!prevL; if(lesFirst) quiz.xp+=30; st.lessons[quiz.mod]={s:Math.max(quiz.score,prevL?prevL.s:0),n:n,d:today()}; if(st.tl&&st.tl.id===quiz.mod) st.lastDaily=today(); }
+  var lesFirst=false, pcd=null;
+  if(quiz.kind==='lesson'){ var prevL=st.lessons[quiz.mod]; lesFirst=!prevL; if(lesFirst) quiz.xp+=30; st.lessons[quiz.mod]={s:Math.max(quiz.score,prevL?prevL.s:0),n:n,d:today()}; if(st.tl&&st.tl.id===quiz.mod) st.lastDaily=today(); pcd=pcLessonDone(quiz.mod); if(pcd&&pcd.end) quiz.xp+=XP_PCEND; }
   var before=rankOf(st.xp).r.n, lvB=CARD.levelOf(st.xp);
   st.xp+=quiz.xp; st.quizzes++;
   if(quiz.kind==='daily') st.lastDaily=today();
@@ -700,6 +702,7 @@ function nextQ(){
   h+='<div class="up d3" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left"><div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">XP GAGNÉS</div><div style="font-family:var(--head);font-size:20px;font-weight:600;color:var(--gold)">+'+quiz.xp+'</div>'+(perfect?'<div style="font-size:11px;color:var(--muted)">dont +'+XP_PERFECT+' bonus sans-faute</div>':'')+(lesFirst?'<div style="font-size:11px;color:var(--muted)">dont +30 leçon terminée</div>':'')+'</div><div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">SÉRIE</div><div style="font-family:var(--head);font-size:20px;font-weight:600">'+sk+' jour'+(sk>1?'s':'')+'</div></div></div>';
   if(up) h+='<div class="up d3" id="upcard" style="display:flex;justify-content:center;margin-top:16px">'+cardHTML(220)+'</div><div class="up d3" style="font-size:13px;color:var(--ink2);margin-top:10px;line-height:1.5">'+rk.r.r+'</div><button class="btn ghost up d3" data-act="cardshare" style="margin-top:12px;color:var(--gold);border-color:rgba(212,175,55,.5)">📸 Partager ma nouvelle carte en story</button>';
   h+='<div class="goldcard up d4" style="margin-top:12px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:8px"><div class="row" style="justify-content:space-between;font-size:13px"><b>'+(lvUp&&!up?'🎉 ':'')+'Niveau '+LI.lv+' · carte '+LI.T.n+'</b><span class="mono" style="color:var(--gold)">'+(LI.lv<100?'+'+fmt(LI.left)+' XP':'MAX')+'</span></div><div class="bar"><i style="width:'+LI.pct+'%"></i></div><span style="font-size:12px;color:var(--silver)">'+(LI.nt?'Prochaine carte : <b>'+LI.nt.n+'</b> au niveau '+LI.nt.from:'Tu as la carte la plus rare de l’appli 👑')+'</span></div>';
+  if(pcd){ var pi=dfInfo(pcd.n); h+='<div class="up d4" style="text-align:left;margin-top:16px"><div class="mono" style="color:var(--gold);font-size:10px;margin-bottom:8px">'+(pcd.end?'🏆 PARCOURS TERMINÉ · +'+XP_PCEND+' XP':'🎯 JOUR '+pcd.n+' VALIDÉ · TON DÉFI DE LA SEMAINE')+'</div>'+(pi?dfCard(pi):'')+'<button class="btn ghost" data-pc="view" style="margin-top:10px">Voir mon parcours '+IC.arrow+'</button></div>'; }
   if(gotFreeze) h+='<div class="glass up d4" style="margin-top:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;text-align:left;border-color:rgba(110,160,255,.5)"><span style="font-size:26px">🧊</span><div style="font-size:13.5px;line-height:1.45"><b>'+sk+' jours de série : tu gagnes un gel !</b><br><span style="color:var(--muted)">Il protégera ta série si tu rates un jour.</span></div></div>';
   if(todayMission() && !st.mission.done) h+='<div class="up d5" style="text-align:left">'+missionHTML()+'</div>';
   var nlx=quiz.kind==='lesson'?(nextLessonOf(LBY[quiz.mod].m)||recLesson()):null;
@@ -1714,6 +1717,113 @@ function ppResult(sc,n,exam){
   view.innerHTML=h; if(exam&&note>=10) confetti();
 }
 
+/* ---------- parcours 14 jours + défis de la semaine ---------- */
+var PC=window.MFC_PARCOURS||[], PCBY={}; PC.forEach(function(p){ PCBY[p.id]=p; });
+var PC_FREE=3, XP_DCHK=5, XP_DOK=20, XP_PCEND=100;
+function dn(s){ var p=String(s).split('-'); return Math.round(Date.UTC(+p[0],+p[1]-1,+p[2])/864e5); }
+function pcCur(){ return st.pc&&PCBY[st.pc.id]?st.pc:null; }
+function pcP(){ var c=pcCur(); return c?PCBY[c.id]:null; }
+function pcDay(){ var c=pcCur(); if(!c) return 0; var P=PCBY[c.id]; for(var i=1;i<=P.days.length;i++) if(!c.les[i]) return i; return P.days.length+1; }
+function pcFinished(){ var P=pcP(); return !!P&&pcDay()>P.days.length; }
+function pcState(n){
+  var c=pcCur(); if(c.les[n]) return 'done'; if(n>pcDay()) return 'lock';
+  if(n>1&&dn(c.les[n-1])>=dn(today())) return 'wait';
+  if(n>PC_FREE&&!isPrem()) return 'prem'; return 'open';
+}
+function dfInfo(n){
+  var c=pcCur(); if(!c||!c.les[n]) return null; var d=PCBY[c.id].days[n-1], f=c.df[n]||{c:[]}, left=7-(dn(today())-dn(c.les[n]));
+  return {n:n,d:d,f:f,left:left,ok:f.c.length>=d.n,todayDone:f.c.indexOf(today())>=0,active:left>0&&f.c.length<d.n};
+}
+function dfList(){ var c=pcCur(), out=[]; if(!c) return out; for(var n=1;n<=PCBY[c.id].days.length;n++){ var i=dfInfo(n); if(i&&i.left>0) out.push(i); } return out; }
+function dfToDo(){ return dfList().filter(function(i){ return i.active&&!i.todayDone; }).length; }
+function srcShort(k){ var s=(window.MFC_SOURCES||{})[k]; if(!s) return ''; var t=s.t, m=t.match(/^(.*?\(\d{4}\))/); return m?m[1]:t.slice(0,60); }
+function pcStart(id){ st.pc={id:id,d0:today(),les:{},df:{}}; save(); pcView(); toast(PCBY[id].e,'Parcours lancé : jour 1 débloqué !',2200); }
+/* appelée à la fin d'une leçon : valide le jour du parcours si c'est sa leçon */
+function pcLessonDone(id){
+  var c=pcCur(); if(!c) return null; var n=pcDay(), P=PCBY[c.id]; if(n>P.days.length||P.days[n-1].l!==id||pcState(n)!=='open') return null;
+  c.les[n]=today(); var end=n===P.days.length; if(end){ st.pcDone=st.pcDone||{}; st.pcDone[c.id]=today(); }
+  return {n:n,d:P.days[n-1],end:end};
+}
+function dfCheck(n){
+  var i=dfInfo(n); if(!i||!i.active||i.todayDone) return;
+  var c=pcCur(); c.df[n]={c:i.f.c.concat([today()])}; var ok=c.df[n].c.length>=i.d.n, before=rankOf(st.xp).r.n;
+  gainXP(XP_DCHK+(ok?XP_DOK:0));
+  if(ok){ confetti(); toast('🏅','<b>Défi réussi, +'+(XP_DCHK+XP_DOK)+' XP !</b><br>'+esc(i.d.t),3000); }
+  else toast('✅','+'+XP_DCHK+' XP · encore '+(i.d.n-c.df[n].c.length)+' jour'+(i.d.n-c.df[n].c.length>1?'s':''),2000);
+  if(rankOf(st.xp).r.n!==before) setTimeout(function(){ toast('🪪','Nouvelle carte débloquée : '+rankOf(st.xp).r.n+' !',3000); },1600);
+  if(document.getElementById('pcview')) pcView(); else { var el=document.querySelector('[data-df="'+n+'"]'); if(el) el.outerHTML=dfCard(dfInfo(n)); else if(tab==='home'&&!quiz) render(); }
+}
+function dots(k,n){ var h=''; for(var j=0;j<n;j++) h+='<i style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;background:'+(j<k?'var(--gold)':'rgba(201,206,214,.2)')+'"></i>'; return h; }
+function dfCard(i,compact){
+  var d=i.d, k=i.f.c.length, S=(window.MFC_SOURCES||{})[d.s]||{};
+  var h='<div class="glass" data-df="'+i.n+'" style="padding:14px 16px;'+(i.ok?'border-color:rgba(110,200,150,.55)':'')+'"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px"><b style="font-size:14.5px;line-height:1.35;flex:1">'+esc(d.t)+'</b><span class="mono" style="font-size:10px;color:'+(i.ok?'var(--good)':'var(--gold)')+';white-space:nowrap">'+(i.ok?'✓ RÉUSSI':'J'+i.n)+'</span></div>';
+  if(!compact) h+='<div style="font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:6px">'+esc(d.x)+'</div><div style="font-size:11px;color:var(--muted);margin-top:6px">📚 '+(S.u?'<a href="'+esc(S.u)+'" target="_blank" rel="noopener" style="color:var(--silver)">'+esc(srcShort(d.s))+'</a>':esc(srcShort(d.s)))+'</div>';
+  h+='<div class="row" style="justify-content:space-between;margin-top:10px;gap:10px"><span style="font-size:12px;color:var(--ink2)">'+dots(k,d.n)+(d.n>1?' '+k+'/'+d.n+' jours':'')+'</span>';
+  if(i.ok) h+='<span style="font-size:12px;color:var(--muted)">+'+(XP_DCHK+XP_DOK)+' XP gagnés</span>';
+  else if(i.todayDone) h+='<span style="font-size:12px;color:var(--good)">✓ Fait aujourd’hui</span>';
+  else h+='<button class="chip" data-pc="check" data-n="'+i.n+'" style="color:var(--gold);border-color:rgba(212,175,55,.5)">'+(d.n>1?'Fait aujourd’hui':'C’est fait')+' ✓</button>';
+  h+='</div>'+(i.active?'<div style="font-size:11px;color:var(--muted);margin-top:6px">Encore '+i.left+' jour'+(i.left>1?'s':'')+' pour le réussir</div>':'')+'</div>';
+  return h;
+}
+function pcHomeCard(){
+  var c=pcCur();
+  if(!c){ var g=st.goal, rec=PC.filter(function(p){ return p.goal===g; })[0]||PC[0];
+    return '<button class="goldcard up d2" data-pc="list" style="margin-top:14px;width:100%;text-align:left;padding:16px;display:flex;gap:12px;align-items:center"><span style="font-size:32px">🎯</span><span style="flex:1"><span class="mono" style="display:block;color:var(--gold);font-size:10px">NOUVEAU · PARCOURS 14 JOURS</span><b style="display:block;font-size:15px;margin-top:2px">'+esc(rec.t)+'</b><span style="display:block;font-size:12.5px;color:var(--muted);margin-top:2px">Chaque jour : une leçon de 2 min + un défi concret à appliquer</span></span>'+IC.arrow+'</button>'; }
+  var P=PCBY[c.id], n=pcDay(), L=P.days.length, todo=dfToDo(), s=n<=L?pcState(n):'end', sub;
+  if(s==='end') sub='🏆 Parcours terminé'+(todo?' · '+todo+' défi'+(todo>1?'s':'')+' à cocher':'');
+  else if(s==='open') sub='▶️ Jour '+n+' : '+esc(LBY[P.days[n-1].l].t);
+  else if(s==='prem') sub='👑 Jour '+n+' avec Premium';
+  else sub='⏳ Jour '+n+' demain';
+  if(s!=='end'&&todo) sub+='<br>✅ '+todo+' défi'+(todo>1?'s':'')+' à cocher aujourd’hui';
+  var pct=Math.round(Math.min(n-1,L)/L*100);
+  return '<button class="goldcard up d2" data-pc="view" style="margin-top:14px;width:100%;text-align:left;padding:16px;display:flex;flex-direction:column;gap:8px"><span class="row" style="justify-content:space-between;width:100%"><span class="mono" style="color:var(--gold);font-size:10px">'+P.e+' MON PARCOURS · '+Math.min(n-1,L)+'/'+L+' JOURS</span>'+IC.arrow+'</span><b style="font-size:15px">'+esc(P.t)+'</b><span class="bar" style="width:100%;display:block"><i style="width:'+pct+'%"></i></span><span style="font-size:13px;color:var(--ink2);line-height:1.5">'+sub+'</span></button>';
+}
+function pcList(){
+  avUnmount(); setNav(false); var c=pcCur(), g=st.goal, done=st.pcDone||{};
+  var list=PC.slice().sort(function(a,b){ return (b.goal===g)-(a.goal===g); });
+  var h='<div class="screen noNav" id="pclist"><div class="wrap"><div class="top"><button class="iconbtn" data-pc="'+(c?'view':'home')+'" aria-label="Retour">'+IC.back+'</button><span></span><span></span></div>';
+  h+='<div class="up"><div class="mono" style="color:var(--gold)">PARCOURS 14 JOURS</div><h1 class="h1" style="margin-top:4px">Choisis ton objectif</h1><p style="color:var(--muted);font-size:13.5px;line-height:1.5;margin:6px 0 0">Chaque jour, une leçon de 2 minutes et un défi concret à appliquer dans ta vraie vie. Tous les défis s’appuient sur des études.</p></div>';
+  h+='<div style="display:flex;flex-direction:column;gap:12px;margin-top:18px">';
+  list.forEach(function(p,i){ var cur=c&&c.id===p.id;
+    h+='<button class="'+(i===0&&p.goal===g?'goldcard':'glass')+' up d'+Math.min(5,i+1)+'" data-pc="pick" data-id="'+p.id+'" style="width:100%;text-align:left;padding:16px;display:flex;gap:14px;align-items:center"><span style="font-size:34px">'+p.e+'</span><span style="flex:1">'+(p.goal===g?'<span class="mono" style="display:block;color:var(--gold);font-size:10px">RECOMMANDÉ POUR TOI</span>':'')+'<b style="display:block;font-size:15.5px">'+esc(p.t)+'</b><span style="display:block;font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:3px">'+esc(p.d)+'</span><span class="mono" style="display:block;font-size:10px;color:var(--silver);margin-top:6px">'+(cur?'▶️ EN COURS':done[p.id]?'🏆 TERMINÉ · À REFAIRE':'14 LEÇONS · 14 DÉFIS')+'</span></span>'+IC.arrow+'</button>'; });
+  h+='</div>';
+  if(!isPrem()) h+='<div style="font-size:12.5px;color:var(--muted);text-align:center;line-height:1.5;margin-top:16px">Les 3 premiers jours sont gratuits. La suite du parcours est incluse dans <b data-sx="premium" style="color:var(--gold)">MFC Premium</b>.</div>';
+  h+='</div></div>'; view.innerHTML=h;
+}
+function pcView(){
+  var c=pcCur(); if(!c){ pcList(); return; }
+  avUnmount(); setNav(false); var P=PCBY[c.id], L=P.days.length, n=pcDay(), fin=n>L, dfs=dfList();
+  var h='<div class="screen noNav" id="pcview"><div class="wrap"><div class="top"><button class="iconbtn" data-pc="home" aria-label="Retour">'+IC.back+'</button><span></span><button class="chip" data-pc="list">Changer</button></div>';
+  h+='<div class="up" style="text-align:center"><div style="font-size:52px;line-height:1">'+P.e+'</div><div class="mono" style="color:var(--gold);margin-top:10px">PARCOURS 14 JOURS</div><h1 class="h1" style="margin-top:4px">'+esc(P.t)+'</h1></div>';
+  h+='<div class="goldcard up d1" style="margin-top:16px;padding:14px 16px"><div class="row" style="justify-content:space-between;font-size:13.5px"><b>'+(fin?'🏆 Parcours terminé !':'Jour '+n+' sur '+L)+'</b><span class="mono" style="color:var(--gold)">'+Math.min(n-1,L)+'/'+L+'</span></div><div class="bar" style="margin-top:10px"><i style="width:'+Math.round(Math.min(n-1,L)/L*100)+'%"></i></div>'+(fin?'<div style="font-size:12.5px;color:var(--ink2);margin-top:8px">+'+XP_PCEND+' XP gagnés. Continue tes défis en cours, puis lance un nouveau parcours.</div>':'')+'</div>';
+  if(dfs.length){ h+='<div class="mono up d2" style="color:var(--muted);margin:22px 0 10px">MES DÉFIS DE LA SEMAINE</div><div class="up d2" style="display:flex;flex-direction:column;gap:10px">'; dfs.slice().reverse().forEach(function(i){ h+=dfCard(i); }); h+='</div>'; }
+  h+='<div class="mono up d3" style="color:var(--muted);margin:22px 0 10px">LES '+L+' JOURS</div><div class="glass up d3" style="padding:4px 14px">';
+  P.days.forEach(function(d,j){ var k=j+1, s=pcState(k), l=LBY[d.l], ico={done:'✅',open:'▶️',wait:'⏳',prem:'👑',lock:'🔒'}[s];
+    h+='<button data-pc="day" data-n="'+k+'" style="width:100%;text-align:left;display:flex;gap:12px;align-items:center;padding:11px 0;border-top:'+(j?'1px solid var(--line)':'0')+(s==='lock'?';opacity:.55':'')+'"><span class="mono" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;'+(s==='open'?'background:var(--gold);color:#0B1640;font-weight:700':'border:1px solid var(--line);color:var(--muted)')+'">'+k+'</span><span style="flex:1"><span style="display:block;font-size:14px;font-weight:600">'+(l?esc(l.e+' '+l.t):'')+'</span><span style="display:block;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4">Défi : '+esc(d.t)+'</span></span><span style="font-size:16px">'+ico+'</span></button>'; });
+  h+='</div><div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5;margin-top:14px">Un nouveau jour se débloque chaque jour, une fois la leçon de la veille terminée. Chaque défi coché : +'+XP_DCHK+' XP, défi réussi : +'+XP_DOK+' XP bonus.</div>';
+  h+='</div></div>'; view.innerHTML=h;
+}
+function pcDayTap(n){
+  var s=pcState(n), P=pcP(), d=P.days[n-1];
+  if(s==='open'||s==='done') lessonView(d.l);
+  else if(s==='prem') paywall('parcours');
+  else if(s==='wait') toast('⏳','Le jour '+n+' se débloque demain. En attendant, coche tes défis !',2600);
+  else toast('🔒','Termine d’abord le jour '+(pcDay())+'.',2200);
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-pc]'); if(!b) return; var a=b.dataset.pc;
+  if(a==='list') pcList();
+  else if(a==='view') pcView();
+  else if(a==='home'){ tab='home'; render(); }
+  else if(a==='check'){ e.preventDefault(); dfCheck(+b.dataset.n); }
+  else if(a==='day') pcDayTap(+b.dataset.n);
+  else if(a==='pick'){ var id=b.dataset.id, c=pcCur();
+    if(c&&c.id===id){ pcView(); return; }
+    if(c&&!pcFinished()&&pcDay()>1){ sheet('<h2 class="h1" style="font-size:18px">Changer de parcours ?</h2><p style="color:var(--muted);font-size:14px;line-height:1.55">Tu es au jour '+pcDay()+' de « '+esc(PCBY[c.id].t)+' ». En changeant, tu repars du jour 1 du nouveau parcours. Tes XP et tes leçons restent acquis.</p><div style="display:flex;flex-direction:column;gap:10px;margin-top:8px"><button class="btn gold" data-pc="go" data-id="'+id+'" data-close>Oui, commencer « '+esc(PCBY[id].t)+' »</button><button class="btn ghost" data-close>Annuler</button></div>'); return; }
+    pcStart(id); }
+  else if(a==='go') pcStart(b.dataset.id);
+});
+
 /* ---------- formule gratuite / Premium ---------- */
 var TESTER_CODES=['MFC-TESTEUR'];
 function isPrem(){ return !!(st.prem&&st.prem.on); }
@@ -1732,7 +1842,7 @@ function canQuiz(kind,mod){
   paywall('quiz'); return false;
 }
 function paywall(why){
-  var t={prepa:'La Prépa STAPS & BPJEPS complète est réservée à Premium.',lesson:'Tu as déjà commencé ta leçon du jour.',quiz:'Tu as utilisé ton quiz gratuit du jour.',rev:'Tu as utilisé ta révision gratuite du jour.'}[why]||'';
+  var t={parcours:'La suite du parcours est réservée à Premium.',prepa:'La Prépa STAPS & BPJEPS complète est réservée à Premium.',lesson:'Tu as déjà commencé ta leçon du jour.',quiz:'Tu as utilisé ton quiz gratuit du jour.',rev:'Tu as utilisé ta révision gratuite du jour.'}[why]||'';
   sheet('<div style="text-align:center"><div style="font-size:44px">👑</div><h2 class="h1" style="font-size:20px;margin-top:6px">'+t+'</h2><p style="color:var(--muted);font-size:14px;line-height:1.55">En version gratuite, tu as <b style="color:var(--ink)">1 leçon, 1 quiz et 1 révision par jour</b>. Les duels et la Course au sommet restent illimités.<br>Reviens demain, ou passe à <b style="color:var(--gold)">MFC Premium</b> pour tout débloquer.</p></div><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px"><button class="btn gold" data-close data-sx="premium">Découvrir Premium '+IC.arrow+'</button><button class="btn ghost" data-close data-sx="toarena">Jouer aux Défis</button><button class="btn ghost" data-close>Revenir demain</button></div>');
 }
 function premiumView(){
@@ -1749,7 +1859,7 @@ function premiumView(){
   }
   // comparatif
   h+='<div class="glass" style="margin-top:22px;padding:6px 16px"><div class="row" style="justify-content:space-between;padding:10px 0;font-size:11px" ><span class="mono" style="color:var(--muted)">CE QUI EST INCLUS</span><span class="mono" style="display:flex;gap:16px"><span style="color:var(--muted);width:52px;text-align:center">GRATUIT</span><span style="color:var(--gold);width:58px;text-align:center">PREMIUM</span></span></div>';
-  [['Leçons','1 / jour','Illimitées'],['Quiz','1 / jour','Illimités'],['Révisions','1 / jour','Illimitées'],['Duels & Course au sommet','Illimités','Illimités'],['Podium & classements','✓','✓'],['Carte d’athlète & ses 7 éditions','✓','✓'],['Prépa STAPS L1 & BPJEPS','1 chapitre','✓ + examens blancs'],['Examens & certificats','–','✓ bientôt'],['Récompenses réelles','–','✓ bientôt']].forEach(function(r){ h+='<div class="row" style="justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px"><span style="flex:1">'+r[0]+'</span><span style="display:flex;gap:16px;font-size:12px;text-align:center"><span style="width:52px;color:var(--muted)">'+r[1]+'</span><span style="width:58px;color:var(--gold);font-weight:700">'+r[2]+'</span></span></div>'; });
+  [['Parcours 14 jours & défis','3 premiers jours','✓'],['Leçons','1 / jour','Illimitées'],['Quiz','1 / jour','Illimités'],['Révisions','1 / jour','Illimitées'],['Duels & Course au sommet','Illimités','Illimités'],['Podium & classements','✓','✓'],['Carte d’athlète & ses 7 éditions','✓','✓'],['Prépa STAPS L1 & BPJEPS','1 chapitre','✓ + examens blancs'],['Examens & certificats','–','✓ bientôt'],['Récompenses réelles','–','✓ bientôt']].forEach(function(r){ h+='<div class="row" style="justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px"><span style="flex:1">'+r[0]+'</span><span style="display:flex;gap:16px;font-size:12px;text-align:center"><span style="width:52px;color:var(--muted)">'+r[1]+'</span><span style="width:58px;color:var(--gold);font-weight:700">'+r[2]+'</span></span></div>'; });
   h+='</div>';
   // récompenses
   h+='<div class="mono" style="color:var(--muted);margin:24px 0 10px">LES RÉCOMPENSES</div><div style="display:flex;flex-direction:column;gap:10px">';
