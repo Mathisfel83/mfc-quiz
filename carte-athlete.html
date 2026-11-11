@@ -71,7 +71,7 @@ var C=window.MFCCard, $=function(i){return document.getElementById(i)};
 var S={level:42,name:'Mathis',photo:'',tier:null};
 function fakeStats(lv,seed){ var mods=['muscle','cardio','nutrition','sommeil','recup','sante'],o={},sum=0; mods.forEach(function(m,i){ var v=Math.round(40+(lv-1)*0.59+Math.sin(i*2.3+seed)*7*(lv<100?1:0)); v=Math.max(40,Math.min(99,v)); o[m]=v; sum+=v; }); return {s:o,ovr:Math.round(sum/6)}; }
 function card(lv,w,extra){ var f=fakeStats(lv,(extra&&extra.seed)||1); return C.html(Object.assign({name:S.name,level:lv,ovr:f.ovr,pos:'HYP',stats:f.s,photo:S.photo},extra||{}),{w:w}); }
-function badge(lv,ovr){ var T=C.tierOf(lv); return '<div class="bdg" style="background:linear-gradient(160deg,'+T.bg[2]+','+T.bg[1]+' 45%,'+T.bg[0]+');color:'+T.ink+';box-shadow:inset 0 0 0 2px '+T.frame[1]+'">'+ovr+'<small>'+T.n.split(' ')[0].toUpperCase().slice(0,6)+'</small></div>'; }
+function badge(lv,ovr){ var T=C.tierOf(lv); return '<div class="bdg" style="background:radial-gradient(circle at 50% 30%,'+T.bg[2]+','+T.bg[1]+' 55%,'+T.bg[0]+');color:'+T.ink+';box-shadow:inset 0 0 0 1.5px '+T.neon+',inset 0 0 10px '+T.neon+'88;text-shadow:0 0 8px '+T.neon+'">'+ovr+'<small style="color:'+T.neon+'">'+T.n.split(' ')[0].toUpperCase().slice(0,6)+'</small></div>'; }
 var REW={bronze:'Ta première carte · ton nom et tes initiales',argent:'Carte Argent · 🎓 diplôme « Curieux »',or:'Carte Or · 🎓 diplôme « Initié »',elite:'Carte Élite bleu nuit et or · pose ta question, Mathis y répond en Reel',heros:'Carte Héros holographique · certificat « Expert MFC Quiz »',legende:'Carte Légende noire et or · ton nom au Hall of Fame',icone:'Carte Icône MFC animée · la plus rare de l’appli'};
 function draw(){
   var lv=S.level, T=C.tierOf(lv);
