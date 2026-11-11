@@ -523,6 +523,7 @@ view.addEventListener('click',function(e){
   else if(a==='mswap'){ var m=chooseMission(st.mission.id); st.mission={d:today(),id:m.id,done:0,swap:1}; st.missionLog[today()]=m.id; save(); render(); }
   else if(a==='notif') notifSheet();
   else if(a==='avme'||a==='tabrank'){ tab='rank'; render(); }
+  else if(a==='cardshare') cardShareSheet();
   else if(a==='avedit'||a==='cardedit') cardEditor({back:'avback',kicker:'TA CARTE',title:'Personnalise ta carte',cta:'Enregistrer',onDone:function(){ tab='rank'; render(); toast('🪪','Carte enregistrée !',2000); }});
   else if(a==='avback'){ ced=null; tab='rank'; render(); }
   else if(a==='goal') goalSheet();
@@ -697,7 +698,7 @@ function nextQ(){
   h+='<div class="ring up d1" style="margin-top:22px"><div style="position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.4),transparent 65%)"></div><svg width="150" height="150" viewBox="0 0 150 150" style="position:relative"><circle cx="75" cy="75" r="52" fill="none" stroke="rgba(201,206,214,.12)" stroke-width="10"/><circle class="v" cx="75" cy="75" r="52" fill="none" stroke="#D4AF37" stroke-width="10" stroke-linecap="round" stroke-dasharray="327" stroke-dashoffset="'+off+'" style="filter:drop-shadow(0 0 8px rgba(212,175,55,.7))"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:var(--head);font-size:34px;font-weight:700">'+quiz.score+'/'+n+'</span><span class="mono" style="color:var(--muted);font-size:10px">BONNES RÉPONSES</span></div></div>';
   h+='<h1 class="h1 up d2" style="margin:20px 0 18px">'+(up?'Carte '+rk.r.n+' débloquée !':t)+'</h1>';
   h+='<div class="up d3" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left"><div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">XP GAGNÉS</div><div style="font-family:var(--head);font-size:20px;font-weight:600;color:var(--gold)">+'+quiz.xp+'</div>'+(perfect?'<div style="font-size:11px;color:var(--muted)">dont +'+XP_PERFECT+' bonus sans-faute</div>':'')+(lesFirst?'<div style="font-size:11px;color:var(--muted)">dont +30 leçon terminée</div>':'')+'</div><div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">SÉRIE</div><div style="font-family:var(--head);font-size:20px;font-weight:600">'+sk+' jour'+(sk>1?'s':'')+'</div></div></div>';
-  if(up) h+='<div class="up d3" id="upcard" style="display:flex;justify-content:center;margin-top:16px">'+cardHTML(220)+'</div><div class="up d3" style="font-size:13px;color:var(--ink2);margin-top:10px;line-height:1.5">'+rk.r.r+'</div>';
+  if(up) h+='<div class="up d3" id="upcard" style="display:flex;justify-content:center;margin-top:16px">'+cardHTML(220)+'</div><div class="up d3" style="font-size:13px;color:var(--ink2);margin-top:10px;line-height:1.5">'+rk.r.r+'</div><button class="btn ghost up d3" data-act="cardshare" style="margin-top:12px;color:var(--gold);border-color:rgba(212,175,55,.5)">📸 Partager ma nouvelle carte en story</button>';
   h+='<div class="goldcard up d4" style="margin-top:12px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:8px"><div class="row" style="justify-content:space-between;font-size:13px"><b>'+(lvUp&&!up?'🎉 ':'')+'Niveau '+LI.lv+' · carte '+LI.T.n+'</b><span class="mono" style="color:var(--gold)">'+(LI.lv<100?'+'+fmt(LI.left)+' XP':'MAX')+'</span></div><div class="bar"><i style="width:'+LI.pct+'%"></i></div><span style="font-size:12px;color:var(--silver)">'+(LI.nt?'Prochaine carte : <b>'+LI.nt.n+'</b> au niveau '+LI.nt.from:'Tu as la carte la plus rare de l’appli 👑')+'</span></div>';
   if(gotFreeze) h+='<div class="glass up d4" style="margin-top:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;text-align:left;border-color:rgba(110,160,255,.5)"><span style="font-size:26px">🧊</span><div style="font-size:13.5px;line-height:1.45"><b>'+sk+' jours de série : tu gagnes un gel !</b><br><span style="color:var(--muted)">Il protégera ta série si tu rates un jour.</span></div></div>';
   if(todayMission() && !st.mission.done) h+='<div class="up d5" style="text-align:left">'+missionHTML()+'</div>';
@@ -902,6 +903,7 @@ function ranks(){
   var h='<div class="screen"><div class="wrap"><div class="up row" style="justify-content:space-between"><div><div class="mono" style="color:var(--muted)">TA PROGRESSION</div><h1 class="h1" style="margin-top:4px">Ma carte</h1></div><button class="chip" data-act="cardedit" style="color:var(--gold)">✏️ Modifier</button></div>';
   h+='<div class="up d1" id="mycard" style="display:flex;justify-content:center;margin-top:18px">'+cardHTML(Math.min(290,window.innerWidth-90))+'</div>';
   h+='<div class="up d1" style="text-align:center;font-size:12px;color:var(--muted);margin-top:10px">Incline ta carte avec le doigt ✨</div>';
+  h+='<button class="btn gold up d1" data-act="cardshare" style="margin-top:14px">📸 Partager ma carte en story</button>';
   h+='<div class="goldcard up d2" style="margin-top:16px;padding:16px"><div class="row" style="justify-content:space-between"><div><div class="mono" style="color:var(--gold);font-size:10px">CARTE '+I.T.n.toUpperCase()+'</div><div style="font-family:var(--head);font-size:24px;font-weight:700;margin-top:2px">Niveau '+I.lv+'<span style="font-size:14px;color:var(--muted)"> / 100</span></div></div><span class="mono" style="color:var(--gold);font-weight:700">'+fmt(st.xp)+' XP</span></div>';
   h+='<div class="bar" style="margin-top:12px;height:10px"><i style="width:'+I.pct+'%"></i></div><div style="font-size:12.5px;color:var(--silver);margin-top:8px;line-height:1.5">'+(I.lv<100?'Encore <b style="color:var(--gold)">'+fmt(I.left)+' XP</b> pour le niveau '+(I.lv+1)+(I.nt?'<br>Prochaine carte : <b style="color:var(--gold2)">'+I.nt.n+'</b> au niveau '+I.nt.from:''):'👑 Niveau maximum : tu as la carte Icône MFC !')+'</div></div>';
   // notes
@@ -1268,15 +1270,60 @@ function storyImg(b){
 }
 function storySheet(u){
   sheet('<div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 class="h1" style="font-size:18px">Ton image story</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><img src="'+u+'" alt="Podium de la semaine" style="width:62%;display:block;margin:0 auto;border-radius:18px;border:1px solid var(--line)"><div style="font-size:12.5px;color:var(--muted);text-align:center;margin:10px 0 14px">Si le bouton ne marche pas : appuie longuement sur l’image, puis « Enregistrer dans Photos ».</div><button class="btn gold" id="stsh">Partager / enregistrer '+IC.arrow+'</button>');
-  document.getElementById('stsh').addEventListener('click',function(){
-    var FS=plug('Filesystem'), SH=plug('Share');
-    if(FS&&SH){ FS.writeFile({path:'podium-mfc-quiz.png',data:u.split(',')[1],directory:'CACHE'}).then(function(r){ return SH.share({files:[r.uri]}); }).catch(function(){}); return; }
-    fetch(u).then(function(r){ return r.blob(); }).then(function(bl){
-      var f=new File([bl],'podium-mfc-quiz.png',{type:'image/png'});
-      if(navigator.canShare&&navigator.canShare({files:[f]})) return navigator.share({files:[f]}).catch(function(){});
-      var a=document.createElement('a'); a.href=u; a.download='podium-mfc-quiz.png'; document.body.appendChild(a); a.click(); a.remove();
-    });
+  document.getElementById('stsh').addEventListener('click',function(){ shareImage(u,'podium-mfc-quiz.png'); });
+}
+/* partage d'une image : feuille de partage iOS (Instagram, Snapchat, WhatsApp, Photos…) ou téléchargement */
+function shareImage(u,fname){
+  var FS=plug('Filesystem'), SH=plug('Share');
+  if(FS&&SH) return FS.writeFile({path:fname,data:u.split(',')[1],directory:'CACHE'}).then(function(r){ return SH.share({files:[r.uri]}); }).catch(function(){});
+  return fetch(u).then(function(r){ return r.blob(); }).then(function(bl){
+    var f=new File([bl],fname,{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})) return navigator.share({files:[f]}).catch(function(){});
+    var a=document.createElement('a'); a.href=u; a.download=fname; document.body.appendChild(a); a.click(); a.remove();
+    toast('📥','Image enregistrée : ajoute-la à ta story depuis tes photos.',3200);
   });
+}
+
+/* ---------- partager ma carte en story ---------- */
+function fontsReady(){ var F=document.fonts; if(!F||!F.load) return Promise.resolve(); return Promise.all(['700 40px Unbounded','600 40px Unbounded','700 40px "JetBrains Mono"','500 40px Inter','700 40px Inter'].map(function(f){ return F.load(f).catch(function(){}); })).then(function(){ return F.ready; }); }
+function cardStoryImg(withPhoto){
+  var me=myCard(); if(!withPhoto) me.photo='';
+  return Promise.all([loadImg('assets/logo-full.png'),loadImg('assets/logo-mark.png'),loadImg(me.photo),fontsReady()]).then(function(im){
+    var W=1080,H=1920,c=document.createElement('canvas'); c.width=W; c.height=H; var x=c.getContext('2d'), T=CARD.tierOf(me.level), I=lvInfo();
+    var g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,'#071230'); g.addColorStop(.55,'#050A16'); g.addColorStop(1,'#0B1A3A'); x.fillStyle=g; x.fillRect(0,0,W,H);
+    var hx=T.neon.replace('#',''), nc=[parseInt(hx.substr(0,2),16),parseInt(hx.substr(2,2),16),parseInt(hx.substr(4,2),16)].join(',');
+    var rg=x.createRadialGradient(W/2,960,40,W/2,960,820); rg.addColorStop(0,'rgba('+nc+',.30)'); rg.addColorStop(1,'rgba('+nc+',0)'); x.fillStyle=rg; x.fillRect(0,0,W,H);
+    var rg2=x.createRadialGradient(W/2,200,10,W/2,200,520); rg2.addColorStop(0,'rgba(212,175,55,.20)'); rg2.addColorStop(1,'rgba(212,175,55,0)'); x.fillStyle=rg2; x.fillRect(0,0,W,H);
+    var logo=im[0]; if(logo){ var lw=300, lh=lw*logo.height/logo.width; x.drawImage(logo,(W-lw)/2,120,lw,lh); }
+    x.textAlign='center'; x.textBaseline='alphabetic';
+    x.fillStyle='#D4AF37'; x.font='700 58px Unbounded, system-ui, sans-serif'; x.fillText('MA CARTE',W/2,380);
+    x.fillStyle='#F2F4F7'; x.font='600 38px Unbounded, system-ui, sans-serif'; x.fillText('D’ATHLÈTE',W/2,436);
+    var cw=660, ch=cw/.7; CARD.draw(x,me,(W-cw)/2,490,cw,{logo:im[1],photo:im[2]});
+    var y=490+ch+92;
+    x.fillStyle='#F2F4F7'; x.font='700 46px Unbounded, system-ui, sans-serif'; x.fillText('Niveau '+me.level+' · Carte '+T.n,W/2,y);
+    x.fillStyle='#D4AF37'; x.font='700 34px "JetBrains Mono", ui-monospace, monospace'; x.fillText(fmt(st.xp)+' XP',W/2,y+58);
+    x.fillStyle='#F2F4F7'; x.font='600 36px Unbounded, system-ui, sans-serif'; x.fillText(I.nt?'Et toi, quelle carte vas-tu débloquer ?':'Qui viendra me rejoindre ?',W/2,1790);
+    x.fillStyle='#D4AF37'; x.font='500 30px Inter, system-ui, sans-serif'; x.fillText('MFC Quiz · la science du sport en 2 minutes par jour',W/2,1846);
+    return c.toDataURL('image/png');
+  });
+}
+var csPhoto=true;
+function cardShareSheet(){
+  var hasPh=!!cardPhoto();
+  sheet('<div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 class="h1" style="font-size:18px">Partager ma carte en story</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div>'+
+    '<div id="csimg" style="width:58%;aspect-ratio:9/16;margin:0 auto;border-radius:18px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;overflow:hidden">Création…</div>'+
+    (hasPh?'<div style="display:flex;justify-content:center;margin-top:12px"><button class="chip" id="csph" style="color:var(--gold)">'+(csPhoto?'🙂 Avec ma photo':'🛡️ Sans ma photo')+'</button></div>':'')+
+    '<div style="font-size:12.5px;color:var(--muted);text-align:center;line-height:1.5;margin:12px 4px 14px">Appuie sur <b style="color:var(--ink)">Partager</b>, puis choisis <b style="color:var(--ink)">Instagram</b> ou <b style="color:var(--ink)">Snapchat</b> → « Story ». Rien n’est publié sans ton accord.</div>'+
+    '<button class="btn gold" id="csgo" disabled>📲 Partager '+IC.arrow+'</button>');
+  var url=null;
+  function build(){
+    var box=document.getElementById('csimg'), bt=document.getElementById('csgo'); if(!box) return; box.textContent='Création…'; bt.disabled=true;
+    cardStoryImg(hasPh&&csPhoto).then(function(u){ url=u; var b=document.getElementById('csimg'); if(!b) return; b.innerHTML='<img src="'+u+'" alt="Ma carte d’athlète en format story" style="width:100%;height:100%;display:block">'; document.getElementById('csgo').disabled=false; })
+      .catch(function(){ var b=document.getElementById('csimg'); if(b) b.textContent='Impossible de créer l’image, réessaie.'; });
+  }
+  var ph=document.getElementById('csph'); if(ph) ph.addEventListener('click',function(){ csPhoto=!csPhoto; ph.textContent=csPhoto?'🙂 Avec ma photo':'🛡️ Sans ma photo'; build(); });
+  document.getElementById('csgo').addEventListener('click',function(){ if(!url) return; shareImage(url,'carte-mfc-quiz.png').then(function(){ if(!st.cardShared){ st.cardShared=1; save(); } }); });
+  build();
 }
 
 /* ---------- mini-quiz chronométré (duels) ---------- */
