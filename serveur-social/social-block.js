@@ -265,15 +265,15 @@ function storySheet(u){
 var rq=null, RQT=20000;
 function runQs(ids,o){
   avUnmount(); setNav(false);
-  rq={qs:ids.map(function(id){ return QBY[id]; }).filter(Boolean).map(function(q){ return {q:q,order:shuffle([0,1,2])}; }),i:0,picked:null,score:0,ms:0,t0:Date.now(),o:o,tm:null,T:o.timer===undefined?RQT:o.timer};
+  rq={qs:ids.map(function(id){ return QBY[id]; }).filter(Boolean).map(function(q){ return {q:q,order:q.vf?[0,1]:shuffle(q.o.map(function(_,i){ return i; }))}; }),i:0,picked:null,score:0,ms:0,t0:Date.now(),o:o,tm:null,T:o.timer===undefined?RQT:o.timer};
   drawRq();
 }
 function drawRq(){
-  var it=rq.qs[rq.i], q=it.q, n=rq.qs.length, ans=rq.picked!==null, L=['A','B','C'];
+  var it=rq.qs[rq.i], q=it.q, n=rq.qs.length, ans=rq.picked!==null, L=q.vf?['V','F']:['A','B','C','D'];
   var h='<div class="screen noNav"><div class="wrap"><div class="top"><button class="iconbtn" data-sx="rqquit" aria-label="Abandonner">'+IC.x+'</button><div class="segs" style="grid-template-columns:repeat('+n+',1fr)">';
   for(var s=0;s<n;s++) h+='<div class="seg'+(s<rq.i||(s===rq.i&&ans)?' done':'')+'"></div>';
   h+='</div><span class="chip" style="color:var(--gold)">'+rq.score+'/'+n+'</span></div>';
-  h+='<div class="mono" style="color:var(--gold);margin-top:18px">'+esc(rq.o.title)+' · '+(rq.i+1)+'/'+n+'</div>';
+  h+='<div class="mono" style="color:var(--gold);margin-top:18px">'+esc(rq.o.title)+' · '+(rq.i+1)+'/'+n+(q.vf?' · <span style="color:var(--ink)">VRAI OU FAUX</span>':'')+'</div>';
   if(!ans&&rq.T) h+='<div class="sxtime"><i id="rqbar" style="width:100%"></i></div>';
   h+='<h1 class="h1" style="margin:12px 0 18px">'+esc(q.q)+'</h1>';
   it.order.forEach(function(oi,pos){ var cls='opt'; if(ans){ cls=oi===q.a?'opt good':oi===rq.picked?'opt bad':'opt dim'; }
