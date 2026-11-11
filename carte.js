@@ -16,7 +16,10 @@
   var MODS = [['muscle', 'MUS'], ['cardio', 'CAR'], ['nutrition', 'NUT'], ['sommeil', 'SOM'], ['recup', 'RÉC'], ['sante', 'SAN']];
   var POS = { perte: 'SÈC', muscle: 'HYP', endu: 'END', physio: 'SCI', sante: 'VIT' };
 
-  function xpFor(l) { l = Math.max(1, Math.min(100, l)) - 1; return 3 * l * l + 20 * l; }
+  /* XP cumulés pour atteindre un niveau : rapide jusqu'au niveau 25, puis bien plus exigeant (cartes Héros, Légende, Icône rares) */
+  function xpFor(L) { L = Math.max(1, Math.min(100, L)); var l = L - 1, k = Math.max(0, L - 25); return 3 * l * l + 20 * l + Math.round(0.24 * k * k * k); }
+  function xpForV1(L) { L = Math.max(1, Math.min(100, L)); var l = L - 1; return 3 * l * l + 20 * l; }
+  function levelOfV1(xp) { var l = 1; while (l < 100 && xp >= xpForV1(l + 1)) l++; return l; }
   function levelOf(xp) { var l = 1; while (l < 100 && xp >= xpFor(l + 1)) l++; return l; }
   function tierOf(level) { var t = TIERS[0]; TIERS.forEach(function (x) { if (level >= x.from) t = x; }); return t; }
   /* note par thème : 40 au départ, 99 quand toutes les questions du thème sont maîtrisées */
@@ -258,5 +261,5 @@
     return H;
   }
 
-  window.MFCCard = { TIERS: TIERS, MODS: MODS, POS: POS, xpFor: xpFor, levelOf: levelOf, tierOf: tierOf, stats: stats, html: html, tilt: tilt, draw: draw };
+  window.MFCCard = { TIERS: TIERS, MODS: MODS, POS: POS, xpFor: xpFor, levelOf: levelOf, levelOfV1: levelOfV1, tierOf: tierOf, stats: stats, html: html, tilt: tilt, draw: draw };
 })();

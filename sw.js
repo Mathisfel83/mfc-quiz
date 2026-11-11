@@ -1,5 +1,5 @@
 /* MFC Quiz — service worker : permet l'utilisation hors-ligne */
-const CACHE = 'mfc-quiz-v23';
+const CACHE = 'mfc-quiz-v24';
 const FILES = [
   './',
   './index.html',

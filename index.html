@@ -253,10 +253,10 @@ var RANKS = [
   {n:'Bronze',xp:0,r:'🪪 Ta carte d’athlète MFC, avec tes 6 notes'},
   {n:'Argent',xp:423,r:'🪪 Carte Argent aux reflets néon'},
   {n:'Or',xp:2208,r:'🪪 Carte Or, notes et contours dorés'},
-  {n:'Élite',xp:6688,r:'🪪 Carte Élite holographique · pose ta question, Mathis y répond en Reel'},
-  {n:'Héros',xp:13568,r:'🪪 Carte Héros holographique + certificat « Expert MFC Quiz »'},
-  {n:'Légende',xp:22848,r:'🪪 Carte Légende noire et or + ton nom au Hall of Fame'},
-  {n:'Icône MFC',xp:31383,r:'🪪 Carte Icône MFC animée, la plus rare de l’appli'}
+  {n:'Élite',xp:8608,r:'🪪 Carte Élite holographique · pose ta question, Mathis y répond en Reel'},
+  {n:'Héros',xp:28928,r:'🪪 Carte Héros holographique + certificat « Expert MFC Quiz »'},
+  {n:'Légende',xp:74688,r:'🪪 Carte Légende noire et or + ton nom au Hall of Fame'},
+  {n:'Icône MFC',xp:132633,r:'🪪 Carte Icône MFC animée, la plus rare de l’appli'}
 ];
 var PER_QUIZ = 5, XP_RIGHT = 10, XP_PERFECT = 20;
 
@@ -895,6 +895,17 @@ function revisions(){
     h+='</div>';
   }
   h+='</div></div>'; view.innerHTML=h;
+}
+
+/* nouvelle courbe de progression (v2) : message unique pour les joueurs dont le niveau baisse */
+function curveNotice(){
+  if(st.curveV===2) return; var oldL=CARD.levelOfV1(st.xp), newL=CARD.levelOf(st.xp); st.curveV=2; save();
+  if(newL>=oldL) return;
+  var oT=CARD.tierOf(oldL), nT=CARD.tierOf(newL);
+  sheet('<div style="text-align:center"><div style="font-size:42px">🪪</div><h2 class="h1" style="font-size:20px;margin-top:6px">La progression évolue</h2></div>'+
+    '<p style="color:var(--muted);font-size:14px;line-height:1.55">Pour que les plus belles cartes restent vraiment rares, les niveaux au-delà de 25 demandent désormais plus d’XP.</p>'+
+    '<div class="glass" style="padding:12px 14px;font-size:14px;line-height:1.6"><div>✅ Tes XP sont intacts : <b style="color:var(--gold)">'+fmt(st.xp)+' XP</b></div><div>📊 Ton niveau passe de '+oldL+' à <b>'+newL+'</b>'+(oT.id!==nT.id?' (carte '+nT.n+')':'')+'</div><div>🏆 Ton classement ne change pas</div></div>'+
+    '<button class="btn gold" data-close style="margin-top:16px">J’ai compris</button>');
 }
 
 /* ---------- ma carte (ancien écran « Rangs ») ---------- */
@@ -1829,7 +1840,7 @@ function bootSocial(){
 /* ==/SOCIAL== */
 var sp=document.getElementById('splash');
 var seen=false; try{ seen=sessionStorage.getItem('mfcq_splash')==='1'; }catch(e){}
-if(st.onboarded) { checkFreeze(); bootSocial(); render(); refreshPush(); } else startOnboarding();
+if(st.onboarded) { checkFreeze(); bootSocial(); render(); refreshPush(); curveNotice(); } else { st.curveV=2; save(); startOnboarding(); }
 setTimeout(function(){ sp.classList.add('out'); setTimeout(function(){ sp.remove(); },700); try{ sessionStorage.setItem('mfcq_splash','1'); }catch(e){} }, seen?600:3600);
 sp.addEventListener('click',function(){ sp.classList.add('out'); setTimeout(function(){ sp.remove(); },700); });
 if(!NATIVE && 'serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
