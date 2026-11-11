@@ -231,3 +231,48 @@ Object.assign(window.MFC_PREPA_SOURCES, {
       ] }
   );
 })();
+
+/* ===== Anatomie — QCM à plusieurs bonnes réponses (multi:1, a = liste des bonnes réponses) ===== */
+(function(){
+  var anat = window.MFC_PREPA.tracks[0].subjects.filter(function(s){ return s.id === 'anat'; })[0];
+  function add(id, qs){ anat.chapters.filter(function(c){ return c.id === id; })[0].qs.push.apply(anat.chapters.filter(function(c){ return c.id === id; })[0].qs, qs); }
+  add('anat-os-mi', [
+    { id: 'pp-os14', multi: 1, q: 'Lesquels sont des os du tarse (pied) ?', o: ['Le talus', 'Le calcanéus', 'L’os naviculaire', 'Le scaphoïde', 'Le lunatum'], a: [0, 1, 2], e: 'Talus, calcanéus et naviculaire font partie des 7 os du tarse. Le scaphoïde et le lunatum sont des os du carpe (poignet).', s: 'osmi' },
+    { id: 'pp-os15', multi: 1, q: 'Avec quels os le fémur s’articule-t-il ?', o: ['L’os coxal', 'Le tibia', 'La patella', 'La fibula'], a: [0, 1, 2], e: 'Le fémur s’articule avec l’os coxal (hanche), le tibia et la patella (genou). La fibula ne s’articule pas avec le fémur.', s: 'osmi' }
+  ]);
+  add('anat-mus-cuisse', [
+    { id: 'pp-mu18', multi: 1, q: 'Quels muscles forment le quadriceps fémoral ?', o: ['Le droit fémoral', 'Le vaste latéral', 'Le vaste médial', 'Le vaste intermédiaire', 'Le sartorius'], a: [0, 1, 2, 3], e: 'Le quadriceps réunit 4 chefs : droit fémoral et vastes latéral, médial et intermédiaire. Le sartorius est un autre muscle de la cuisse.', s: 'musmi' },
+    { id: 'pp-mu19', multi: 1, q: 'Quels muscles forment les ischio-jambiers ?', o: ['Le biceps fémoral', 'Le semi-tendineux', 'Le semi-membraneux', 'Le gracile'], a: [0, 1, 2], e: 'Biceps fémoral, semi-tendineux et semi-membraneux. Le gracile est un adducteur de la cuisse.', s: 'musmi' }
+  ]);
+  add('anat-jambe', [
+    { id: 'pp-ja8', multi: 1, q: 'Quelles sont les loges musculaires de la jambe ?', o: ['Antérieure', 'Latérale', 'Postérieure', 'Médiale'], a: [0, 1, 2], e: 'Les fascias divisent la jambe en 3 loges : antérieure, latérale et postérieure. Il n’y a pas de loge médiale.', s: 'musmi' },
+    { id: 'pp-ja9', multi: 1, q: 'Quels mouvements se font à la cheville (articulation talo-crurale) ?', o: ['La flexion dorsale', 'La flexion plantaire', 'L’inversion', 'L’éversion'], a: [0, 1], e: 'La cheville fait la flexion dorsale et la flexion plantaire. L’inversion et l’éversion se font aux articulations intertarsiennes.', s: 'mouv' }
+  ]);
+  add('anat-genou', [
+    { id: 'pp-ge11', multi: 1, q: 'Quelles articulations composent le genou ?', o: ['Fémoro-patellaire', 'Fémoro-tibiale médiale', 'Fémoro-tibiale latérale', 'Tibio-fibulaire proximale'], a: [0, 1, 2], e: 'Le genou réunit 3 articulations : fémoro-patellaire et fémoro-tibiales médiale et latérale. La tibio-fibulaire proximale est une articulation à part.', s: 'artgen' },
+    { id: 'pp-ge12', multi: 1, q: 'Quels ligaments du genou sont situés à l’intérieur de l’articulation ?', o: ['Le LCA', 'Le LCP', 'Le ligament collatéral tibial', 'Le ligament collatéral fibulaire'], a: [0, 1], e: 'Les ligaments croisés (LCA et LCP) sont intra-articulaires. Les collatéraux sont à l’extérieur, sur les côtés.', s: 'artgen' }
+  ]);
+  add('anat-mouv', [
+    { id: 'pp-mv14', multi: 1, q: 'Quels mouvements se font dans le plan frontal ?', o: ['L’abduction', 'L’adduction', 'La flexion latérale du tronc', 'La flexion du coude', 'La rotation médiale'], a: [0, 1, 2], e: 'Abduction, adduction et flexion latérale se font dans le plan frontal. La flexion du coude se fait dans le plan sagittal.', s: 'mouv' },
+    { id: 'pp-mv15', multi: 1, q: 'Quels mouvements s’enchaînent dans une circumduction ?', o: ['Flexion', 'Adduction', 'Extension', 'Abduction', 'Pronation'], a: [0, 1, 2, 3], e: 'La circumduction enchaîne flexion, adduction, extension et abduction ; l’extrémité du membre décrit un cercle.', s: 'mouv' }
+  ]);
+  add('anat-os-ms', [
+    { id: 'pp-ms13', multi: 1, q: 'Lesquels sont des os du carpe (poignet) ?', o: ['Le scaphoïde', 'Le lunatum', 'Le capitatum', 'L’hamatum', 'Le talus', 'Le calcanéus'], a: [0, 1, 2, 3], e: 'Scaphoïde, lunatum, capitatum et hamatum sont des os du carpe. Le talus et le calcanéus sont des os du tarse (pied).', s: 'osms' },
+    { id: 'pp-ms14', multi: 1, q: 'Avec quels os l’extrémité distale de l’humérus s’articule-t-elle ?', o: ['Le radius', 'L’ulna', 'La scapula', 'La clavicule'], a: [0, 1], e: 'La trochlée s’articule avec l’ulna et le capitulum avec le radius. La scapula s’articule avec la tête de l’humérus, en haut.', s: 'osms' }
+  ]);
+  add('anat-mus-ms', [
+    { id: 'pp-mb14', multi: 1, q: 'Quels muscles forment la coiffe des rotateurs ?', o: ['Le supra-épineux', 'L’infra-épineux', 'Le petit rond', 'Le subscapulaire', 'Le grand rond', 'Le deltoïde'], a: [0, 1, 2, 3], e: 'Supra-épineux, infra-épineux, petit rond et subscapulaire. Le grand rond et le deltoïde n’en font pas partie.', s: 'musms' },
+    { id: 'pp-mb15', multi: 1, q: 'Quels muscles fléchissent le coude ?', o: ['Le biceps brachial', 'Le brachial', 'Le brachio-radial', 'Le triceps brachial', 'L’anconé'], a: [0, 1, 2], e: 'Biceps brachial, brachial et brachio-radial fléchissent l’avant-bras. Le triceps et l’anconé l’étendent.', s: 'musms' },
+    { id: 'pp-mb16', multi: 1, q: 'Quels muscles rétractent la scapula (la rapprochent de la colonne) ?', o: ['Le trapèze', 'Le grand rhomboïde', 'Le petit rhomboïde', 'Le dentelé antérieur'], a: [0, 1, 2], e: 'Le trapèze et les rhomboïdes rétractent la scapula. Le dentelé antérieur fait l’inverse : il la protracte.', s: 'musms' }
+  ]);
+  add('anat-rachis', [
+    { id: 'pp-ra15', multi: 1, q: 'Quelles sont les courbures secondaires de la colonne ?', o: ['Cervicale', 'Lombaire', 'Thoracique', 'Sacro-coccygienne'], a: [0, 1], e: 'Les courbures cervicale et lombaire apparaissent après la naissance. Thoracique et sacro-coccygienne sont primaires.', s: 'rachis' },
+    { id: 'pp-ra16', multi: 1, q: 'Quelles caractéristiques ont les vertèbres cervicales ?', o: ['Des foramens transversaires', 'Un processus épineux souvent bifide', 'Des facettes costales', 'Les corps les plus épais de la colonne'], a: [0, 1], e: 'Les cervicales ont des foramens transversaires et un processus épineux souvent bifide. Les facettes costales sont thoraciques, et les corps les plus épais sont lombaires.', s: 'rachis' },
+    { id: 'pp-ra17', multi: 1, q: 'Quels sont des sites fréquents de hernie discale ?', o: ['L4/L5', 'L5/S1', 'C5/C6', 'T6/T7'], a: [0, 1, 2], e: 'Sites fréquents : L4/L5 et L5/S1 (sciatique), C5/C6 et C6/C7 (douleurs du cou et du bras).', s: 'rachis' }
+  ]);
+  add('anat-art', [
+    { id: 'pp-ar12', multi: 1, q: 'Quelles articulations sont des énarthroses (sphéroïdes) ?', o: ['L’épaule (gléno-humérale)', 'La hanche', 'Le coude (huméro-ulnaire)', 'La cheville'], a: [0, 1], e: 'L’épaule et la hanche sont des énarthroses. L’huméro-ulnaire et la cheville sont des articulations en charnière.', s: 'art96' },
+    { id: 'pp-ar13', multi: 1, q: 'Quels ligaments renforcent la hanche ?', o: ['L’ilio-fémoral', 'Le pubo-fémoral', 'L’ischio-fémoral', 'L’annulaire', 'Le deltoïde'], a: [0, 1, 2], e: 'Ilio-fémoral, pubo-fémoral et ischio-fémoral. L’annulaire est au coude, le deltoïde à la cheville.', s: 'art96' },
+    { id: 'pp-ar14', multi: 1, q: 'Quelles articulations partagent la capsule du coude ?', o: ['Huméro-ulnaire', 'Huméro-radiale', 'Radio-ulnaire proximale', 'Radio-ulnaire distale'], a: [0, 1, 2], e: 'Huméro-ulnaire, huméro-radiale et radio-ulnaire proximale. La radio-ulnaire distale est au poignet.', s: 'art96' }
+  ]);
+})();

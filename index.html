@@ -1352,17 +1352,20 @@ function runQs(ids,o){
   drawRq();
 }
 function drawRq(){
-  var it=rq.qs[rq.i], q=it.q, n=rq.qs.length, ans=rq.picked!==null, L=q.vf?['V','F']:['A','B','C','D'];
+  var it=rq.qs[rq.i], q=it.q, n=rq.qs.length, ans=rq.picked!==null, L=q.vf?['V','F']:['A','B','C','D','E','F'];
   var h='<div class="screen noNav"><div class="wrap"><div class="top"><button class="iconbtn" data-sx="rqquit" aria-label="Abandonner">'+IC.x+'</button><div class="segs" style="grid-template-columns:repeat('+n+',1fr)">';
   for(var s=0;s<n;s++) h+='<div class="seg'+(s<rq.i||(s===rq.i&&ans)?' done':'')+'"></div>';
   h+='</div><span class="chip" style="color:var(--gold)">'+rq.score+'/'+n+'</span></div>';
-  h+='<div class="mono" style="color:var(--gold);margin-top:18px">'+esc(rq.o.title)+' · '+(rq.i+1)+'/'+n+(q.vf?' · <span style="color:var(--ink)">VRAI OU FAUX</span>':'')+'</div>';
+  h+='<div class="mono" style="color:var(--gold);margin-top:18px">'+esc(rq.o.title)+' · '+(rq.i+1)+'/'+n+(q.vf?' · <span style="color:var(--ink)">VRAI OU FAUX</span>':q.multi?' · <span style="color:var(--ink)">PLUSIEURS RÉPONSES</span>':'')+'</div>';
   if(!ans&&rq.T) h+='<div class="sxtime"><i id="rqbar" style="width:100%"></i></div>';
   h+='<h1 class="h1" style="margin:12px 0 18px">'+esc(q.q)+'</h1>';
-  it.order.forEach(function(oi,pos){ var cls='opt'; if(ans){ cls=oi===q.a?'opt good':oi===rq.picked?'opt bad':'opt dim'; }
-    h+='<button class="'+cls+'" '+(ans?'disabled':'data-sx="rqpick" data-i="'+oi+'"')+'><span class="l">'+(ans&&oi===q.a?IC.check:ans&&oi===rq.picked?'✕':L[pos])+'</span><span>'+esc(q.o[oi])+'</span></button>'; });
-  if(ans){ var right=rq.picked===q.a, src=S[q.s];
-    h+='<div class="glass fb"><span style="font-family:var(--head);font-weight:600;font-size:15px;color:'+(right?'var(--good)':'var(--bad)')+'">'+(right?'Bien joué !':rq.picked<0?'Temps écoulé !':'Raté…')+'</span><div style="font-size:14px;line-height:1.55;color:var(--ink2);margin-top:8px">'+esc(q.e)+'</div>'+(src?'<span class="src">Source : '+esc(src.t)+'<br><a href="'+src.u+'" target="_blank" rel="noopener">Voir l’étude '+IC.ext+'</a></span>':'')+'</div><div style="height:14px"></div><button class="btn gold" data-sx="rqnext">'+(rq.i<n-1?'Question suivante':'Voir le résultat')+IC.arrow+'</button>'; }
+  var M=!!q.multi, sel=rq.sel||[], isA=function(oi){ return M?q.a.indexOf(oi)>=0:oi===q.a; }, wasP=function(oi){ return M?sel.indexOf(oi)>=0:oi===rq.picked; };
+  if(M&&!ans) h+='<div style="font-size:13px;color:var(--muted);margin:-8px 0 14px">Coche <b style="color:var(--ink)">toutes</b> les bonnes réponses, puis valide.</div>';
+  it.order.forEach(function(oi,pos){ var cls='opt', on=M&&!ans&&sel.indexOf(oi)>=0; if(ans){ cls=isA(oi)?'opt good':wasP(oi)?'opt bad':'opt dim'; }
+    h+='<button class="'+cls+'" '+(ans?'disabled':'data-sx="'+(M?'rqtog':'rqpick')+'" data-i="'+oi+'"')+(on?' style="border-color:var(--gold);background:rgba(212,175,55,.12)"':'')+'><span class="l"'+(on?' style="background:var(--gold);color:#070D1C;border-color:var(--gold)"':'')+'>'+(ans&&isA(oi)?IC.check:ans&&wasP(oi)?'✕':on?'✓':L[pos])+'</span><span>'+esc(q.o[oi])+'</span></button>'; });
+  if(M&&!ans) h+='<button class="btn gold" data-sx="rqval" style="width:100%;margin-top:6px'+(sel.length?'':';opacity:.45')+'"'+(sel.length?'':' disabled')+'>Valider ('+sel.length+')</button>';
+  if(ans){ var right=rq.ok, src=S[q.s];
+    h+='<div class="glass fb"><span style="font-family:var(--head);font-weight:600;font-size:15px;color:'+(right?'var(--good)':'var(--bad)')+'">'+(right?'Bien joué !':rq.picked===-1?'Temps écoulé !':M?'Raté… il fallait cocher toutes les bonnes réponses, et seulement elles.':'Raté…')+'</span><div style="font-size:14px;line-height:1.55;color:var(--ink2);margin-top:8px">'+esc(q.e)+'</div>'+(src?'<span class="src">Source : '+esc(src.t)+'<br><a href="'+src.u+'" target="_blank" rel="noopener">Voir l’étude '+IC.ext+'</a></span>':'')+'</div><div style="height:14px"></div><button class="btn gold" data-sx="rqnext">'+(rq.i<n-1?'Question suivante':'Voir le résultat')+IC.arrow+'</button>'; }
   h+='</div></div>'; view.innerHTML=h;
   clearInterval(rq.tm);
   if(!ans){ rq.t0=Date.now(); if(rq.T) rq.tm=setInterval(function(){ if(!rq){ return; } var el=Date.now()-rq.t0, b=document.getElementById('rqbar'); if(b) b.style.width=Math.max(0,100-el/rq.T*100)+'%'; if(el>=rq.T) rqPick(-1); },200); }
@@ -1370,9 +1373,11 @@ function drawRq(){
 }
 function rqPick(oi){
   if(!rq||rq.picked!==null) return; clearInterval(rq.tm);
-  var q=rq.qs[rq.i].q; rq.picked=oi; buzz(oi===q.a); rq.ms+=Math.min(rq.T||9e9,Date.now()-rq.t0);
+  var q=rq.qs[rq.i].q, sel=rq.sel||[]; rq.picked=oi;
+  var ok=q.multi?(oi!==-1&&sel.length===q.a.length&&q.a.every(function(x){ return sel.indexOf(x)>=0; })):oi===q.a;
+  rq.ok=ok; buzz(ok); rq.ms+=Math.min(rq.T||9e9,Date.now()-rq.t0);
   st.answered++; var pp=q.id.indexOf('pp-')===0;
-  if(oi===q.a){ rq.score++; st.correct++; if(pp){ ppSt().m[q.id]=1; } else { st.mastered[q.id]=1; delete st.wrong[q.id]; } } else if(!pp) st.wrong[q.id]=1;
+  if(ok){ rq.score++; st.correct++; if(pp){ ppSt().m[q.id]=1; } else { st.mastered[q.id]=1; delete st.wrong[q.id]; } } else if(!pp) st.wrong[q.id]=1;
   save(); drawRq();
 }
 function rqEnd(){ var r=rq; clearInterval(r.tm); rq=null; gainXP(r.score*XP_RIGHT); r.o.done(r.score,r.ms); }
@@ -1786,7 +1791,9 @@ document.getElementById('app').addEventListener('click',function(e){
   else if(a==='duelgo'){ var d2=duelById(id); if(d2) duelPlay(d2); }
   else if(a==='toarena'){ tab='arena'; render(); }
   else if(a==='rqpick') rqPick(+b.dataset.i);
-  else if(a==='rqnext'){ if(rq.i<rq.qs.length-1){ rq.i++; rq.picked=null; drawRq(); } else rqEnd(); }
+  else if(a==='rqtog'){ if(!rq||rq.picked!==null) return; rq.sel=rq.sel||[]; var ti=+b.dataset.i, k=rq.sel.indexOf(ti); if(k<0) rq.sel.push(ti); else rq.sel.splice(k,1); var keep=Date.now()-rq.t0; drawRq(); rq.t0=Date.now()-keep; }
+  else if(a==='rqval'){ if(rq&&(rq.sel||[]).length) rqPick(-2); }
+  else if(a==='rqnext'){ if(rq.i<rq.qs.length-1){ rq.i++; rq.picked=null; rq.sel=[]; drawRq(); } else rqEnd(); }
   else if(a==='rqquit'){ if(confirm('Abandonner ? Tes réponses actuelles seront comptées.')) rqEnd(); }
   else if(a==='roomnew'){ if(rm) roomClose(true); roomCreate(); }
   else if(a==='roomjoin') roomJoinSheet();
