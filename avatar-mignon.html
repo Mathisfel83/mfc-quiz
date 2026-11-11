@@ -1,0 +1,67 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MFC Quiz · Avatar mignon (prototype)</title>
+<style>
+body{margin:0;min-height:100vh;background:radial-gradient(120% 70% at 50% 25%,#13265A,#050A16);color:#F2F4F7;font-family:Inter,system-ui,-apple-system,sans-serif}
+.wrap{max-width:480px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 16px 40px}
+h1{font-size:20px;margin:4px 0 2px}.k{font:700 11px ui-monospace,monospace;letter-spacing:1.5px;color:#D4AF37;margin-top:16px}
+.k:first-child{margin-top:0}
+#stage{height:58vh;min-height:380px;border-radius:26px;border:1px solid rgba(212,175,55,.35);overflow:hidden;margin-top:12px;position:relative;background:linear-gradient(180deg,rgba(19,38,90,.5),rgba(5,10,22,.2))}
+.tag{position:absolute;top:12px;left:12px;background:rgba(5,10,22,.65);border:1px solid rgba(212,175,55,.5);border-radius:999px;padding:6px 12px;font:700 12px Inter,system-ui;color:#F6DC8C;pointer-events:none}
+.hint{position:absolute;bottom:10px;width:100%;text-align:center;font-size:12px;color:#C9CED6;pointer-events:none}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+button{border:1px solid rgba(201,206,214,.25);background:rgba(255,255,255,.06);color:#F2F4F7;border-radius:999px;padding:9px 14px;font:600 13.5px Inter,system-ui;cursor:pointer}
+button.on{background:rgba(212,175,55,.18);border-color:#D4AF37;color:#F3D98A}
+button.lock{opacity:.45}
+.sw{width:32px;height:32px;padding:0;border-radius:50%}
+.sw.on{outline:2px solid #D4AF37;outline-offset:2px}
+input[type=range]{width:100%;accent-color:#D4AF37;margin-top:10px}
+.lvl{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px}
+.lvl b{font-size:26px;color:#F6DC8C}
+.note{font-size:12px;color:#9AA4B5;line-height:1.5;margin-top:18px}
+</style></head><body><div class="wrap">
+<div class="k">PROTOTYPE · AVATAR MIGNON</div><h1>Ton athlète MFC</h1>
+<div id="stage"><div class="tag" id="tag">Niv. 1 · Tenue MFC</div><div class="hint">↔ Fais-le tourner avec le doigt</div></div>
+<div class="row"><button data-a="salut">👋 Salut</button><button data-a="biceps">💪 Biceps</button><button data-a="victoire">🏆 Victoire</button><button data-a="triste">😕 Raté</button></div>
+
+<div class="k">NIVEAU (SIMULATION XP)</div>
+<div class="lvl"><span>Niveau</span><b id="lv">1</b></div>
+<input type="range" id="level" min="1" max="100" value="1">
+<div class="row" id="tiers"></div>
+
+<div class="k">RENDU</div><div class="row" id="style"><button data-v="doux" class="on">Doux 3D</button><button data-v="cartoon">Cartoon (contours)</button></div>
+<div class="k">SEXE</div><div class="row" id="sex"><button data-v="h" class="on">Homme</button><button data-v="f">Femme</button></div>
+<div class="k">PEAU</div><div class="row" id="skin"></div>
+<div class="k">COIFFURE</div><div class="row" id="hair"></div>
+<div class="k">COULEUR DES CHEVEUX</div><div class="row" id="hairColor"></div>
+<div class="k">YEUX</div><div class="row" id="eyes"></div>
+<div class="note">Prototype de test : il ne change rien à l'appli. Personnage entièrement dessiné par le code (aucun modèle externe, aucune licence tierce). Les paliers de tenues suivent le niveau ; bouge le curseur pour les voir.</div>
+</div>
+<script type="module">
+import A from './avatar-mignon.js';
+const cfg={style:'doux',sex:'h',level:1,hair:'court',skin:'#E2AE84',hairColor:'#3B2416',eyes:'#5A3A22'};
+const SKINS=['#F6D3B8','#E2AE84','#C98C5E','#A86C42','#7A4A2C','#4E2E1C'];
+const HAIRS=[['court','Court'],['pique','Piqué'],['boucles','Bouclé'],['rase','Rasé'],['queue','Queue'],['long','Long'],['carre','Carré'],['chignon','Chignon']];
+const HC=['#141016','#3B2416','#6B4123','#B07A3E','#E3C07A','#A8442A','#D9D9DE','#2F5BD8'];
+const EYES=['#5A3A22','#2B6CB0','#3C8D5A','#8A6E2F','#1E1E24'];
+const DEF_HAIR={h:'court',f:'queue'};
+const $=id=>document.getElementById(id);
+function render(){
+  $('skin').innerHTML=SKINS.map(c=>`<button class="sw ${cfg.skin===c?'on':''}" data-v="${c}" style="background:${c}"></button>`).join('');
+  $('hair').innerHTML=HAIRS.map(h=>`<button data-v="${h[0]}" class="${cfg.hair===h[0]?'on':''}">${h[1]}</button>`).join('');
+  $('hairColor').innerHTML=HC.map(c=>`<button class="sw ${cfg.hairColor===c?'on':''}" data-v="${c}" style="background:${c}"></button>`).join('');
+  $('eyes').innerHTML=EYES.map(c=>`<button class="sw ${cfg.eyes===c?'on':''}" data-v="${c}" style="background:${c}"></button>`).join('');
+  const cur=A.tierFor(cfg.level);
+  $('tiers').innerHTML=A.TIERS.map(t=>`<button data-lv="${t.lv}" class="${t===cur?'on':''} ${cfg.level<t.lv?'lock':''}">${cfg.level<t.lv?'🔒 ':''}${t.name} · ${t.lv}</button>`).join('');
+  $('lv').textContent=cfg.level; $('tag').textContent=`Niv. ${cfg.level} · ${cur.name}`; $('level').value=cfg.level;
+  ['style','sex'].forEach(id=>[...$(id).children].forEach(b=>b.classList.toggle('on',b.dataset.v===cfg[id])));
+}
+function go(){ render(); A.update(cfg); }
+['skin','hair','hairColor','eyes','style'].forEach(k=>$(k).addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cfg[k]=b.dataset.v; go(); }));
+$('sex').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cfg.sex=b.dataset.v; cfg.hair=DEF_HAIR[cfg.sex]; go(); });
+$('tiers').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cfg.level=+b.dataset.lv; go(); });
+let prevTier=null;
+$('level').addEventListener('input',e=>{ cfg.level=+e.target.value; const t=A.tierFor(cfg.level); render(); if(t!==prevTier){ prevTier=t; A.update(cfg); } });
+document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>A.anim(b.dataset.a));
+render(); A.mount($('stage'),cfg); prevTier=A.tierFor(cfg.level);
+document.title='done';
+</script></body></html>
