@@ -3,10 +3,12 @@
    API : window.MFCAvatar3 = { mount, update, anim, unmount, snapshot, ready } */
 import * as THREE from './vendor/three.module.min.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
+import { RoomEnvironment } from './vendor/RoomEnvironment.js';
+import { toCreasedNormals } from './vendor/BufferGeometryUtils.js';
 
 const BASE = (window.MFC_AV3_BASE || './av3/');
 const PAL = { navy: '#22346E', navy2: '#18254F', gold: '#D4AF37', goldL: '#F3D98A', white: '#EEF1F6', silver: '#B9C2D0', blue: '#2F7BFF', sole: '#E9ECF2' };
-const DEFAULT = { sex: 'h', skin: '#D9A07A', hair: 'court', hairColor: '#4A2C1A', eyes: '#5B3A22', level: 1, mus: 0.8 };
+const DEFAULT = { style: 'base', sex: 'h', skin: '#D9A07A', hair: 'court', hairColor: '#4A2C1A', eyes: '#5B3A22', level: 1, mus: 0.8 };
 
 /* ---------- composition des tenues (palier niveau 1 pour le prototype) ---------- */
 const HEADS = {
@@ -73,9 +75,32 @@ function sculpt(mesh, mus) {
 /* ---------- couleurs : un matériau « flat » par rôle (rendu low-poly à facettes) ---------- */
 const MATS = {};
 const HIDE = new THREE.MeshBasicMaterial({ visible: false });
+/* trois rendus : 'base' (facettes), 'lisse' (surfaces lissées + éclairage d'ambiance), 'cel' (style jeu vidéo : aplats + contour) */
+let STYLE = 'base', RAMP = null, OUTL = null, ENV = null;
+function toonRamp() {
+  if (RAMP) return RAMP;
+  RAMP = new THREE.DataTexture(new Uint8Array([70, 70, 70, 255, 150, 150, 150, 255, 215, 215, 215, 255, 255, 255, 255, 255]), 4, 1, THREE.RGBAFormat);
+  RAMP.minFilter = RAMP.magFilter = THREE.NearestFilter; RAMP.generateMipmaps = false; RAMP.needsUpdate = true; return RAMP;
+}
+function outlineMat() {
+  if (OUTL) return OUTL;
+  OUTL = new THREE.MeshBasicMaterial({ color: '#060A16', side: THREE.BackSide });
+  OUTL.onBeforeCompile = (sh) => { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += normalize(normal) * ' + (window.MFC_AV3_OUTLINE || 0.011).toFixed(4) + ';'); };
+  return OUTL;
+}
 function mat(color, opt = {}) {
-  const k = color + JSON.stringify(opt);
-  return MATS[k] || (MATS[k] = new THREE.MeshStandardMaterial(Object.assign({ color, flatShading: true, roughness: 0.62, metalness: 0.05 }, opt)));
+  const k = STYLE + color + JSON.stringify(opt);
+  if (MATS[k]) return MATS[k];
+  let m;
+  if (STYLE === 'cel') {
+    m = new THREE.MeshToonMaterial({ color, gradientMap: toonRamp() });
+    if (opt.emissive) m.emissive = new THREE.Color(opt.emissive);
+    if ((opt.metalness || 0) > 0.4) m.emissive = new THREE.Color(color).multiplyScalar(0.22);
+  } else if (STYLE === 'lisse') {
+    const met = (opt.metalness || 0) > 0.4;
+    m = new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.68, metalness: 0.04 }, opt, { flatShading: false }, met ? { metalness: 0.9, roughness: 0.22 } : {}));
+  } else m = new THREE.MeshStandardMaterial(Object.assign({ color, flatShading: true, roughness: 0.62, metalness: 0.05 }, opt));
+  return (MATS[k] = m);
 }
 function colorFor(part, matName, cfg) {
   const r0 = (ROLE[part] || {})[matName];
@@ -174,35 +199,40 @@ let R = null;
 function ensure() {
   if (R) return R;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.setPixelRatio(Math.min(2.5, window.devicePixelRatio || 1));
   renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
   const scene = new THREE.Scene();
   const cam = new THREE.PerspectiveCamera(26, 1, 0.05, 50);
-  scene.add(new THREE.HemisphereLight('#C8D6FF', '#1A1530', 1.15));
+  const hemi = new THREE.HemisphereLight('#C8D6FF', '#1A1530', 1.15); scene.add(hemi);
   const key = new THREE.DirectionalLight('#FFF1DC', 2.6); key.position.set(1.6, 3.2, 2.6); scene.add(key);
   const rimG = new THREE.DirectionalLight('#FFC861', 2.4); rimG.position.set(-2.4, 2.0, -2.2); scene.add(rimG);
   const rimB = new THREE.DirectionalLight('#5B8CFF', 1.8); rimB.position.set(2.6, 1.4, -2.0); scene.add(rimB);
   // socle
   const stage = new THREE.Group(); scene.add(stage);
-  const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.68, 0.09, 48), mat('#141E40', { metalness: 0.0, roughness: 0.85 }));
+  const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.68, 0.09, 48), new THREE.MeshStandardMaterial({ color: '#141E40', metalness: 0, roughness: 0.85, envMapIntensity: 0.15 }));
   disc.position.y = -0.045; stage.add(disc);
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.645, 0.012, 8, 96), new THREE.MeshBasicMaterial({ color: '#FFD36B' }));
   ring.rotation.x = Math.PI / 2; ring.position.y = 0.002; stage.add(ring);
   const glowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); const gr = x.createRadialGradient(64, 64, 10, 64, 64, 64); gr.addColorStop(0, 'rgba(255,205,90,.55)'); gr.addColorStop(.6, 'rgba(212,175,55,.18)'); gr.addColorStop(1, 'rgba(212,175,55,0)'); x.fillStyle = gr; x.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
   glow.rotation.x = -Math.PI / 2; glow.position.y = 0.004; stage.add(glow);
+  // ombre de contact douce sous les pieds
+  const shTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); const gr = x.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, 'rgba(0,0,0,.62)'); gr.addColorStop(.5, 'rgba(0,0,0,.28)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = gr; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.75, 0.6), new THREE.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false }));
+  shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.007; stage.add(shadow);
   // montagnes low-poly (identité MFC)
   const mts = new THREE.Group(); scene.add(mts);
   [[-1.7, -4.2, 1.1, 1.1], [1.8, -4.4, 0.95, 0.95], [-0.2, -5.6, 1.5, 1.4], [3.2, -5.2, 0.8, 1.2], [-3.3, -5.0, 0.85, 1.2]].forEach(([x, z, h, r]) => {
-    const m = new THREE.Mesh(new THREE.ConeGeometry(r, h * 1.6, 5, 1), mat('#16245A', { roughness: 0.95 })); m.position.set(x, h * 0.8 - 0.05, z); m.rotation.y = x; mts.add(m);
-    const cap = new THREE.Mesh(new THREE.ConeGeometry(r * 0.28, h * 0.45, 5, 1), mat('#C9A447', { emissive: '#2A1E06', roughness: 0.7 })); cap.position.set(x, h * 1.6 - 0.05 - h * 0.22 + 0.0, z); cap.rotation.y = x; mts.add(cap);
+    const m = new THREE.Mesh(new THREE.ConeGeometry(r, h * 1.6, 5, 1), new THREE.MeshStandardMaterial({ color: '#16245A', flatShading: true, roughness: 0.95, envMapIntensity: 0.15 })); m.position.set(x, h * 0.8 - 0.05, z); m.rotation.y = x; mts.add(m);
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(r * 0.28, h * 0.45, 5, 1), new THREE.MeshStandardMaterial({ color: '#C9A447', emissive: '#2A1E06', flatShading: true, roughness: 0.7, envMapIntensity: 0.3 })); cap.position.set(x, h * 1.6 - 0.05 - h * 0.22 + 0.0, z); cap.rotation.y = x; mts.add(cap);
   });
-  R = { renderer, scene, cam, stage, ring, glow, mts, host: null, av: null, raf: 0, yaw: 0.35, vyaw: 0, drag: null, lastTouch: 0, clock: new THREE.Clock(), mixer: null, actions: {}, pose: null };
+  R = { renderer, scene, cam, stage, ring, glow, mts, hemi, key, rimG, rimB, host: null, av: null, raf: 0, yaw: 0.35, vyaw: 0, drag: null, lastTouch: 0, clock: new THREE.Clock(), mixer: null, actions: {}, pose: null };
   return R;
 }
 
 async function build(cfg) {
   const c = Object.assign({}, DEFAULT, cfg); const sx = c.sex === 'f' ? 'f' : 'h', G = sx === 'f' ? 'F' : 'M';
+  STYLE = ['lisse', 'cel'].includes(c.style) ? c.style : 'base';
   const o = OUTFIT1[sx], head = HEADS[sx][c.hair] || Object.values(HEADS[sx])[0];
   const names = [o.body, o.legs, o.legs2, o.feet, head].filter(Boolean);
   const [base, ...parts] = await Promise.all([get(G + '_anims'), ...names.map(get)]);
@@ -227,9 +257,16 @@ async function build(cfg) {
       if (!Array.isArray(m.material)) mesh.material = mesh.material[0];
       if (/_Head$/.test(name)) { mesh.geometry.computeVertexNormals(); const es = findEyes(mesh, m, name); if (es) eyeSpots = es; }
       if (!/_Head$/.test(name)) sculpt(mesh, c.mus);
+      if (STYLE !== 'base' && !/_Head$/.test(name)) mesh.geometry = toCreasedNormals(mesh.geometry, Math.PI / 3);
       if (c.level >= 5 && ACCENT[name]) accent(mesh, ACCENT[name], mat(PAL.gold, { metalness: 0.5, roughness: 0.35 }));
       mesh.frustumCulled = false; mesh.castShadow = false;
       sk.add(mesh);
+      if (STYLE === 'cel') {
+        const og = toCreasedNormals(mesh.geometry.clone(), Math.PI);
+        og.groups = mesh.geometry.groups.map((g) => Object.assign({}, g));
+        const om = Array.isArray(mesh.material) ? mesh.material.map((x) => (x === HIDE ? HIDE : outlineMat())) : (mesh.material === HIDE ? HIDE : outlineMat());
+        const o = new THREE.SkinnedMesh(og, om); o.bind(mesh.skeleton, mesh.bindMatrix); o.frustumCulled = false; sk.add(o);
+      }
     });
   });
   // proportions héroïques : tête un peu plus petite, mains plus fines
@@ -314,6 +351,9 @@ const api = {
     const r = ensure(); const av = await build(cfg);
     if (r.av) r.scene.remove(r.av.root);
     r.av = av; r.scene.add(av.root);
+    // éclairage selon le rendu
+    if (STYLE === 'lisse') { if (!ENV) { const pm = new THREE.PMREMGenerator(r.renderer); ENV = pm.fromScene(new RoomEnvironment(), 0.04).texture; pm.dispose(); } r.scene.environment = ENV; r.scene.environmentIntensity = 0.32; r.hemi.intensity = 0.75; r.key.intensity = 2.7; }
+    else { r.scene.environment = null; r.hemi.intensity = STYLE === 'cel' ? 1.4 : 1.15; r.key.intensity = STYLE === 'cel' ? 2.8 : 2.6; }
     const idle = av.actions.Idle || Object.values(av.actions)[0]; if (idle) idle.reset().play();
     resize();
   },
