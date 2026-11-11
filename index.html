@@ -903,7 +903,7 @@ function ranks(){
   var h='<div class="screen"><div class="wrap"><div class="up row" style="justify-content:space-between"><div><div class="mono" style="color:var(--muted)">TA PROGRESSION</div><h1 class="h1" style="margin-top:4px">Ma carte</h1></div><button class="chip" data-act="cardedit" style="color:var(--gold)">✏️ Modifier</button></div>';
   h+='<div class="up d1" id="mycard" style="display:flex;justify-content:center;margin-top:18px">'+cardHTML(Math.min(290,window.innerWidth-90))+'</div>';
   h+='<div class="up d1" style="text-align:center;font-size:12px;color:var(--muted);margin-top:10px">Incline ta carte avec le doigt ✨</div>';
-  h+='<button class="btn gold up d1" data-act="cardshare" style="margin-top:14px">📸 Partager ma carte en story</button>';
+  h+='<button class="btn gold up d1" data-act="cardshare" style="margin-top:14px">📸 Partager ma carte en story'+(sharesLeft()?' · +'+XP_SHARE+' XP':'')+'</button>';
   h+='<div class="goldcard up d2" style="margin-top:16px;padding:16px"><div class="row" style="justify-content:space-between"><div><div class="mono" style="color:var(--gold);font-size:10px">CARTE '+I.T.n.toUpperCase()+'</div><div style="font-family:var(--head);font-size:24px;font-weight:700;margin-top:2px">Niveau '+I.lv+'<span style="font-size:14px;color:var(--muted)"> / 100</span></div></div><span class="mono" style="color:var(--gold);font-weight:700">'+fmt(st.xp)+' XP</span></div>';
   h+='<div class="bar" style="margin-top:12px;height:10px"><i style="width:'+I.pct+'%"></i></div><div style="font-size:12.5px;color:var(--silver);margin-top:8px;line-height:1.5">'+(I.lv<100?'Encore <b style="color:var(--gold)">'+fmt(I.left)+' XP</b> pour le niveau '+(I.lv+1)+(I.nt?'<br>Prochaine carte : <b style="color:var(--gold2)">'+I.nt.n+'</b> au niveau '+I.nt.from:''):'👑 Niveau maximum : tu as la carte Icône MFC !')+'</div></div>';
   // notes
@@ -923,7 +923,7 @@ function ranks(){
   h+='</div>';
   // comment gagner des XP
   h+='<div class="glass up d6" style="margin-top:22px;padding:16px"><div class="mono" style="color:var(--gold);font-size:10px;margin-bottom:10px">COMMENT GAGNER DES XP</div>';
-  [['✅','Bonne réponse','+10'],['🎯','Quiz sans faute','+20'],['📖','Leçon terminée (1re fois)','+30'],['🌱','Mission du jour','+15'],['⚔️','Duel gagné','+20'],['🏔️','Course au sommet : bonne réponse','+5 à +15'],['🚩','Course au sommet gagnée','+50']].forEach(function(x){ h+='<div class="row" style="justify-content:space-between;padding:6px 0;font-size:13.5px;border-top:1px solid var(--line)"><span>'+x[0]+' '+x[1]+'</span><span class="mono" style="color:var(--gold);font-weight:700;white-space:nowrap">'+x[2]+'</span></div>'; });
+  [['✅','Bonne réponse','+10'],['🎯','Quiz sans faute','+20'],['📖','Leçon terminée (1re fois)','+30'],['🌱','Mission du jour','+15'],['⚔️','Duel gagné','+20'],['🏔️','Course au sommet : bonne réponse','+5 à +15'],['🚩','Course au sommet gagnée','+50'],['📸','Carte partagée en story (2 fois / semaine)','+'+XP_SHARE]].forEach(function(x){ h+='<div class="row" style="justify-content:space-between;padding:6px 0;font-size:13.5px;border-top:1px solid var(--line)"><span>'+x[0]+' '+x[1]+'</span><span class="mono" style="color:var(--gold);font-weight:700;white-space:nowrap">'+x[2]+'</span></div>'; });
   h+='</div></div></div>'; view.innerHTML=h; tiltIn('mycard');
 }
 
@@ -1275,13 +1275,13 @@ function storySheet(u){
 /* partage d'une image : feuille de partage iOS (Instagram, Snapchat, WhatsApp, Photos…) ou téléchargement */
 function shareImage(u,fname){
   var FS=plug('Filesystem'), SH=plug('Share');
-  if(FS&&SH) return FS.writeFile({path:fname,data:u.split(',')[1],directory:'CACHE'}).then(function(r){ return SH.share({files:[r.uri]}); }).catch(function(){});
+  if(FS&&SH) return FS.writeFile({path:fname,data:u.split(',')[1],directory:'CACHE'}).then(function(r){ return SH.share({files:[r.uri]}); }).then(function(){ return true; },function(){ return false; });
   return fetch(u).then(function(r){ return r.blob(); }).then(function(bl){
     var f=new File([bl],fname,{type:'image/png'});
-    if(navigator.canShare&&navigator.canShare({files:[f]})) return navigator.share({files:[f]}).catch(function(){});
+    if(navigator.canShare&&navigator.canShare({files:[f]})) return navigator.share({files:[f]}).then(function(){ return true; },function(){ return false; });
     var a=document.createElement('a'); a.href=u; a.download=fname; document.body.appendChild(a); a.click(); a.remove();
-    toast('📥','Image enregistrée : ajoute-la à ta story depuis tes photos.',3200);
-  });
+    toast('📥','Image enregistrée : ajoute-la à ta story depuis tes photos.',3200); return true;
+  }).catch(function(){ return false; });
 }
 
 /* ---------- partager ma carte en story ---------- */
@@ -1307,13 +1307,22 @@ function cardStoryImg(withPhoto){
     return c.toDataURL('image/png');
   });
 }
-var csPhoto=true;
+var csPhoto=true, XP_SHARE=25, SHARE_MAX=2;
+function weekStart(){ var d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-((d.getDay()+6)%7)); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function sharesLeft(){ var w=weekStart(); if(!st.shareWk||st.shareWk.w!==w) return SHARE_MAX; return Math.max(0,SHARE_MAX-st.shareWk.n); }
+function shareBonusH(){ var n=sharesLeft(); return n?'<b style="color:var(--gold)">+'+XP_SHARE+' XP</b> à chaque partage · encore <b style="color:var(--ink)">'+n+'</b> partage'+(n>1?'s':'')+' récompensé'+(n>1?'s':'')+' cette semaine':'Bonus XP déjà pris 2 fois cette semaine · il revient lundi'; }
+function shareReward(){
+  var n=sharesLeft(); if(!n) return; var w=weekStart(); st.shareWk={w:w,n:SHARE_MAX-n+1};
+  var before=rankOf(st.xp).r.n; gainXP(XP_SHARE); var el=document.getElementById('csxp'); if(el) el.innerHTML=shareBonusH();
+  toast('📸','+'+XP_SHARE+' XP, merci pour le partage !',2400); if(rankOf(st.xp).r.n!==before) toast('🪪','Nouvelle carte débloquée : '+rankOf(st.xp).r.n+' !',3000);
+}
 function cardShareSheet(){
   var hasPh=!!cardPhoto();
   sheet('<div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 class="h1" style="font-size:18px">Partager ma carte en story</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div>'+
     '<div id="csimg" style="width:58%;aspect-ratio:9/16;margin:0 auto;border-radius:18px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;overflow:hidden">Création…</div>'+
     (hasPh?'<div style="display:flex;justify-content:center;margin-top:12px"><button class="chip" id="csph" style="color:var(--gold)">'+(csPhoto?'🙂 Avec ma photo':'🛡️ Sans ma photo')+'</button></div>':'')+
     '<div style="font-size:12.5px;color:var(--muted);text-align:center;line-height:1.5;margin:12px 4px 14px">Appuie sur <b style="color:var(--ink)">Partager</b>, puis choisis <b style="color:var(--ink)">Instagram</b> ou <b style="color:var(--ink)">Snapchat</b> → « Story ». Rien n’est publié sans ton accord.</div>'+
+    '<div id="csxp" class="glass" style="padding:10px 12px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.45;margin-bottom:12px">'+shareBonusH()+'</div>'+
     '<button class="btn gold" id="csgo" disabled>📲 Partager '+IC.arrow+'</button>');
   var url=null;
   function build(){
@@ -1322,7 +1331,7 @@ function cardShareSheet(){
       .catch(function(){ var b=document.getElementById('csimg'); if(b) b.textContent='Impossible de créer l’image, réessaie.'; });
   }
   var ph=document.getElementById('csph'); if(ph) ph.addEventListener('click',function(){ csPhoto=!csPhoto; ph.textContent=csPhoto?'🙂 Avec ma photo':'🛡️ Sans ma photo'; build(); });
-  document.getElementById('csgo').addEventListener('click',function(){ if(!url) return; shareImage(url,'carte-mfc-quiz.png').then(function(){ if(!st.cardShared){ st.cardShared=1; save(); } }); });
+  document.getElementById('csgo').addEventListener('click',function(){ if(!url) return; shareImage(url,'carte-mfc-quiz.png').then(function(ok){ if(ok) shareReward(); }); });
   build();
 }
 
