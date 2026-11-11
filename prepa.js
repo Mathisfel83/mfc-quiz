@@ -276,3 +276,114 @@ Object.assign(window.MFC_PREPA_SOURCES, {
     { id: 'pp-ar14', multi: 1, q: 'Quelles articulations partagent la capsule du coude ?', o: ['Huméro-ulnaire', 'Huméro-radiale', 'Radio-ulnaire proximale', 'Radio-ulnaire distale'], a: [0, 1, 2], e: 'Huméro-ulnaire, huméro-radiale et radio-ulnaire proximale. La radio-ulnaire distale est au poignet.', s: 'art96' }
   ]);
 })();
+
+/* ===== Physiologie (STAPS + BPJEPS) ===== */
+Object.assign(window.MFC_PREPA_SOURCES, {
+  c191: { t: 'OpenStax, Anatomy and Physiology (2013), §19.1 Heart Anatomy. Rice University, CC BY 4.0.', u: 'https://openstax.org/books/anatomy-and-physiology/pages/19-1-heart-anatomy' },
+  c192: { t: 'OpenStax, Anatomy and Physiology (2013), §19.2 Cardiac Muscle and Electrical Activity. Rice University, CC BY 4.0.', u: 'https://openstax.org/books/anatomy-and-physiology/pages/19-2-cardiac-muscle-and-electrical-activity' },
+  c194: { t: 'OpenStax, Anatomy and Physiology (2013), §19.4 Cardiac Physiology. Rice University, CC BY 4.0.', u: 'https://openstax.org/books/anatomy-and-physiology/pages/19-4-cardiac-physiology' },
+  r223: { t: 'OpenStax, Anatomy and Physiology (2013), §22.3 The Process of Breathing. Rice University, CC BY 4.0.', u: 'https://openstax.org/books/anatomy-and-physiology/pages/22-3-the-process-of-breathing' },
+  r225: { t: 'OpenStax, Anatomy and Physiology (2013), §22.5 Transport of Gases. Rice University, CC BY 4.0.', u: 'https://openstax.org/books/anatomy-and-physiology/pages/22-5-transport-of-gases' },
+  m103: { t: 'OpenStax, Anatomy and Physiology (2013), §10.3 Muscle Fiber Contraction and Relaxation. Rice University, CC BY 4.0.', u: 'https://openstax.org/books/anatomy-and-physiology/pages/10-3-muscle-fiber-contraction-and-relaxation' },
+  m105: { t: 'OpenStax, Anatomy and Physiology (2013), §10.5 Types of Muscle Fibers. Rice University, CC BY 4.0.', u: 'https://openstax.org/books/anatomy-and-physiology/pages/10-5-types-of-muscle-fibers' }
+});
+(function(){
+  var VF = ['Vrai', 'Faux'];
+  var staps = window.MFC_PREPA.tracks[0], bp = window.MFC_PREPA.tracks[1];
+  var ph = staps.subjects.filter(function(s){ return s.id === 'physio'; })[0];
+  delete ph.soon; ph.desc = 'Cœur, respiration, énergie musculaire';
+  if(!bp.subjects.some(function(s){ return s.id === 'physio'; })) bp.subjects.splice(1, 0, { id: 'physio', ref: 'staps', name: 'Physiologie de l’effort', e: '❤️', desc: 'Commun avec la prépa STAPS' });
+  ph.chapters = [
+    { id: 'ph-coeur', t: 'Le cœur', free: 1,
+      k: ['4 cavités : 2 oreillettes (atria) qui reçoivent le sang, 2 ventricules qui l’éjectent.',
+          'Cœur droit : sang pauvre en O2 → tronc pulmonaire → poumons (petite circulation). Cœur gauche : sang oxygéné → aorte → corps (grande circulation).',
+          'Valves : tricuspide (à droite) et mitrale (à gauche) entre oreillettes et ventricules ; valves semi-lunaires pulmonaire et aortique à la sortie des ventricules.',
+          'Le nœud sinusal (sino-atrial), dans l’oreillette droite, est le pacemaker du cœur. L’influx passe ensuite par le nœud atrio-ventriculaire, le faisceau et les fibres de Purkinje.'],
+      qs: [
+        { id: 'pp-ph1', q: 'Combien de cavités compte le cœur ?', o: ['2', '3', '4', '6'], a: 2, e: '2 oreillettes (atria) en haut, qui reçoivent le sang, et 2 ventricules en bas, qui sont les pompes principales.', s: 'c191' },
+        { id: 'pp-ph2', q: 'Où arrive le sang oxygéné qui revient des poumons ?', o: ['Dans l’oreillette droite', 'Dans l’oreillette gauche', 'Dans le ventricule droit', 'Dans l’aorte'], a: 1, e: 'Les veines pulmonaires ramènent le sang oxygéné dans l’oreillette gauche. L’oreillette droite reçoit le sang pauvre en O2 des veines caves.', s: 'c191' },
+        { id: 'pp-ph3', q: 'Le ventricule gauche éjecte le sang dans…', o: ['Le tronc pulmonaire', 'L’aorte', 'La veine cave', 'Les veines pulmonaires'], a: 1, e: 'Le ventricule gauche envoie le sang oxygéné dans l’aorte, vers tout le corps (circulation systémique).', s: 'c191' },
+        { id: 'pp-ph4', vf: 1, q: 'La valve mitrale se trouve entre l’oreillette droite et le ventricule droit.', o: VF, a: 1, e: 'Faux. À droite, c’est la valve tricuspide (3 valvules). La mitrale (bicuspide, 2 valvules) est à gauche.', s: 'c191' },
+        { id: 'pp-ph5', q: 'Pourquoi la paroi du ventricule gauche est-elle plus épaisse que celle du droit ?', o: ['Il éjecte deux fois plus de sang', 'Il doit générer une pression plus forte pour la grande circulation', 'Il reçoit le sang des veines caves', 'Il contient le nœud sinusal'], a: 1, e: 'Les deux ventricules éjectent le même volume, mais le gauche doit pousser le sang dans toute la circulation systémique, plus longue et plus résistante.', s: 'c191' },
+        { id: 'pp-ph6', vf: 1, q: 'Les cordages tendineux et les muscles papillaires empêchent les valves atrio-ventriculaires de se retourner vers les oreillettes.', o: VF, a: 0, e: 'Vrai. Quand les ventricules se contractent, les muscles papillaires tendent les cordages, ce qui maintient les valvules fermées.', s: 'c191' },
+        { id: 'pp-ph7', q: 'Quelle couche de la paroi du cœur est faite de muscle cardiaque ?', o: ['L’épicarde', 'Le myocarde', 'L’endocarde', 'Le péricarde pariétal'], a: 1, e: 'Le myocarde, couche moyenne et la plus épaisse, est le muscle cardiaque. L’endocarde tapisse l’intérieur ; l’épicarde recouvre l’extérieur.', s: 'c191' },
+        { id: 'pp-ph8', q: 'Quel est le « pacemaker » naturel du cœur ?', o: ['Le nœud atrio-ventriculaire', 'Le nœud sinusal (sino-atrial)', 'Les fibres de Purkinje', 'Le nerf vague'], a: 1, e: 'Le nœud sinusal, dans la paroi de l’oreillette droite près de la veine cave supérieure, a le rythme de dépolarisation le plus rapide : il impose le rythme du cœur.', s: 'c192' },
+        { id: 'pp-ph9', vf: 1, q: 'Le muscle cardiaque peut générer lui-même ses impulsions électriques (automatisme).', o: VF, a: 0, e: 'Vrai. C’est l’autorythmicité, propre au muscle cardiaque. Le système nerveux et les hormones modulent ensuite la fréquence.', s: 'c192' },
+        { id: 'pp-ph10', multi: 1, q: 'Quels éléments font partie du système de conduction du cœur ?', o: ['Le nœud sinusal', 'Le nœud atrio-ventriculaire', 'Les fibres de Purkinje', 'Les muscles papillaires', 'La valve mitrale'], a: [0, 1, 2], e: 'Nœud sinusal, voies internodales, nœud atrio-ventriculaire, faisceau atrio-ventriculaire et ses branches, fibres de Purkinje. Muscles papillaires et valves ne conduisent pas l’influx.', s: 'c192' },
+        { id: 'pp-ph11', multi: 1, q: 'Quels vaisseaux ramènent du sang pauvre en oxygène dans l’oreillette droite ?', o: ['La veine cave supérieure', 'La veine cave inférieure', 'Le sinus coronaire', 'Les veines pulmonaires'], a: [0, 1, 2], e: 'L’oreillette droite reçoit les deux veines caves et le sinus coronaire. Les veines pulmonaires arrivent dans l’oreillette gauche, avec du sang oxygéné.', s: 'c191' }
+      ] },
+    { id: 'ph-debit', t: 'Débit cardiaque et effort',
+      k: ['Débit cardiaque = fréquence cardiaque × volume d’éjection systolique (Qc = FC × VES).',
+          'Au repos : VES ≈ 70 mL, FC ≈ 75 bpm, débit ≈ 5,25 L/min par ventricule.',
+          'À l’effort, le débit peut être multiplié par 4 à 5 (jusqu’à 7–8 chez les meilleurs athlètes d’endurance).',
+          'Sympathique (noradrénaline) : accélère le cœur. Parasympathique (nerf vague, acétylcholine) : ralentit le cœur.'],
+      qs: [
+        { id: 'pp-pd1', q: 'Comment calcule-t-on le débit cardiaque ?', o: ['FC + VES', 'FC × VES', 'VES ÷ FC', 'FC × pression artérielle'], a: 1, e: 'Débit cardiaque = fréquence cardiaque × volume d’éjection systolique.', s: 'c194' },
+        { id: 'pp-pd2', q: 'Quel est le débit cardiaque moyen au repos (par ventricule) ?', o: ['Environ 1 L/min', 'Environ 5 L/min', 'Environ 20 L/min', 'Environ 50 L/min'], a: 1, e: 'Avec FC ≈ 75 bpm et VES ≈ 70 mL : environ 5,25 L/min (de 4 à 8 L/min selon les personnes).', s: 'c194' },
+        { id: 'pp-pd3', q: 'Quel est le volume d’éjection systolique moyen au repos ?', o: ['Environ 7 mL', 'Environ 70 mL', 'Environ 700 mL', 'Environ 7 L'], a: 1, e: 'Environ 70 mL par battement chez un adulte de 70 kg au repos (de 55 à 100 mL).', s: 'c194' },
+        { id: 'pp-pd4', q: 'Selon la formule classique, quelle est la FC max estimée d’une personne de 40 ans ?', o: ['160 bpm', '180 bpm', '200 bpm', '220 bpm'], a: 1, e: 'FC max ≈ 220 − âge : 220 − 40 = 180 bpm. C’est une estimation, pas une valeur exacte pour chacun.', s: 'c194' },
+        { id: 'pp-pd5', vf: 1, q: 'À l’effort, le débit cardiaque d’un jeune adulte en bonne santé peut être multiplié par 4 à 5.', o: VF, a: 0, e: 'Vrai. FC vers 150 bpm et VES vers 130 mL donnent environ 19,5 L/min. Les meilleurs athlètes d’endurance montent à 7 ou 8 fois le repos.', s: 'c194' },
+        { id: 'pp-pd6', q: 'Comment appelle-t-on la différence entre le débit cardiaque maximal et celui de repos ?', o: ['La fraction d’éjection', 'La réserve cardiaque', 'La précharge', 'La postcharge'], a: 1, e: 'La réserve cardiaque mesure la capacité restante du cœur à augmenter son débit.', s: 'c194' },
+        { id: 'pp-pd7', q: 'Quelle est la fraction d’éjection normale du ventricule ?', o: ['Environ 10–20 %', 'Environ 30–40 %', 'Environ 55–70 %', 'Environ 95–100 %'], a: 2, e: 'Normalement 55 à 70 % (moyenne 58 %) du sang présent en fin de remplissage est éjecté à chaque battement.', s: 'c194' },
+        { id: 'pp-pd8', vf: 1, q: 'Le nerf vague (parasympathique) accélère la fréquence cardiaque.', o: VF, a: 1, e: 'Faux. Le nerf vague libère de l’acétylcholine et ralentit le cœur. Sans lui, le nœud sinusal battrait vers 100 bpm.', s: 'c194' },
+        { id: 'pp-pd9', q: 'Que dit le mécanisme de Frank-Starling ?', o: ['Plus le ventricule est étiré, plus sa contraction est forte', 'Plus la FC monte, plus le VES monte toujours', 'Le cœur gauche éjecte plus que le droit', 'La FC max baisse avec l’entraînement'], a: 0, e: 'Dans les limites physiologiques, un remplissage plus important étire davantage le ventricule, qui se contracte plus fort : le VES augmente.', s: 'c194' },
+        { id: 'pp-pd10', vf: 1, q: 'Une fréquence cardiaque de repos inférieure à 60 bpm s’appelle une bradycardie.', o: VF, a: 0, e: 'Vrai. La FC de repos normale va de 60 à 100 bpm. Les athlètes entraînés ont souvent une FC de repos très basse.', s: 'c194' },
+        { id: 'pp-pd11', multi: 1, q: 'Quels effets a la stimulation sympathique (noradrénaline) sur le cœur ?', o: ['Elle augmente la fréquence cardiaque', 'Elle agit sur les récepteurs bêta-1', 'Elle passe par le nerf vague', 'Elle libère de l’acétylcholine'], a: [0, 1], e: 'La noradrénaline se fixe sur les récepteurs bêta-1 et accélère le cœur. Le nerf vague et l’acétylcholine relèvent du parasympathique.', s: 'c194' }
+      ] },
+    { id: 'ph-resp', t: 'La ventilation',
+      k: ['Loi de Boyle : à température constante, la pression d’un gaz varie à l’inverse de son volume.',
+          'Inspiration calme : diaphragme + intercostaux externes. Expiration calme : passive (rétraction élastique des poumons).',
+          'Volume courant ≈ 500 mL. Capacité vitale ≈ 4 000 à 5 000 mL. Capacité pulmonaire totale ≈ 6 000 mL (homme) et 4 200 mL (femme).',
+          'Le principal stimulus de la ventilation est le CO2 du sang (via le pH), pas le manque d’oxygène.'],
+      qs: [
+        { id: 'pp-rs1', q: 'Quels muscles assurent l’inspiration calme ?', o: ['Les abdominaux', 'Le diaphragme et les intercostaux externes', 'Les intercostaux internes', 'Les scalènes uniquement'], a: 1, e: 'Le diaphragme descend et les intercostaux externes soulèvent les côtes : le volume du thorax augmente.', s: 'r223' },
+        { id: 'pp-rs2', vf: 1, q: 'Au repos, l’expiration est un phénomène passif.', o: VF, a: 0, e: 'Vrai. Le diaphragme et les intercostaux se relâchent ; l’élasticité des poumons chasse l’air.', s: 'r223' },
+        { id: 'pp-rs3', q: 'Selon la loi de Boyle, quand le volume du thorax augmente, la pression dans les poumons…', o: ['Augmente', 'Diminue', 'Ne change pas', 'Devient égale à 0'], a: 1, e: 'Pression et volume varient en sens inverse : le volume augmente, la pression baisse sous la pression atmosphérique, et l’air entre.', s: 'r223' },
+        { id: 'pp-rs4', q: 'Quel est le volume courant au repos ?', o: ['Environ 50 mL', 'Environ 500 mL', 'Environ 1 500 mL', 'Environ 5 000 mL'], a: 1, e: 'Environ 500 mL d’air par respiration calme.', s: 'r223' },
+        { id: 'pp-rs5', q: 'La capacité vitale correspond à…', o: ['Volume courant + VRI + VRE', 'Volume résiduel seul', 'Volume courant × fréquence respiratoire', 'Capacité totale + volume résiduel'], a: 0, e: 'C’est tout l’air mobilisable : volume courant + volume de réserve inspiratoire + volume de réserve expiratoire. En général 4 000 à 5 000 mL.', s: 'r223' },
+        { id: 'pp-rs6', vf: 1, q: 'Après une expiration maximale, les poumons sont complètement vides d’air.', o: VF, a: 1, e: 'Faux. Il reste le volume résiduel, qui empêche les alvéoles de s’affaisser.', s: 'r223' },
+        { id: 'pp-rs7', q: 'Quelle est la fréquence respiratoire normale d’un adulte au repos ?', o: ['4 à 6 par minute', '12 à 18 par minute', '30 à 40 par minute', '60 à 80 par minute'], a: 1, e: 'Un adulte respire normalement 12 à 18 fois par minute ; les enfants plus souvent.', s: 'r223' },
+        { id: 'pp-rs8', q: 'Quel est le principal stimulus chimique de la ventilation ?', o: ['La baisse de l’oxygène', 'La hausse du CO2 sanguin (et la baisse du pH)', 'La hausse du glucose', 'La température extérieure'], a: 1, e: 'C’est le CO2 : il fait monter les ions H+ et baisser le pH, ce que détectent les chémorécepteurs centraux. L’O2 n’agit fortement que s’il chute beaucoup.', s: 'r223' },
+        { id: 'pp-rs9', q: 'Où se trouvent les principaux centres respiratoires ?', o: ['Dans le cervelet', 'Dans le bulbe rachidien et le pont', 'Dans les poumons', 'Dans la moelle lombaire'], a: 1, e: 'Le bulbe (groupes respiratoires dorsal et ventral) fixe le rythme ; le pont l’ajuste.', s: 'r223' },
+        { id: 'pp-rs10', vf: 1, q: 'Le surfactant augmente la tension de surface dans les alvéoles.', o: VF, a: 1, e: 'Faux. Sécrété par les cellules alvéolaires de type II, il réduit la tension de surface et empêche les alvéoles de s’affaisser à l’expiration.', s: 'r223' },
+        { id: 'pp-rs11', multi: 1, q: 'Quels muscles participent à l’expiration forcée ?', o: ['Les intercostaux internes', 'Les obliques de l’abdomen', 'Le diaphragme', 'Les intercostaux externes'], a: [0, 1], e: 'Les abdominaux (dont les obliques) repoussent les viscères vers le diaphragme et les intercostaux internes compriment la cage thoracique.', s: 'r223' }
+      ] },
+    { id: 'ph-gaz', t: 'Le transport des gaz',
+      k: ['Environ 98,5 % de l’O2 est transporté par l’hémoglobine ; environ 1,5 % est dissous dans le plasma.',
+          'Une hémoglobine porte jusqu’à 4 O2 (4 hèmes contenant du fer). Saturation normale : 95 à 99 %.',
+          'Acidité, chaleur et CO2 favorisent la libération de l’O2 vers les muscles actifs (effet Bohr).',
+          'Le CO2 voyage surtout sous forme de bicarbonate (≈ 70 %), puis lié à l’hémoglobine (≈ 20 %) et dissous (7–10 %).'],
+      qs: [
+        { id: 'pp-gz1', q: 'Quelle part de l’oxygène sanguin est transportée par l’hémoglobine ?', o: ['Environ 1,5 %', 'Environ 50 %', 'Environ 70 %', 'Environ 98,5 %'], a: 3, e: 'Seulement 1,5 % de l’O2 est dissous dans le plasma ; tout le reste voyage fixé à l’hémoglobine des globules rouges.', s: 'r225' },
+        { id: 'pp-gz2', q: 'Combien de molécules d’O2 une hémoglobine peut-elle transporter ?', o: ['1', '2', '4', '8'], a: 2, e: 'L’hémoglobine possède 4 groupements hème contenant du fer : jusqu’à 4 molécules d’O2.', s: 'r225' },
+        { id: 'pp-gz3', q: 'Quelle est la saturation normale de l’hémoglobine chez une personne en bonne santé ?', o: ['50 à 60 %', '75 à 80 %', '95 à 99 %', 'Toujours 100 %'], a: 2, e: 'Elle varie généralement entre 95 et 99 %.', s: 'r225' },
+        { id: 'pp-gz4', vf: 1, q: 'Un sang plus acide favorise la libération de l’oxygène par l’hémoglobine.', o: VF, a: 0, e: 'Vrai : c’est l’effet Bohr. Dans un muscle actif, plus acide et plus chaud, l’hémoglobine lâche plus facilement son O2.', s: 'r225' },
+        { id: 'pp-gz5', q: 'Sous quelle forme la majorité du CO2 est-elle transportée dans le sang ?', o: ['Dissous dans le plasma', 'Liée à l’hémoglobine', 'Sous forme de bicarbonate', 'Liée au glucose'], a: 2, e: 'Environ 70 % sous forme de bicarbonate (HCO3−), environ 20 % lié à l’hémoglobine et 7 à 10 % dissous.', s: 'r225' },
+        { id: 'pp-gz6', q: 'Quelle enzyme accélère la transformation du CO2 en bicarbonate ?', o: ['La créatine kinase', 'L’anhydrase carbonique', 'L’amylase', 'La lipase'], a: 1, e: 'L’anhydrase carbonique catalyse CO2 + H2O ↔ H2CO3 ↔ H+ + HCO3−.', s: 'r225' },
+        { id: 'pp-gz7', vf: 1, q: 'Le CO2 se fixe sur le fer de l’hémoglobine, à la même place que l’O2.', o: VF, a: 1, e: 'Faux. Le CO2 se fixe sur les acides aminés de la globine (carbaminohémoglobine), pas sur le fer.', s: 'r225' },
+        { id: 'pp-gz8', vf: 1, q: 'Une hausse de la température favorise la libération de l’O2 vers les tissus.', o: VF, a: 0, e: 'Vrai. C’est utile surtout dans les tissus très actifs, comme les muscles à l’effort.', s: 'r225' },
+        { id: 'pp-gz9', q: 'L’effet Haldane signifie que…', o: ['Une hémoglobine saturée en O2 fixe moins bien le CO2', 'Le CO2 augmente l’affinité de l’hémoglobine pour l’O2', 'Le fœtus a moins d’hémoglobine', 'Le plasma transporte la majorité de l’O2'], a: 0, e: 'Quand l’hémoglobine est chargée d’O2, elle fixe moins le CO2 ; dans les tissus pauvres en O2, elle en fixe davantage.', s: 'r225' },
+        { id: 'pp-gz10', multi: 1, q: 'Quels facteurs favorisent la libération de l’O2 par l’hémoglobine ?', o: ['Une baisse du pH (plus acide)', 'Une hausse de la température', 'Une hausse du CO2', 'Une hausse du pH (plus basique)'], a: [0, 1, 2], e: 'Acidité, chaleur et CO2 favorisent la libération de l’O2. Un pH plus basique la freine.', s: 'r225' }
+      ] },
+    { id: 'ph-energie', t: 'Énergie et fibres musculaires',
+      k: ['Le muscle stocke très peu d’ATP : quelques secondes de contraction.',
+          'Créatine phosphate : environ 15 premières secondes. Glycolyse anaérobie : 2 ATP nets par glucose, environ 1 minute. Respiration aérobie : environ 36 ATP par glucose, dans les mitochondries.',
+          'Fibres lentes oxydatives (type I) : rouges, endurantes, posture. Rapides oxydatives (IIa) : intermédiaires. Rapides glycolytiques (IIx) : blanches, puissantes, vite fatigables.',
+          'La contraction : le Ca2+ se fixe sur la troponine, la tropomyosine libère les sites de l’actine, la myosine forme des ponts et tire.'],
+      qs: [
+        { id: 'pp-en1', q: 'Combien de temps la créatine phosphate fournit-elle de l’énergie ?', o: ['Environ 1 à 2 s', 'Environ 15 s', 'Environ 5 min', 'Environ 1 h'], a: 1, e: 'La créatine phosphate, via la créatine kinase, régénère l’ATP très vite mais seulement pendant environ 15 secondes.', s: 'm103' },
+        { id: 'pp-en2', q: 'Combien d’ATP nets la glycolyse anaérobie produit-elle par molécule de glucose ?', o: ['2', '4', '36', '100'], a: 0, e: '2 ATP nets par glucose, contre environ 36 pour la respiration aérobie.', s: 'm103' },
+        { id: 'pp-en3', q: 'Combien de temps la glycolyse anaérobie peut-elle soutenir l’activité ?', o: ['Environ 1 seconde', 'Environ 1 minute', 'Environ 30 minutes', 'Plusieurs heures'], a: 1, e: 'Environ 1 minute : utile pour des efforts brefs et intenses.', s: 'm103' },
+        { id: 'pp-en4', vf: 1, q: 'La respiration aérobie fournit environ 95 % de l’ATP d’un muscle au repos ou modérément actif.', o: VF, a: 0, e: 'Vrai. Elle se déroule dans les mitochondries et produit environ 36 ATP par glucose, mais elle est plus lente et dépend d’un apport d’O2.', s: 'm103' },
+        { id: 'pp-en5', q: 'Où se déroule la respiration aérobie ?', o: ['Dans le noyau', 'Dans les mitochondries', 'Dans le réticulum sarcoplasmique', 'Dans le plasma sanguin'], a: 1, e: 'Dans les mitochondries. C’est pour cela que les fibres oxydatives en contiennent beaucoup.', s: 'm103' },
+        { id: 'pp-en6', q: 'Sur quelle protéine le calcium se fixe-t-il pour déclencher la contraction ?', o: ['La myosine', 'La troponine', 'La titine', 'L’hémoglobine'], a: 1, e: 'Le Ca2+ se fixe sur la troponine, ce qui déplace la tropomyosine et libère les sites de fixation de l’actine.', s: 'm103' },
+        { id: 'pp-en7', vf: 1, q: 'Pendant la contraction, la bande A du sarcomère raccourcit.', o: VF, a: 1, e: 'Faux. La bande A garde la même largeur ; ce sont les stries Z qui se rapprochent et la bande I qui raccourcit.', s: 'm103' },
+        { id: 'pp-en8', q: 'Pourquoi le souffle reste-t-il accéléré après un effort intense ?', o: ['Pour rembourser la dette d’oxygène', 'Pour refroidir les poumons', 'Parce que le cœur s’est arrêté', 'Pour produire de la créatine'], a: 0, e: 'La consommation d’O2 reste élevée pour restaurer l’ATP et la créatine phosphate et recycler le lactate : c’est la dette d’oxygène.', s: 'm103' },
+        { id: 'pp-en9', q: 'Quelles fibres sont rouges, riches en myoglobine et résistantes à la fatigue ?', o: ['Rapides glycolytiques (IIx)', 'Rapides oxydatives (IIa)', 'Lentes oxydatives (type I)', 'Aucune'], a: 2, e: 'Les fibres lentes oxydatives : beaucoup de mitochondries, de capillaires et de myoglobine. Elles servent à la posture et aux efforts prolongés.', s: 'm105' },
+        { id: 'pp-en10', vf: 1, q: 'Les fibres rapides glycolytiques produisent beaucoup de force mais se fatiguent vite.', o: VF, a: 0, e: 'Vrai. Elles utilisent surtout la glycolyse anaérobie, ont un gros diamètre et servent aux mouvements rapides et puissants.', s: 'm105' },
+        { id: 'pp-en11', vf: 1, q: 'Un muscle ne contient qu’un seul type de fibres.', o: VF, a: 1, e: 'Faux. La plupart des muscles contiennent les 3 types, en proportions qui dépendent de leur fonction principale.', s: 'm105' },
+        { id: 'pp-en12', multi: 1, q: 'Quels sont les trois mécanismes de régénération de l’ATP dans le muscle ?', o: ['La créatine phosphate', 'La glycolyse anaérobie', 'La respiration aérobie', 'La synthèse de myoglobine', 'La digestion des protéines'], a: [0, 1, 2], e: 'Créatine phosphate, glycolyse anaérobie et respiration aérobie.', s: 'm103' },
+        { id: 'pp-en13', multi: 1, q: 'Quelles caractéristiques ont les fibres lentes oxydatives ?', o: ['Beaucoup de mitochondries', 'Beaucoup de myoglobine', 'Un gros diamètre', 'Une forte résistance à la fatigue'], a: [0, 1, 3], e: 'Mitochondries, myoglobine et capillaires abondants, grande endurance. Mais leur diamètre est petit : elles produisent peu de tension.', s: 'm105' }
+      ] }
+  ];
+})();
