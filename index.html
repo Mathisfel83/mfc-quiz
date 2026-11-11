@@ -172,6 +172,8 @@ a{color:var(--gold2);text-decoration:none}
 .rng::-moz-range-track{height:6px;border-radius:3px;background:var(--gold)}
 .rng::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--gold)}
 .avnote{margin-top:14px;font-size:12.5px;color:var(--muted);line-height:1.5}
+.coll{display:flex;gap:10px;overflow-x:auto;margin:0 -20px;padding:12px 20px 8px;scroll-snap-type:x mandatory;scrollbar-width:none}.coll::-webkit-scrollbar{display:none}.coll>*{scroll-snap-align:start}
+.bdg{width:38px;height:46px;clip-path:polygon(12% 0,88% 0,100% 8%,100% 82%,50% 100%,0 82%,0 8%);display:flex;align-items:center;justify-content:center;font:700 14px/1 var(--head);padding-bottom:5px;box-sizing:border-box;flex-shrink:0}
 .avcta{position:absolute;left:0;right:0;bottom:0;padding:12px 20px calc(var(--sab) + 14px);background:linear-gradient(180deg,rgba(7,13,28,0),rgba(7,13,28,.92) 35%);z-index:6}
 .avcta .btn{max-width:520px;margin:0 auto}
 .lpath{display:flex;flex-direction:column;gap:10px;margin:18px 0 14px;position:relative}
@@ -210,6 +212,7 @@ a{color:var(--gold2);text-decoration:none}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(212,175,55,.55)}100%{box-shadow:0 0 0 18px rgba(212,175,55,0)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<script src="carte.js"></script>
 </head>
 <body>
 <div class="app" id="app">
@@ -247,12 +250,13 @@ a{color:var(--gold2);text-decoration:none}
 var Q = window.MFC_QUESTIONS, S = window.MFC_SOURCES, M = window.MFC_MODULES;
 var QBY = {}; Q.forEach(function(q){ QBY[q.id]=q; });
 var RANKS = [
-  {n:'Novice',xp:0,r:'Le début de l’aventure'},
-  {n:'Curieux',xp:500,r:'🧢 Casquette MFC + diplôme Curieux'},
-  {n:'Initié',xp:2500,r:'✨ Survêtement Or + diplôme Initié'},
-  {n:'Analyste',xp:5000,r:'🥼 Blouse de labo + diplôme · Pose ta question, Mathis y répond en Reel'},
-  {n:'Expert',xp:10000,r:'🎓 Toge de diplômé + certificat « Expert MFC Quiz »'},
-  {n:'Légende',xp:25000,r:'👑 Armure de Légende + ton nom au Hall of Fame'}
+  {n:'Bronze',xp:0,r:'🪪 Ta carte d’athlète MFC, avec tes 6 notes'},
+  {n:'Argent',xp:423,r:'🪪 Carte Argent aux reflets néon'},
+  {n:'Or',xp:2208,r:'🪪 Carte Or, notes et contours dorés'},
+  {n:'Élite',xp:6688,r:'🪪 Carte Élite holographique · pose ta question, Mathis y répond en Reel'},
+  {n:'Héros',xp:13568,r:'🪪 Carte Héros holographique + certificat « Expert MFC Quiz »'},
+  {n:'Légende',xp:22848,r:'🪪 Carte Légende noire et or + ton nom au Hall of Fame'},
+  {n:'Icône MFC',xp:31383,r:'🪪 Carte Icône MFC animée, la plus rare de l’appli'}
 ];
 var PER_QUIZ = 5, XP_RIGHT = 10, XP_PERFECT = 20;
 
@@ -462,14 +466,14 @@ function setNav(show){
   if(!show) return;
   var wrong=Object.keys(st.wrong).length;
   nav.className='nav n5';
-  var items=[['home','Apprendre',IC.home],['rank','Rangs',IC.medal],['rev','Révisions',IC.rev],['arena','Défis',IC.rank],['me','Profil',IC.user]];
+  var items=[['home','Apprendre',IC.home],['rank','Ma carte',IC.medal],['rev','Révisions',IC.rev],['arena','Défis',IC.rank],['me','Profil',IC.user]];
   nav.innerHTML = items.map(function(it){
     return '<button data-tab="'+it[0]+'" class="'+(tab===it[0]?'on':'')+'">'+it[2]+(it[0]==='rev'&&wrong?'<span class="badge">'+wrong+'</span>':'')+it[1]+'</button>';
   }).join('');
 }
 nav.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; tab=b.dataset.tab; render(); });
 function render(){
-  quiz=null; ed=null; avUnmount(); if(rm) roomClose(true); if(rq){ clearInterval(rq.tm); rq=null; }
+  quiz=null; ed=null; ced=null; avUnmount(); if(rm) roomClose(true); if(rq){ clearInterval(rq.tm); rq=null; }
   if(tab==='home') home(); else if(tab==='body') bodyView(); else if(tab==='rev') revisions(); else if(tab==='rank') ranks(); else if(tab==='arena') arena(); else profile();
   setNav(true); syncSoon();
 }
@@ -480,13 +484,14 @@ function home(){
   var pct = next ? Math.min(100,Math.round((st.xp-rk.r.xp)/(next.xp-rk.r.xp)*100)) : 100;
   var dailyDone = st.lastDaily===today();
   var h='<div class="screen"><div class="wrap">';
-  h+='<div class="row up" style="justify-content:space-between;margin-bottom:16px"><div class="row"><button data-act="avme" aria-label="Mon avatar">'+avatarCard()+'</button><div><div class="mono" style="color:var(--muted)">'+(g?esc(g.n.toUpperCase()):'CULTIVE TON CORPS')+'</div><div style="font-family:var(--head);font-weight:600;font-size:17px">'+(st.name?'Salut '+esc(st.name):'MFC Quiz')+'</div></div></div><div class="row" style="gap:6px">'+(st.freezes?'<span class="chip" data-act="freezeinfo" style="padding:7px 9px">🧊'+st.freezes+'</span>':'')+'<span class="chip" data-act="freezeinfo">'+IC.flame+sk+'</span></div></div>';
-  h+='<div class="goldcard up d1" style="padding:16px;display:flex;flex-direction:column;gap:10px"><div class="row" style="justify-content:space-between"><div><div class="mono" style="color:var(--silver);font-size:10px">TON RANG</div><div style="font-family:var(--head);font-size:21px;font-weight:600">'+rk.r.n+'</div></div><div style="font-family:var(--mono);font-weight:700;font-size:18px;color:var(--gold);text-shadow:0 0 18px rgba(212,175,55,.45)">'+fmt(st.xp)+' XP</div></div><div class="bar"><i style="width:'+pct+'%"></i></div><div style="font-size:13px;color:var(--ink2)">'+(next?'Encore <b style="color:var(--gold)">'+fmt(next.xp-st.xp)+' XP</b> pour devenir <b>'+next.n+'</b>':'Rang maximum atteint !')+'</div></div>';
+  h+='<div class="row up" style="justify-content:space-between;margin-bottom:16px"><div class="row"><button data-act="avme" aria-label="Ma carte">'+avatarCard()+'</button><div><div class="mono" style="color:var(--muted)">'+(g?esc(g.n.toUpperCase()):'CULTIVE TON CORPS')+'</div><div style="font-family:var(--head);font-weight:600;font-size:17px">'+(st.name?'Salut '+esc(st.name):'MFC Quiz')+'</div></div></div><div class="row" style="gap:6px">'+(st.freezes?'<span class="chip" data-act="freezeinfo" style="padding:7px 9px">🧊'+st.freezes+'</span>':'')+'<span class="chip" data-act="freezeinfo">'+IC.flame+sk+'</span></div></div>';
+  var LI=lvInfo();
+  h+='<button class="goldcard up d1" data-act="tabrank" style="width:100%;text-align:left;padding:16px;display:flex;flex-direction:column;gap:10px"><div class="row" style="justify-content:space-between;width:100%"><div><div class="mono" style="color:var(--silver);font-size:10px">TA CARTE · '+LI.T.n.toUpperCase()+'</div><div style="font-family:var(--head);font-size:21px;font-weight:600">Niveau '+LI.lv+'</div></div><div style="font-family:var(--mono);font-weight:700;font-size:18px;color:var(--gold);text-shadow:0 0 18px rgba(212,175,55,.45)">'+fmt(st.xp)+' XP</div></div><div class="bar" style="width:100%"><i style="width:'+LI.pct+'%"></i></div><div style="font-size:13px;color:var(--ink2)">'+(LI.lv<100?'Encore <b style="color:var(--gold)">'+fmt(LI.left)+' XP</b> pour le niveau '+(LI.lv+1)+(LI.nt?' · carte <b>'+LI.nt.n+'</b> au niveau '+LI.nt.from:''):'Niveau maximum : tu as la carte Icône MFC !')+'</div></button>';
   var tl=todayLesson(), tlDone=tl&&lDone(tl.id), nxt=tlDone?recLesson():null, showL=tlDone&&nxt?nxt:tl, nst=Object.keys(studiedSet()).length;
   if(showL) h+='<button class="up d2" data-act="lesson" data-id="'+showL.id+'" style="margin-top:14px;width:100%;text-align:left;padding:18px;border-radius:24px;background:linear-gradient(140deg,rgba(60,110,255,.22),rgba(60,110,255,.04) 60%);border:1px solid rgba(110,150,255,.45);display:flex;align-items:center;gap:14px"><div style="width:52px;height:52px;border-radius:17px;background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:26px;'+(tlDone?'':'animation:pulse 1.8s ease-out infinite')+'">'+showL.e+'</div><div style="flex:1"><div class="mono" style="color:#9DB8FF">'+(tlDone?'LEÇON DU JOUR ✓ · ENCORE UNE ?':'LEÇON DU JOUR')+'</div><div style="font-size:16px;font-weight:700;margin-top:3px;line-height:1.3">'+esc(showL.t)+'</div><div style="font-size:12px;color:var(--muted);margin-top:3px">'+esc(modName(showL.m))+' · cours '+Math.max(2,Math.round((lessonCards(showL).length*15+Math.min(8,showL.qs.length)*12)/60))+' min + quiz'+(tlDone?'':(sk?' · garde ta série de '+sk+' j':' · lance ta série'))+'</div></div>'+IC.arrow+'</button>';
   else h+='<div class="goldcard up d2" style="margin-top:14px;padding:16px"><b>Toutes les leçons sont terminées 🎓</b><div style="font-size:13px;color:var(--ink2);margin-top:4px">De nouvelles leçons arrivent bientôt. En attendant, enchaîne les défis !</div></div>';
   if(nst) h+='<button class="up d2" data-act="daily" style="margin-top:10px;width:100%;text-align:left;padding:13px 16px;border-radius:20px;background:var(--glass);border:1px solid var(--line);display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:12px;background:rgba(212,175,55,.16);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0">'+IC.bolt+'</div><div style="flex:1"><div style="font-size:14.5px;font-weight:700">Défi rapide · 5 questions</div><div style="font-size:12px;color:var(--muted);margin-top:1px">Sur les leçons déjà vues ('+nst+' questions)</div></div>'+IC.arrow+'</button>';
-  if(!st.avatar) h+='<button class="notifcard up d2" data-act="avedit" style="border-style:solid;border-color:rgba(212,175,55,.6);background:linear-gradient(140deg,rgba(212,175,55,.16),rgba(212,175,55,.02))"><span style="font-size:30px">🧍</span><div style="flex:1"><div class="mono" style="color:var(--gold);font-size:10px">NOUVEAU</div><div style="font-size:15px;font-weight:700">Crée ton avatar 3D</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Il gagne des tenues à chaque nouveau rang</div></div>'+IC.arrow+'</button>';
+  if(!st.cardSeen) h+='<button class="notifcard up d2" data-act="tabrank" style="border-style:solid;border-color:rgba(212,175,55,.6);background:linear-gradient(140deg,rgba(212,175,55,.16),rgba(212,175,55,.02))"><span style="font-size:30px">🪪</span><div style="flex:1"><div class="mono" style="color:var(--gold);font-size:10px">NOUVEAU</div><div style="font-size:15px;font-weight:700">Découvre ta carte d’athlète</div><div style="font-size:12px;color:var(--muted);margin-top:2px">6 notes, 100 niveaux, 7 cartes à collectionner</div></div>'+IC.arrow+'</button>';
   h+='<div class="up d3">'+missionHTML()+'</div>';
   if(!st.notif.on && isStandalone() && pushOK()) h+='<button class="notifcard up d3" data-act="notif"><div style="color:var(--gold)">'+IC.bell+'</div><div style="flex:1"><div style="font-size:14px;font-weight:700">Active ton rappel du matin</div><div style="font-size:12px;color:var(--muted);margin-top:2px">2 minutes de quiz pour démarrer la journée</div></div>'+IC.arrow+'</button>';
   h+='<button class="goldcard up d3" data-sx="prepa" style="margin-top:16px;width:100%;padding:14px 16px;display:flex;gap:12px;align-items:center;text-align:left"><span style="font-size:30px">🎓</span><span style="flex:1"><span class="mono" style="color:var(--gold);font-size:10px">NOUVEAU · PREMIUM</span><br><b style="font-size:15.5px">Prépa STAPS L1 & BPJEPS</b><br><span style="font-size:12.5px;color:var(--muted)">Quiz par matière et examens blancs notés sur 20</span></span>'+IC.arrow+'</button>';
@@ -517,10 +522,9 @@ view.addEventListener('click',function(e){
   else if(a==='mdone') missionDone();
   else if(a==='mswap'){ var m=chooseMission(st.mission.id); st.mission={d:today(),id:m.id,done:0,swap:1}; st.missionLog[today()]=m.id; save(); render(); }
   else if(a==='notif') notifSheet();
-  else if(a==='avme'){ tab='me'; render(); }
-  else if(a==='avedit') avatarEditor({back:'avback',kicker:'TON AVATAR',title:'Personnalise ton avatar',cta:'Enregistrer',onDone:function(){ tab=st.onboarded?'me':'home'; render(); toast('✨','Avatar enregistré !',2000); }});
-  else if(a==='avback'){ tab='me'; render(); }
-  else if(a==='avwear'){ var o=AV_OUTFITS[+b.dataset.id]; st.avatar=Object.assign(avCfg(),{outfit:o.id,diploma:o.r}); save(); var back=tab==='rank'?'rank':'me'; avSnap(function(){ tab=back; render(); toast(o.e,'<b>'+o.n+'</b> enfilée !',2400); }); }
+  else if(a==='avme'||a==='tabrank'){ tab='rank'; render(); }
+  else if(a==='avedit'||a==='cardedit') cardEditor({back:'avback',kicker:'TA CARTE',title:'Personnalise ta carte',cta:'Enregistrer',onDone:function(){ tab='rank'; render(); toast('🪪','Carte enregistrée !',2000); }});
+  else if(a==='avback'){ ced=null; tab='rank'; render(); }
   else if(a==='goal') goalSheet();
   else if(a==='freezeinfo') freezeSheet();
   else if(a==='mod') modView(b.dataset.id);
@@ -596,7 +600,7 @@ function drawLesson(){
   view.innerHTML=h;
 }
 function modView(id){
-  avUnmount(); ed=null;
+  ced=null;
   var ls=lessonsOf(id), m=M.filter(function(x){ return x.id===id; })[0], dc=doneCount(id), nx=nextLessonOf(id), st2=studiedSet(), nst=Q.filter(function(q){ return q.m===id&&st2[q.id]; }).length;
   var h='<div class="screen"><div class="wrap"><div class="row up" style="justify-content:space-between"><button class="iconbtn" data-act="home" aria-label="Retour">'+IC.back+'</button><span class="chip" style="color:var(--gold)">'+dc+'/'+ls.length+' leçons</span></div>';
   h+='<div class="up d1" style="margin-top:14px;display:flex;gap:14px;align-items:center"><div class="ic" style="width:54px;height:54px;border-radius:17px;background:rgba(212,175,55,.14);display:flex;align-items:center;justify-content:center;color:var(--gold)">'+IC[m.icon].replace('<svg','<svg width="28" height="28"')+'</div><div><h1 class="h1">'+m.name+'</h1><div style="font-size:13px;color:var(--muted);margin-top:4px">'+m.desc+'</div></div></div>';
@@ -679,32 +683,30 @@ function nextQ(){
   if(perfect) quiz.xp+=XP_PERFECT;
   var lesFirst=false;
   if(quiz.kind==='lesson'){ var prevL=st.lessons[quiz.mod]; lesFirst=!prevL; if(lesFirst) quiz.xp+=30; st.lessons[quiz.mod]={s:Math.max(quiz.score,prevL?prevL.s:0),n:n,d:today()}; if(st.tl&&st.tl.id===quiz.mod) st.lastDaily=today(); }
-  var before=rankOf(st.xp).r.n;
+  var before=rankOf(st.xp).r.n, lvB=CARD.levelOf(st.xp);
   st.xp+=quiz.xp; st.quizzes++;
   if(quiz.kind==='daily') st.lastDaily=today();
   var gotFreeze=recordDay(), sk=streak();
   save();
-  var rk=rankOf(st.xp), up=rk.r.n!==before;
+  var rk=rankOf(st.xp), up=rk.r.n!==before, LI=lvInfo(), lvUp=LI.lv>lvB;
   var off=Math.round(327*(1-quiz.score/n));
   var titles=['On révise et on y retourne !','Bon début, continue !','Bon début, continue !','Pas mal du tout !','Très solide !','Parfait, sans faute !'];
   var t=titles[Math.round(quiz.score/n*5)];
   var h='<div class="screen noNav"><div class="wrap" style="text-align:center;padding-top:20px">';
-  h+='<div class="mono up" style="color:var(--gold);letter-spacing:2px">'+(up?'NOUVEAU RANG DÉBLOQUÉ':quiz.kind==='lesson'?'LEÇON TERMINÉE':'QUIZ TERMINÉ')+'</div>';
+  h+='<div class="mono up" style="color:var(--gold);letter-spacing:2px">'+(up?'NOUVELLE CARTE DÉBLOQUÉE':lvUp?'NIVEAU '+LI.lv+' ATTEINT':quiz.kind==='lesson'?'LEÇON TERMINÉE':'QUIZ TERMINÉ')+'</div>';
   h+='<div class="ring up d1" style="margin-top:22px"><div style="position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.4),transparent 65%)"></div><svg width="150" height="150" viewBox="0 0 150 150" style="position:relative"><circle cx="75" cy="75" r="52" fill="none" stroke="rgba(201,206,214,.12)" stroke-width="10"/><circle class="v" cx="75" cy="75" r="52" fill="none" stroke="#D4AF37" stroke-width="10" stroke-linecap="round" stroke-dasharray="327" stroke-dashoffset="'+off+'" style="filter:drop-shadow(0 0 8px rgba(212,175,55,.7))"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:var(--head);font-size:34px;font-weight:700">'+quiz.score+'/'+n+'</span><span class="mono" style="color:var(--muted);font-size:10px">BONNES RÉPONSES</span></div></div>';
-  h+='<h1 class="h1 up d2" style="margin:20px 0 18px">'+(up?'Tu es maintenant '+rk.r.n+' !':t)+'</h1>';
+  h+='<h1 class="h1 up d2" style="margin:20px 0 18px">'+(up?'Carte '+rk.r.n+' débloquée !':t)+'</h1>';
   h+='<div class="up d3" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left"><div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">XP GAGNÉS</div><div style="font-family:var(--head);font-size:20px;font-weight:600;color:var(--gold)">+'+quiz.xp+'</div>'+(perfect?'<div style="font-size:11px;color:var(--muted)">dont +'+XP_PERFECT+' bonus sans-faute</div>':'')+(lesFirst?'<div style="font-size:11px;color:var(--muted)">dont +30 leçon terminée</div>':'')+'</div><div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">SÉRIE</div><div style="font-family:var(--head);font-size:20px;font-weight:600">'+sk+' jour'+(sk>1?'s':'')+'</div></div></div>';
-  if(rk.next){ var p=Math.round((st.xp-rk.r.xp)/(rk.next.xp-rk.r.xp)*100);
-    h+='<div class="goldcard up d4" style="margin-top:12px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:8px"><div class="row" style="justify-content:space-between;font-size:13px"><b>Prochain rang : '+rk.next.n+'</b><span class="mono" style="color:var(--gold)">'+fmt(st.xp)+' / '+fmt(rk.next.xp)+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div><span style="font-size:12px;color:var(--silver)">'+rk.next.r+'</span></div>'; }
-  if(up && AV_OUTFITS[rk.i]) { var uo=AV_OUTFITS[rk.i], fi=avImg('full');
-    h+='<div class="goldcard up d3" style="margin-top:12px;padding:14px;display:flex;gap:12px;align-items:center;text-align:left"><div style="font-size:40px;line-height:1">'+uo.e+'</div><div style="flex:1"><div class="mono" style="color:var(--gold);font-size:10px">TENUE + DIPLÔME DÉBLOQUÉS</div><div style="font-size:16px;font-weight:700;margin-top:2px">'+uo.n+'</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">'+uo.d+'</div></div></div><button class="btn gold up d4" data-act="avwear" data-id="'+rk.i+'" style="margin-top:10px">Enfiler ma nouvelle tenue '+IC.arrow+'</button>'; }
+  if(up) h+='<div class="up d3" id="upcard" style="display:flex;justify-content:center;margin-top:16px">'+cardHTML(220)+'</div><div class="up d3" style="font-size:13px;color:var(--ink2);margin-top:10px;line-height:1.5">'+rk.r.r+'</div>';
+  h+='<div class="goldcard up d4" style="margin-top:12px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:8px"><div class="row" style="justify-content:space-between;font-size:13px"><b>'+(lvUp&&!up?'🎉 ':'')+'Niveau '+LI.lv+' · carte '+LI.T.n+'</b><span class="mono" style="color:var(--gold)">'+(LI.lv<100?'+'+fmt(LI.left)+' XP':'MAX')+'</span></div><div class="bar"><i style="width:'+LI.pct+'%"></i></div><span style="font-size:12px;color:var(--silver)">'+(LI.nt?'Prochaine carte : <b>'+LI.nt.n+'</b> au niveau '+LI.nt.from:'Tu as la carte la plus rare de l’appli 👑')+'</span></div>';
   if(gotFreeze) h+='<div class="glass up d4" style="margin-top:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;text-align:left;border-color:rgba(110,160,255,.5)"><span style="font-size:26px">🧊</span><div style="font-size:13.5px;line-height:1.45"><b>'+sk+' jours de série : tu gagnes un gel !</b><br><span style="color:var(--muted)">Il protégera ta série si tu rates un jour.</span></div></div>';
   if(todayMission() && !st.mission.done) h+='<div class="up d5" style="text-align:left">'+missionHTML()+'</div>';
   var nlx=quiz.kind==='lesson'?(nextLessonOf(LBY[quiz.mod].m)||recLesson()):null;
   if(quiz.kind==='lesson') h+='<div class="up d5" style="display:flex;flex-direction:column;gap:10px;margin-top:22px">'+(nlx?'<button class="btn gold" data-act="nextles" style="height:auto;min-height:56px;padding:10px 16px;line-height:1.3">'+esc(nlx.e)+' Leçon suivante : '+esc(nlx.t)+' '+IC.arrow+'</button>':'')+'<button class="btn ghost" data-act="again">Refaire le quiz</button><button class="btn ghost" data-act="home">Retour à l’accueil</button></div>';
   else h+='<div class="up d5" style="display:flex;flex-direction:column;gap:10px;margin-top:22px"><button class="btn gold" data-act="again">Encore 5 questions '+IC.arrow+'</button><button class="btn ghost" data-act="home">Retour à l’accueil</button></div>';
   h+='</div></div>';
-  view.innerHTML=h;
-  if(perfect||up) confetti();
+  view.innerHTML=h; if(up) tiltIn('upcard');
+  if(perfect||up||lvUp) confetti();
 }
 function confetti(){
   var c=document.createElement('div'); c.className='confetti';
@@ -715,114 +717,59 @@ function confetti(){
 
 
 
-/* ---------- avatar 3D ---------- */
-var AV_DEFAULT={sex:'h',frame:1,cm:178,kg:74,mus:45,skin:'#F2C4A2',eyes:'#3B7BC8',hair:'court',hairColor:'#6B3E22',beard:'non',top:'hoodie',topColor:'#3E6FA8',outfit:'base',diploma:0};
-var AV_OUTFITS=[{id:'base',n:'Ma tenue',r:0,d:'Ta tenue personnalisée',e:'👕'},{id:'casquette',n:'Casquette MFC',r:1,d:'Bleu nuit et or, sur ta tenue',e:'🧢'},{id:'or',n:'Survêtement Or',r:2,d:'Noir intégral, bandes dorées',e:'✨'},{id:'labo',n:'Blouse de labo',r:3,d:'Le look du scientifique du sport',e:'🥼'},{id:'toge',n:'Toge de diplômé',r:4,d:'Toge, étole dorée et mortier',e:'🎓'},{id:'legende',n:'Armure de Légende',r:5,d:'Or massif, cape et couronne',e:'👑'}];
-var SKINS=['#FBDCC7','#F2C4A2','#E8B28C','#D99E76','#C68B5E','#AE7449','#93603A','#7A4A2E','#5E3824','#43271A'];
-var EYES=[['#5B3A1E','Marron'],['#7A5230','Noisette'],['#B07A2E','Ambre'],['#3F7A3A','Vert'],['#2E6FB0','Bleu'],['#7F8C99','Gris'],['#1A120C','Noir']];
-var HAIRC=['#1A120C','#3A2416','#6B3E22','#8B5A2B','#C8873A','#E6C27A','#B5532A','#9C9C9C','#EDEDED','#3D6BFF','#E05A9C'];
-var CLOTH=['#14233F','#0B0F18','#F2F2F2','#D4AF37','#8E1020','#2F6B3F','#4F8BFF','#E05A5A','#9AA4B5','#F08C5A','#7A4FD6'];
-var HAIRS=[['court','Court'],['rase','Rasé'],['long','Long'],['queue','Queue de cheval'],['chignon','Chignon'],['boucles','Bouclés'],['afro','Afro'],['chauve','Chauve']];
-function withAvatar(cb){ if(window.MFCAvatar) cb(window.MFCAvatar); else window.addEventListener('mfc-avatar',function(){ cb(window.MFCAvatar); },{once:true}); }
-function avUnmount(){ if(window.MFCAvatar) window.MFCAvatar.unmount(); }
-function avCfg(){ return Object.assign({},AV_DEFAULT,st.avatar||{}); }
-function avImg(kind){ try{ return localStorage.getItem('mfcq_av_'+kind)||''; }catch(e){ return ''; } }
-function avSnap(cb){
-  withAvatar(function(A){
-    var c=avCfg();
-    A.snapshot(c,'portrait',200).then(function(u){ try{ localStorage.setItem('mfcq_av_face',u); }catch(e){} return A.snapshot(c,'full',360); })
-     .then(function(u){ try{ localStorage.setItem('mfcq_av_full',u); }catch(e){} if(cb) cb(); })
-     .catch(function(){ if(cb) cb(); });
-  });
+/* ---------- carte d'athlète ---------- */
+var CARD=window.MFCCard, ed=null;
+function avUnmount(){}
+function cardPhoto(){ try{ return localStorage.getItem('mfcq_card_photo')||''; }catch(e){ return ''; } }
+function myCard(extra){ var s=CARD.stats(st,Q,GOALS[st.goal]); return Object.assign({name:(st.card&&st.card.name)||st.name||st.pseudo||'Athlète',level:CARD.levelOf(st.xp),ovr:s.ovr,stats:s.s,pos:CARD.POS[st.goal]||'MFC',photo:cardPhoto()},extra||{}); }
+function cardHTML(w,extra){ return CARD.html(myCard(extra),{w:w}); }
+function lvInfo(){ var lv=CARD.levelOf(st.xp), a=CARD.xpFor(lv), b=lv<100?CARD.xpFor(lv+1):a; return {lv:lv,T:CARD.tierOf(lv),nt:CARD.TIERS.filter(function(t){ return t.from>lv; })[0],pct:lv<100?Math.round((st.xp-a)/(b-a)*100):100,left:Math.max(0,b-st.xp)}; }
+/* jeton rond (note + couleur de carte) : image publique dans les classements et les duels */
+function cardToken(sz){
+  sz=sz||84; var c=document.createElement('canvas'); c.width=c.height=sz; var x=c.getContext('2d'), r=sz/2, o=myCard(), T=CARD.tierOf(o.level);
+  try{
+    var g=x.createRadialGradient(r,r*.7,1,r,r,r); g.addColorStop(0,T.bg[2]); g.addColorStop(.6,T.bg[1]); g.addColorStop(1,T.bg[0]);
+    x.beginPath(); x.arc(r,r,r-.5,0,Math.PI*2); x.fillStyle=g; x.fill();
+    x.lineWidth=sz*.05; x.strokeStyle=T.neon; x.shadowColor=T.neon; x.shadowBlur=sz*.1; x.beginPath(); x.arc(r,r,r-sz*.06,0,Math.PI*2); x.stroke(); x.shadowBlur=0;
+    x.lineWidth=Math.max(1,sz*.012); x.globalAlpha=.55; x.beginPath(); x.arc(r,r,r-sz*.14,0,Math.PI*2); x.stroke(); x.globalAlpha=1;
+    x.textAlign='center'; x.textBaseline='middle'; x.fillStyle=T.ink; x.shadowColor=T.neon; x.shadowBlur=sz*.07;
+    x.font='700 '+Math.round(sz*.34)+'px Unbounded, system-ui, sans-serif'; x.fillText(String(o.ovr),r,r*.9); x.shadowBlur=0;
+    x.fillStyle=T.light?T.ink2:T.neon; x.font='700 '+Math.round(sz*.105)+'px "JetBrains Mono", ui-monospace, monospace'; x.fillText(T.n.split(' ')[0].toUpperCase().slice(0,6),r,r*1.42);
+  }catch(e){}
+  return c.toDataURL('image/png');
 }
-function musWord(v){ return v<20?'Fin':v<45?'Tonique':v<70?'Athlétique':v<88?'Musclé':'Bodybuilder'; }
-var ed=null;
-function avatarEditor(o){
-  avUnmount();
-  ed={cfg:avCfg(),tab:'corps',o:o};
-  var h='<div class="screen noNav" style="padding-bottom:calc(var(--sab) + 96px)"><div class="wrap">';
+function avImg(){ return cardToken(84); }
+function avatarCard(){ return '<img src="'+cardToken(112)+'" alt="Ma carte" style="width:50px;height:50px;border-radius:50%;display:block">'; }
+function tiltIn(id){ var el=document.getElementById(id); if(el&&el.firstChild) CARD.tilt(el.firstChild); }
+function badgeH(T,txt){ return '<div class="bdg" style="background:radial-gradient(circle at 50% 30%,'+T.bg[2]+','+T.bg[1]+' 55%,'+T.bg[0]+');color:'+T.ink+';box-shadow:inset 0 0 0 1.5px '+T.neon+',inset 0 0 10px '+T.neon+'88;text-shadow:0 0 8px '+T.neon+'">'+txt+'</div>'; }
+var ced=null;
+function cardEditor(o){ ced={name:(st.card&&st.card.name)||st.name||'',photo:cardPhoto(),o:o}; drawCed(); }
+function cedCard(){ var el=document.getElementById('cedcard'); if(!el) return; el.innerHTML=CARD.html(myCard({name:ced.name.trim()||'Athlète',photo:ced.photo}),{w:Math.min(260,window.innerWidth-90)}); tiltIn('cedcard'); }
+function drawCed(){
+  var o=ced.o, h='<div class="screen noNav" style="padding-bottom:calc(var(--sab) + 96px)"><div class="wrap">';
   h+='<div class="row" style="justify-content:space-between;height:44px">'+(o.back?'<button class="iconbtn" data-act="'+o.back+'" aria-label="Retour">'+IC.back+'</button>':'<span style="width:44px"></span>')+(o.dots||'')+'<span style="width:44px"></span></div>';
-  h+='<div class="up" style="margin-top:6px"><div class="mono" style="color:var(--gold)">'+(o.kicker||'TON AVATAR')+'</div><h1 class="h1" style="margin-top:4px">'+(o.title||'Crée ton avatar')+'</h1></div>';
-  h+='<div class="avstage up d1" id="avstage"><div class="avload">Chargement de la 3D…</div><div class="avhint">↔ Fais-le tourner · touche-le !</div><div class="avquick"><button data-ed="anim" data-v="flex" aria-label="Pose muscles">💪</button><button data-ed="anim" data-v="wave" aria-label="Coucou">👋</button><button data-ed="anim" data-v="cheer" aria-label="Victoire">🙌</button></div></div>';
-  h+='<div class="avtabs up d2" id="avtabs"></div><div id="avpanel" class="up d3"></div>';
-  h+='</div></div><div class="avcta"><button class="btn gold" data-ed="done">'+(o.cta||'Valider mon avatar')+' '+IC.arrow+'</button></div>';
-  view.innerHTML=h; setNav(false);
-  edTabs(); edPanel();
-  withAvatar(function(A){ var s=document.getElementById('avstage'); if(!s||!ed) return; A.mount(s,ed.cfg,{mode:'full',onReady:function(){ var l=s.querySelector('.avload'); if(l) l.remove(); }}); });
+  h+='<div class="up" style="margin-top:6px"><div class="mono" style="color:var(--gold)">'+(o.kicker||'TA CARTE')+'</div><h1 class="h1" style="margin-top:4px">'+(o.title||'Ta carte d’athlète')+'</h1><p style="color:var(--muted);font-size:13.5px;line-height:1.5;margin:6px 0 0">Ses 6 notes montent avec tes bonnes réponses, et elle change de matière à chaque palier : Bronze, Argent, Or… jusqu’à Icône MFC au niveau 100.</p></div>';
+  h+='<div id="cedcard" class="up d1" style="display:flex;justify-content:center;margin-top:18px"></div>';
+  h+='<div class="up d2"><label for="cedname" class="mono" style="display:block;color:var(--muted);margin:20px 0 8px">NOM SUR LA CARTE</label><input id="cedname" class="field" maxlength="14" autocomplete="given-name" placeholder="Ton prénom ou surnom" value="'+esc(ced.name)+'"></div>';
+  h+='<div class="up d2" style="display:flex;gap:10px;margin-top:12px"><label class="btn ghost" style="flex:1;cursor:pointer">📷 '+(ced.photo?'Changer de photo':'Ajouter ma photo')+'<input type="file" accept="image/*" id="cedphoto" hidden></label>'+(ced.photo?'<button class="btn ghost" data-ced="nophoto" style="flex:0 0 auto;width:auto;padding:0 18px">Retirer</button>':'')+'</div>';
+  h+='<div class="up d3" style="font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px">🔒 Ta photo reste sur ce téléphone. Les autres joueurs voient seulement ton jeton : ta note et la couleur de ta carte.</div>';
+  h+='</div></div><div class="avcta"><button class="btn gold" data-ced="done">'+(o.cta||'Enregistrer')+' '+IC.arrow+'</button></div>';
+  view.innerHTML=h; setNav(false); cedCard();
 }
-function edTabs(){
-  var T=[['corps','Corps'],['peau','Peau'],['visage','Visage'],['cheveux','Cheveux'],['haut','Haut'],['tenues','Tenues 🏆']];
-  document.getElementById('avtabs').innerHTML=T.map(function(t){ return '<button data-ed="tab" data-v="'+t[0]+'" class="'+(ed.tab===t[0]?'on':'')+'">'+t[1]+'</button>'; }).join('');
-}
-function seg(key,opts){ return '<div class="seg2">'+opts.map(function(x){ return '<button data-ed="set" data-k="'+key+'" data-v="'+x[0]+'" class="'+(String(ed.cfg[key])===String(x[0])?'on':'')+'">'+x[1]+'</button>'; }).join('')+'</div>'; }
-function sw(key,list,big){ return '<div class="swatches">'+list.map(function(x){ var c=Array.isArray(x)?x[0]:x; return '<button data-ed="set" data-k="'+key+'" data-v="'+c+'" class="'+(ed.cfg[key]===c?'on':'')+(big?' big':'')+'" style="background:'+c+'" aria-label="'+(Array.isArray(x)?x[1]:c)+'"></button>'; }).join('')+'</div>'; }
-function lab(t,v){ return '<div class="row" style="justify-content:space-between;margin:16px 0 8px"><span class="mono" style="color:var(--muted)">'+t+'</span>'+(v!==undefined?'<span class="mono" style="color:var(--gold);font-size:12px" id="lv_'+t.replace(/\W/g,'')+'">'+v+'</span>':'')+'</div>'; }
-function slider(key,min,max,step){ return '<input type="range" class="rng" data-ed="range" data-k="'+key+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+ed.cfg[key]+'">'; }
-function edPanel(){
-  var c=ed.cfg, h='', rk=rankOf(st.xp).i;
-  if(ed.tab==='corps'){
-    h+=lab('SILHOUETTE')+seg('sex',[['h','Homme'],['f','Femme']]);
-    h+=lab('MORPHOLOGIE')+seg('frame',[[0.92,'Fine'],[1,'Normale'],[1.1,'Large']]);
-    h+=lab('TAILLE',c.cm+' cm')+slider('cm',145,205,1);
-    h+=lab('POIDS',c.kg+' kg')+slider('kg',40,140,1);
-    h+=lab('MUSCULATURE',musWord(c.mus))+slider('mus',0,100,1);
-  } else if(ed.tab==='peau'){
-    h+=lab('COULEUR DE PEAU')+sw('skin',SKINS,true);
-  } else if(ed.tab==='visage'){
-    h+=lab('COULEUR DES YEUX')+sw('eyes',EYES,true);
-    if(c.sex==='h') h+=lab('BARBE')+seg('beard',[['non','Aucune'],['courte','Courte'],['complete','Complète']]);
-  } else if(ed.tab==='cheveux'){
-    h+=lab('COIFFURE')+'<div class="grid2">'+HAIRS.map(function(x){ return '<button data-ed="set" data-k="hair" data-v="'+x[0]+'" class="'+(c.hair===x[0]?'on':'')+'">'+x[1]+'</button>'; }).join('')+'</div>';
-    h+=lab('COULEUR')+sw('hairColor',HAIRC);
-  } else if(ed.tab==='haut'){
-    h+=lab('STYLE')+'<div class="grid2">'+(c.sex==='f'?[['hoodie','Sweat à capuche'],['sweat','Sweat'],['tshirt','T-shirt'],['debardeur','Débardeur'],['brassiere','Brassière']]:[['hoodie','Sweat à capuche'],['sweat','Sweat'],['tshirt','T-shirt'],['debardeur','Débardeur']]).map(function(x){ return '<button data-ed="set" data-k="top" data-v="'+x[0]+'" class="'+(c.top===x[0]?'on':'')+'">'+x[1]+'</button>'; }).join('')+'</div>';
-    h+=lab('COULEUR')+sw('topColor',CLOTH);
-    if(c.outfit!=='base'&&c.outfit!=='casquette') h+='<div class="avnote">Ta tenue de rang est équipée : repasse sur « Ma tenue » dans l’onglet Tenues pour voir ces réglages.</div>';
-  } else if(ed.tab==='bas'){
-    h+=lab('STYLE')+seg('bottom',[['short','Short'],['jogging','Jogging'],['legging','Legging']]);
-    h+=lab('COULEUR')+sw('bottomColor',CLOTH);
-    h+=lab('CHAUSSURES')+sw('shoes',['#F2F2F2','#111216','#D4AF37','#E05A5A','#4F8BFF','#2F6B3F']);
-  } else {
-    h+=lab('TENUES · UNE PAR RANG');
-    AV_OUTFITS.forEach(function(x){ var ok=rk>=x.r;
-      h+='<button class="choice'+(c.outfit===x.id?' on':'')+'" '+(ok?'data-ed="set" data-k="outfit" data-v="'+x.id+'"':'data-ed="locked" data-v="'+x.r+'"')+' style="'+(ok?'':'opacity:.55')+'"><span class="ic">'+(ok?x.e:'🔒')+'</span><span><b>'+x.n+'</b><small>'+(ok?x.d:'Débloquée au rang '+RANKS[x.r].n+' ('+fmt(RANKS[x.r].xp)+' XP)')+'</small></span></button>';
-    });
-    h+=lab('DIPLÔME DANS LES MAINS');
-    h+='<div class="grid2"><button data-ed="set" data-k="diploma" data-v="0" class="'+(!c.diploma?'on':'')+'">Aucun</button>';
-    for(var i=1;i<RANKS.length;i++){ var ok=rk>=i; h+='<button '+(ok?'data-ed="set" data-k="diploma" data-v="'+i+'"':'data-ed="locked" data-v="'+i+'"')+' class="'+(+c.diploma===i?'on':'')+'" style="'+(ok?'':'opacity:.45')+'">'+(ok?'🎓 ':'🔒 ')+RANKS[i].n+'</button>'; }
-    h+='</div><div class="avnote">Chaque nouveau rang débloque une tenue plus stylée et son diplôme.</div>';
-  }
-  document.getElementById('avpanel').innerHTML=h;
-}
-function edAct(b){
-  var a=b.dataset.ed, A=window.MFCAvatar;
-  if(a==='tab'){ ed.tab=b.dataset.v; edTabs(); edPanel(); return; }
-  if(a==='anim'){ if(A) A.anim(b.dataset.v,1800); return; }
-  if(a==='locked'){ var r=RANKS[+b.dataset.v]; toast('🔒','Débloqué au rang <b>'+r.n+'</b> : encore '+fmt(Math.max(0,r.xp-st.xp))+' XP.',2600); return; }
-  if(a==='set'){
-    var k=b.dataset.k, v=b.dataset.v; if(k==='frame'||k==='diploma') v=+v;
-    ed.cfg[k]=v; if(k==='sex'&&v==='f') ed.cfg.beard='non'; if(k==='sex'&&v==='h'&&ed.cfg.top==='brassiere') ed.cfg.top='debardeur'; if(k==='sex'&&v==='f'&&ed.cfg.hair==='court') ed.cfg.hair='long';
-    if(A){ A.update(ed.cfg); if(k==='outfit') A.anim('cheer',1400); if(k==='sex'||k==='frame') A.anim('flex',1200); if(k==='hair'||k==='hairColor'||k==='beard'||k==='eyes') A.anim('wave',1200); if(k==='top'||k==='topColor'||k==='skin') A.anim('cheer',1200); }
-    edPanel(); return;
-  }
-  if(a==='done'){
-    st.avatar=ed.cfg; save(); var o=ed.o; ed=null;
-    avSnap(function(){ avUnmount(); o.onDone(); });
-  }
-}
-view.addEventListener('input',function(e){
-  var r=e.target.closest('[data-ed=range]'); if(!r||!ed) return;
-  var k=r.dataset.k; ed.cfg[k]=+r.value;
-  var id=k==='cm'?'lv_TAILLE':k==='kg'?'lv_POIDS':'lv_MUSCULATURE', el=document.getElementById(id);
-  if(el) el.textContent=k==='cm'?r.value+' cm':k==='kg'?r.value+' kg':musWord(+r.value);
-  if(window.MFCAvatar) window.MFCAvatar.update(ed.cfg,true);
+view.addEventListener('input',function(e){ if(ced&&e.target.id==='cedname'){ ced.name=e.target.value; cedCard(); } });
+view.addEventListener('change',function(e){
+  if(!ced||e.target.id!=='cedphoto') return; var f=e.target.files&&e.target.files[0]; if(!f) return;
+  var rd=new FileReader(); rd.onload=function(){ var im=new Image(); im.onload=function(){ try{ var k=Math.min(1,480/Math.max(im.width,im.height)), c=document.createElement('canvas'); c.width=Math.round(im.width*k); c.height=Math.round(im.height*k); c.getContext('2d').drawImage(im,0,0,c.width,c.height); ced.photo=c.toDataURL('image/jpeg',.82); drawCed(); }catch(err){ toast('⚠️','Photo illisible, essaie une autre image.',2400); } }; im.src=rd.result; }; rd.readAsDataURL(f);
 });
-view.addEventListener('change',function(e){ var r=e.target.closest('[data-ed=range]'); if(!r||!ed||!window.MFCAvatar) return; window.MFCAvatar.update(ed.cfg); if(r.dataset.k==='mus') window.MFCAvatar.anim('flex',1800); });
-view.addEventListener('click',function(e){ var b=e.target.closest('[data-ed]'); if(!b||!ed||b.tagName==='INPUT') return; edAct(b); });
-function avatarCard(){
-  var img=avImg('face');
-  return img?'<img src="'+img+'" alt="Ton avatar" style="width:52px;height:52px;border-radius:16px;object-fit:cover;background:radial-gradient(circle at 50% 35%,rgba(212,175,55,.35),rgba(14,22,42,.9));border:1px solid rgba(212,175,55,.5)">':'<div class="glass" style="width:56px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center"><img src="assets/logo-mark.png" alt="MFC" style="width:42px"></div>';
-}
+view.addEventListener('click',function(e){
+  var b=e.target.closest('[data-ced]'); if(!b||!ced) return;
+  if(b.dataset.ced==='nophoto'){ ced.photo=''; drawCed(); return; }
+  if(b.dataset.ced==='done'){
+    st.card={name:ced.name.trim().slice(0,14)}; save();
+    try{ if(ced.photo) localStorage.setItem('mfcq_card_photo',ced.photo); else localStorage.removeItem('mfcq_card_photo'); }catch(err){ toast('⚠️','Photo trop lourde pour ce téléphone : carte enregistrée sans photo.',2800); }
+    var o=ced.o; ced=null; if(typeof syncSoon==='function') syncSoon(); o.onDone();
+  }
+});
 
 /* ---------- mon corps ---------- */
 function bodyView(){
@@ -873,9 +820,9 @@ function bodyView(){
 var ob=null, TIMES=['06:30','07:00','07:30','08:00','08:30','09:00','12:30','19:00'];
 function startOnboarding(){ ob={step:0,name:st.name||'',goal:st.goal||'',level:st.level||'',time:st.notif.time||'08:00',msg:''}; setNav(false); drawOb(); }
 function drawOb(){
-  avUnmount(); ed=null;
+  avUnmount(); ed=null; ced=null;
   var n=6, dots='<div class="dots">'; for(var i=0;i<n;i++) dots+='<i class="'+(i===ob.step?'on':'')+'"></i>'; dots+='</div>';
-  if(ob.step===1){ if(!st.avatar) st.avatar=Object.assign({},AV_DEFAULT); avatarEditor({back:'obback',dots:dots,kicker:'ÉTAPE 1 / 4',title:(ob.name?esc(ob.name)+', crée':'Crée')+' ton avatar',cta:'Continuer',onDone:function(){ ob.step=2; drawOb(); }}); return; }
+  if(ob.step===1){ cardEditor({back:'obback',dots:dots,kicker:'ÉTAPE 1 / 4',title:(ob.name?esc(ob.name)+', voici':'Voici')+' ta carte d’athlète',cta:'Continuer',onDone:function(){ ob.step=2; drawOb(); }}); if(ced&&!ced.name&&ob.name){ ced.name=ob.name; drawCed(); } return; }
   var h='<div class="screen noNav"><div class="wrap" style="min-height:100%;display:flex;flex-direction:column">';
   h+='<div class="row" style="justify-content:space-between;height:44px">'+(ob.step>0?'<button class="iconbtn" data-act="obback" aria-label="Retour">'+IC.back+'</button>':'<span></span>')+dots+'<span style="width:44px"></span></div>';
   if(ob.step===0){
@@ -899,8 +846,7 @@ function drawOb(){
     h+='<div class="glass up d2" style="margin-top:16px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start"><div style="color:var(--gold);margin-top:2px">'+IC.bell+'</div><div style="font-size:13.5px;line-height:1.5;color:var(--ink2)">'+(ob.msg?esc(ob.msg):'Un seul rappel par jour, jamais plus. Tu pourras changer l’heure ou couper le rappel à tout moment dans ton Profil.')+'</div></div>';
   } else {
     var g=GOALS[ob.goal], gm=Object.keys(g.w).sort(function(a,b){return g.w[b]-g.w[a];}).slice(0,3).map(function(id){ return M.filter(function(m){return m.id===id;})[0].name; });
-    var fimg=avImg('full');
-    h+='<div style="text-align:center;margin-top:1vh" class="up">'+(fimg?'<img src="'+fimg+'" alt="Ton avatar" style="height:30vh;max-height:260px;filter:drop-shadow(0 10px 30px rgba(212,175,55,.3))">':'<div style="font-size:64px;line-height:1;filter:drop-shadow(0 0 30px rgba(212,175,55,.5))">'+g.e+'</div>')+'<h1 class="h1" style="margin-top:16px;font-size:23px">Ton parcours est prêt'+(ob.name?', '+esc(ob.name):'')+' !</h1></div>';
+    h+='<div style="text-align:center;margin-top:1vh" class="up">'+'<div style="display:flex;justify-content:center">'+cardHTML(170)+'</div>'+'<h1 class="h1" style="margin-top:16px;font-size:23px">Ton parcours est prêt'+(ob.name?', '+esc(ob.name):'')+' !</h1></div>';
     h+='<div class="goldcard up d1" style="margin-top:22px;padding:16px 18px"><div class="mono" style="color:var(--silver);font-size:10px">TON OBJECTIF</div><div style="font-family:var(--head);font-size:17px;font-weight:600;margin-top:3px">'+g.n+'</div><div style="font-size:13px;color:var(--ink2);margin-top:8px;line-height:1.5">Priorité à : <b style="color:var(--gold2)">'+gm.join(' · ')+'</b>. Les autres thèmes restent dans le mélange, pour une culture complète.</div></div>';
     h+='<div class="up d2" style="display:grid;gap:10px;margin-top:12px">';
     [['📖','Une leçon de 2 minutes par jour','Un mini-cours clair, puis un quiz pour ancrer ce que tu as appris'],['✅','Une mission concrète par jour','Une action simple, prouvée par la science, pour passer à la pratique'],['🧊','1 gel de série offert','Il protège ta série si tu rates un jour. Gagne-en un tous les 7 jours']].forEach(function(x){
@@ -950,53 +896,41 @@ function revisions(){
   h+='</div></div>'; view.innerHTML=h;
 }
 
-/* ---------- rangs ---------- */
+/* ---------- ma carte (ancien écran « Rangs ») ---------- */
 function ranks(){
-  var rk=rankOf(st.xp), cfg=avCfg(), cur=AV_OUTFITS.filter(function(o){ return o.id===cfg.outfit; })[0]||AV_OUTFITS[0];
-  var h='<div class="screen"><div class="wrap"><div class="up row" style="justify-content:space-between"><div><div class="mono" style="color:var(--muted)">TA PROGRESSION</div><h1 class="h1" style="margin-top:4px">Rangs</h1></div><span class="chip" style="color:var(--gold)">'+fmt(st.xp)+' XP</span></div>';
-  // héros : avatar + rang actuel
-  h+='<div class="goldcard up d1" style="margin-top:14px;padding:0;overflow:hidden"><div class="avstage" id="avstage" style="height:36vh;max-height:340px;border:0;border-radius:0;background:transparent"><div class="avload">Chargement de la 3D…</div></div>';
-  h+='<div style="padding:4px 18px 18px;text-align:center"><div class="mono" style="color:var(--gold);font-size:10px">RANG '+(rk.i+1)+' / '+RANKS.length+'</div><div style="font-family:var(--head);font-size:30px;font-weight:700;margin:4px 0 2px">'+rk.r.n+'</div><div style="font-size:13px;color:var(--muted)">'+cur.e+' '+cur.n+'</div>';
-  if(rk.next){ var pc=Math.round((st.xp-rk.r.xp)/(rk.next.xp-rk.r.xp)*100);
-    h+='<div class="bar" style="margin-top:14px;height:10px"><i style="width:'+pc+'%"></i></div><div class="row" style="justify-content:space-between;margin-top:8px;font-size:12.5px"><span style="color:var(--silver)">Encore <b style="color:var(--gold)">'+fmt(rk.next.xp-st.xp)+' XP</b></span><span class="mono" style="color:var(--muted);font-size:11px">'+fmt(st.xp)+' / '+fmt(rk.next.xp)+'</span></div>'; }
-  else h+='<div style="margin-top:12px;font-size:14px;color:var(--gold);font-weight:700">👑 Rang maximum atteint !</div>';
-  h+='</div></div>';
-  // prochaine récompense
-  if(rk.next){ var no=AV_OUTFITS[rk.i+1];
-    h+='<div class="glass up d2" style="margin-top:14px;padding:14px;display:flex;gap:14px;align-items:center"><div style="position:relative;width:96px;height:106px;flex-shrink:0;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.04)"><img data-rth="'+(rk.i+1)+'" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(.55) saturate(.7)"><span style="position:absolute;right:6px;bottom:6px;font-size:18px">🔒</span></div><div style="flex:1"><div class="mono" style="color:var(--gold);font-size:10px">PROCHAINE RÉCOMPENSE · '+rk.next.n.toUpperCase()+'</div><div style="font-size:16px;font-weight:700;margin-top:4px">'+(no?no.e+' '+no.n:'')+'</div><div style="font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.45">'+rk.next.r+'</div></div></div>'; }
-  // parcours des rangs
-  h+='<div class="mono up d3" style="color:var(--muted);margin:22px 0 10px">TOUS LES RANGS</div><div style="display:flex;flex-direction:column;gap:10px">';
-  RANKS.forEach(function(r,i){ var done=st.xp>=r.xp, now=i===rk.i, o=AV_OUTFITS[i], worn=o&&o.id===cfg.outfit;
-    h+='<div class="'+(now?'goldcard':'glass')+' up d'+Math.min(7,i+3)+'" style="display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:20px'+(done?'':';opacity:.8')+'"><div style="position:relative;width:70px;height:78px;flex-shrink:0;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.04)"><img data-rth="'+i+'" alt="" style="width:100%;height:100%;object-fit:cover'+(done?'':';filter:brightness(.45) saturate(.6)')+'">'+(done?'':'<span style="position:absolute;right:4px;bottom:4px;font-size:14px">🔒</span>')+'</div>';
-    h+='<div style="flex:1;min-width:0"><div style="font-size:15.5px;font-weight:700">'+r.n+(now?' <span class="mono" style="color:var(--gold);font-size:10px">· TOI</span>':'')+'</div><div style="font-size:12px;color:var(--muted);line-height:1.4;margin-top:2px">'+r.r+'</div><div class="mono" style="font-size:10px;color:'+(done?'var(--good)':'var(--silver)')+';margin-top:4px">'+(done?'✓ DÉBLOQUÉ':fmt(r.xp)+' XP')+'</div></div>';
-    if(done&&o) h+=worn?'<span class="chip" style="font-size:11px;color:var(--gold)">Portée</span>':'<button class="chip" data-act="avwear" data-id="'+i+'" style="font-size:11px">Porter</button>';
-    h+='</div>'; });
+  var I=lvInfo(), me=myCard(); if(!st.cardSeen){ st.cardSeen=1; save(); }
+  var h='<div class="screen"><div class="wrap"><div class="up row" style="justify-content:space-between"><div><div class="mono" style="color:var(--muted)">TA PROGRESSION</div><h1 class="h1" style="margin-top:4px">Ma carte</h1></div><button class="chip" data-act="cardedit" style="color:var(--gold)">✏️ Modifier</button></div>';
+  h+='<div class="up d1" id="mycard" style="display:flex;justify-content:center;margin-top:18px">'+cardHTML(Math.min(290,window.innerWidth-90))+'</div>';
+  h+='<div class="up d1" style="text-align:center;font-size:12px;color:var(--muted);margin-top:10px">Incline ta carte avec le doigt ✨</div>';
+  h+='<div class="goldcard up d2" style="margin-top:16px;padding:16px"><div class="row" style="justify-content:space-between"><div><div class="mono" style="color:var(--gold);font-size:10px">CARTE '+I.T.n.toUpperCase()+'</div><div style="font-family:var(--head);font-size:24px;font-weight:700;margin-top:2px">Niveau '+I.lv+'<span style="font-size:14px;color:var(--muted)"> / 100</span></div></div><span class="mono" style="color:var(--gold);font-weight:700">'+fmt(st.xp)+' XP</span></div>';
+  h+='<div class="bar" style="margin-top:12px;height:10px"><i style="width:'+I.pct+'%"></i></div><div style="font-size:12.5px;color:var(--silver);margin-top:8px;line-height:1.5">'+(I.lv<100?'Encore <b style="color:var(--gold)">'+fmt(I.left)+' XP</b> pour le niveau '+(I.lv+1)+(I.nt?'<br>Prochaine carte : <b style="color:var(--gold2)">'+I.nt.n+'</b> au niveau '+I.nt.from:''):'👑 Niveau maximum : tu as la carte Icône MFC !')+'</div></div>';
+  // notes
+  var g=GOALS[st.goal];
+  h+='<div class="mono up d3" style="color:var(--muted);margin:24px 0 10px">MES NOTES</div><div class="glass up d3" style="padding:6px 16px">';
+  CARD.MODS.forEach(function(m){ var v=me.stats[m[0]], mm=M.filter(function(x){ return x.id===m[0]; })[0], p=modProgress(m[0]);
+    h+='<button data-act="mod" data-id="'+m[0]+'" style="width:100%;text-align:left;display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)"><span style="font-family:var(--head);font-weight:700;font-size:18px;width:34px;color:var(--gold2)">'+v+'</span><span style="flex:1"><span style="display:flex;justify-content:space-between;font-size:14px;font-weight:600">'+esc(mm?mm.name:m[1])+'<span class="mono" style="color:var(--muted);font-size:11px">'+p.m+'/'+p.t+' ✓</span></span><span class="bar" style="display:block;margin-top:6px;height:5px"><i style="width:'+Math.round((v-40)/59*100)+'%"></i></span></span></button>'; });
+  h+='<div style="font-size:12px;color:var(--muted);line-height:1.5;padding:10px 0 8px;border-top:1px solid var(--line)">Chaque note part de 40 et monte jusqu’à 99 quand tu maîtrises toutes les questions du thème. Ta note générale ('+me.ovr+')'+(g?' compte davantage les thèmes de ton objectif « '+esc(g.n)+' »':' est la moyenne de tes 6 notes')+'.</div></div>';
+  // collection
+  h+='<div class="mono up d4" style="color:var(--muted);margin:24px 0 4px">MA COLLECTION · '+CARD.TIERS.filter(function(t){ return I.lv>=t.from; }).length+' / '+CARD.TIERS.length+'</div><div class="coll up d4">';
+  CARD.TIERS.forEach(function(t){ h+=CARD.html(Object.assign({},me,{level:t.from,tier:t.id,locked:I.lv<t.from}),{w:104}); });
+  h+='</div>';
+  // récompenses
+  h+='<div class="mono up d5" style="color:var(--muted);margin:22px 0 10px">CE QUE TU GAGNES</div><div class="glass up d5" style="padding:4px 14px">';
+  RANKS.forEach(function(r,i){ var t=CARD.TIERS[i], ok=I.lv>=t.from;
+    h+='<div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-top:'+(i?'1px solid var(--line)':'0')+'">'+badgeH(t,t.from)+'<div style="flex:1'+(ok?'':';opacity:.65')+'"><div style="font-size:14.5px;font-weight:700">'+r.n+' <span class="mono" style="font-size:10px;color:'+(ok?'var(--good)':'var(--muted)')+'">'+(ok?'✓ OBTENUE':'NIV. '+t.from)+'</span></div><div style="font-size:12.5px;color:var(--muted);line-height:1.4;margin-top:2px">'+r.r.replace('🪪 ','')+'</div></div></div>'; });
   h+='</div>';
   // comment gagner des XP
-  h+='<div class="glass up d7" style="margin-top:22px;padding:16px"><div class="mono" style="color:var(--gold);font-size:10px;margin-bottom:10px">COMMENT GAGNER DES XP</div>';
+  h+='<div class="glass up d6" style="margin-top:22px;padding:16px"><div class="mono" style="color:var(--gold);font-size:10px;margin-bottom:10px">COMMENT GAGNER DES XP</div>';
   [['✅','Bonne réponse','+10'],['🎯','Quiz sans faute','+20'],['📖','Leçon terminée (1re fois)','+30'],['🌱','Mission du jour','+15'],['⚔️','Duel gagné','+20'],['🏔️','Course au sommet : bonne réponse','+5 à +15'],['🚩','Course au sommet gagnée','+50']].forEach(function(x){ h+='<div class="row" style="justify-content:space-between;padding:6px 0;font-size:13.5px;border-top:1px solid var(--line)"><span>'+x[0]+' '+x[1]+'</span><span class="mono" style="color:var(--gold);font-weight:700;white-space:nowrap">'+x[2]+'</span></div>'; });
-  h+='</div></div></div>'; view.innerHTML=h;
-  withAvatar(function(A){
-    var s=document.getElementById('avstage'); if(!s||tab!=='rank') return;
-    A.mount(s,cfg,{mode:'full',onReady:function(){ var l=s.querySelector('.avload'); if(l) l.remove(); rankThumbs(A,cfg); }});
-  });
-}
-var RTH={};
-function rankThumbs(A,cfg){
-  var base=JSON.stringify(Object.assign({},cfg,{outfit:'',diploma:0})), todo=[];
-  document.querySelectorAll('img[data-rth]').forEach(function(img){ var i=+img.dataset.rth, k=base+i; if(RTH[k]) img.src=RTH[k]; else if(todo.indexOf(i)<0) todo.push(i); });
-  (function next(){
-    if(!todo.length||tab!=='rank') return; var i=todo.shift(), o=AV_OUTFITS[i]; if(!o) return next();
-    A.snapshot(Object.assign({},cfg,{outfit:o.id,diploma:o.r}),'full',180).then(function(u){ RTH[base+i]=u; document.querySelectorAll('img[data-rth="'+i+'"]').forEach(function(im){ im.src=u; }); next(); }).catch(next);
-  })();
+  h+='</div></div></div>'; view.innerHTML=h; tiltIn('mycard');
 }
 
 /* ---------- profil ---------- */
 function profile(){
   var acc=st.answered?Math.round(st.correct/st.answered*100):0, mastered=Object.keys(st.mastered).length;
   var rk=rankOf(st.xp);
-  var h='<div class="screen"><div class="wrap"><div class="up row" style="justify-content:space-between"><div><div class="mono" style="color:var(--muted)">'+rk.r.n.toUpperCase()+' · '+fmt(st.xp)+' XP</div><h1 class="h1" style="margin-top:4px">'+(st.name?esc(st.name):'Ton profil')+'</h1></div><button class="chip" data-act="avedit" style="color:var(--gold)">✏️ Avatar</button></div>';
-  h+='<div class="avstage up d1" id="avstage" style="height:40vh"><div class="avload">Chargement de la 3D…</div><div class="avhint">↔ Fais-le tourner · touche-le !</div></div>';
+  var h='<div class="screen"><div class="wrap"><div class="up row" style="justify-content:space-between"><div><div class="mono" style="color:var(--muted)">CARTE '+rk.r.n.toUpperCase()+' · NIV. '+CARD.levelOf(st.xp)+'</div><h1 class="h1" style="margin-top:4px">'+(st.name?esc(st.name):'Ton profil')+'</h1></div><button class="chip" data-act="cardedit" style="color:var(--gold)">✏️ Ma carte</button></div>';
+  h+='<div class="up d1" id="mecard" style="display:flex;justify-content:center;margin-top:16px">'+cardHTML(Math.min(250,window.innerWidth-110))+'</div>';
   h+='<div class="up d1" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">';
   [['QUESTIONS',fmt(st.answered)],['RÉUSSITE',acc+' %'],['MAÎTRISÉES',mastered+'/'+Q.length],['MEILLEURE SÉRIE',st.best+' j'],['MISSIONS',fmt(st.missionsDone)],['QUIZ TERMINÉS',fmt(st.quizzes)]].forEach(function(x){ h+='<div class="glass" style="padding:14px"><div class="mono" style="color:var(--muted);font-size:10px">'+x[0]+'</div><div style="font-family:var(--head);font-size:20px;font-weight:600">'+x[1]+'</div></div>'; });
   h+='</div><div class="glass list up d2" style="margin-top:14px;padding:4px 16px">';
@@ -1015,7 +949,7 @@ function profile(){
   if(st.pseudo||sbSess()) h+='<button data-sx="delacc" class="row" style="width:100%;justify-content:space-between;font-size:15px;color:var(--bad)"><span>Supprimer mon compte de joueur</span></button>';
   h+='</div><div style="text-align:center;margin-top:22px"><img src="assets/logo-full.png" alt="MFC – Mathis Félicité Coaching" style="width:170px;opacity:.85"><div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5">Contenu éducatif, ne remplace pas l’avis d’un médecin.<br>Ta progression est enregistrée sur ce téléphone.</div></div>';
   h+='</div></div>'; view.innerHTML=h;
-  withAvatar(function(A){ var s=document.getElementById('avstage'); if(!s||tab!=='me') return; A.mount(s,avCfg(),{mode:'full',onReady:function(){ var l=s.querySelector('.avload'); if(l) l.remove(); }}); });
+  tiltIn('mecard');
 }
 function sheet(inner){
   var s=document.createElement('div'); s.className='sheet'; s.innerHTML='<div>'+inner+'</div>';
@@ -1270,7 +1204,7 @@ function themeName(t){ if(t==='mix') return 'Mélange de thèmes'; var m=M.filte
 
 /* --- pseudo + liens d'invitation --- */
 function pseudoSheet(){
-  sheet('<div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 class="h1" style="font-size:18px">Ton pseudo de joueur</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><form id="psf"><input id="psi" class="sxinput" maxlength="20" value="'+esc(st.pseudo||st.name||'')+'" placeholder="Ex. Mathis_83" autocomplete="nickname"><div style="font-size:12.5px;color:var(--muted);line-height:1.5;margin:10px 2px 16px">Ton pseudo et ton avatar s’affichent dans les classements. Le podium de la semaine peut être partagé par Mathis en story Instagram : évite ton nom complet si tu préfères rester discret.</div><button class="btn gold" type="submit">Valider</button></form>');
+  sheet('<div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 class="h1" style="font-size:18px">Ton pseudo de joueur</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><form id="psf"><input id="psi" class="sxinput" maxlength="20" value="'+esc(st.pseudo||st.name||'')+'" placeholder="Ex. Mathis_83" autocomplete="nickname"><div style="font-size:12.5px;color:var(--muted);line-height:1.5;margin:10px 2px 16px">Ton pseudo et ton jeton de carte (ta note et sa couleur) s’affichent dans les classements. Le podium de la semaine peut être partagé par Mathis en story Instagram : évite ton nom complet si tu préfères rester discret.</div><button class="btn gold" type="submit">Valider</button></form>');
   var f=document.getElementById('psf'), i=document.getElementById('psi');
   f.addEventListener('submit',function(e){ e.preventDefault(); var v=i.value.trim().slice(0,20); if(v.length<2){ toast('✏️','Au moins 2 caractères',2000); return; }
     var prev=st.pseudo; st.pseudo=v; save(); f.querySelector('button').textContent='Connexion…';
@@ -1603,7 +1537,7 @@ function playerSheet(id){
 function reportSheet(id){
   var p=ppl[id]||{pseudo:'ce joueur'};
   sheet('<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 class="h1" style="font-size:18px">Signaler '+esc(p.pseudo)+'</h2><button class="iconbtn" data-close aria-label="Fermer">'+IC.x+'</button></div><div style="display:flex;flex-direction:column;gap:8px">'+
-    [['pseudo','Pseudo choquant ou insultant'],['avatar','Avatar inapproprié'],['triche','Triche aux classements'],['autre','Autre comportement']].map(function(r){ return '<button class="btn ghost" data-sx="reportgo" data-id="'+id+'" data-v="'+r[0]+'" style="justify-content:flex-start;padding:0 16px">'+r[1]+'</button>'; }).join('')+
+    [['pseudo','Pseudo choquant ou insultant'],['avatar','Image de profil inappropriée'],['triche','Triche aux classements'],['autre','Autre comportement']].map(function(r){ return '<button class="btn ghost" data-sx="reportgo" data-id="'+id+'" data-v="'+r[0]+'" style="justify-content:flex-start;padding:0 16px">'+r[1]+'</button>'; }).join('')+
     '</div><div style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5">Ton signalement est anonyme pour l’autre joueur. Mathis l’examine et peut suspendre le compte.</div>');
 }
 function blockedSheet(){
@@ -1613,7 +1547,7 @@ function blockedSheet(){
   }).catch(function(e){ var el=document.getElementById('blk'); if(el) el.textContent=e.message; });
 }
 function deleteSheet(){
-  sheet('<h2 class="h1" style="font-size:18px">Supprimer ton compte de joueur ?</h2><p style="color:var(--muted);font-size:14px;line-height:1.55">Ton pseudo, ton avatar, tes amis, tes duels et ta place dans les classements seront <b style="color:var(--ink)">définitivement supprimés</b> de nos serveurs. Impossible d’annuler.</p><p style="color:var(--muted);font-size:13px;line-height:1.5">Tes leçons et ta progression restent sur ce téléphone. Pour les effacer aussi, utilise « Effacer ma progression ».</p><div style="display:flex;flex-direction:column;gap:10px;margin-top:8px"><button class="btn" data-sx="deletego" style="background:rgba(240,140,90,.15);border:1px solid var(--bad);color:var(--bad)">Oui, supprimer mon compte</button><button class="btn ghost" data-close>Annuler</button></div>');
+  sheet('<h2 class="h1" style="font-size:18px">Supprimer ton compte de joueur ?</h2><p style="color:var(--muted);font-size:14px;line-height:1.55">Ton pseudo, ton jeton de carte, tes amis, tes duels et ta place dans les classements seront <b style="color:var(--ink)">définitivement supprimés</b> de nos serveurs. Impossible d’annuler.</p><p style="color:var(--muted);font-size:13px;line-height:1.5">Tes leçons et ta progression restent sur ce téléphone. Pour les effacer aussi, utilise « Effacer ma progression ».</p><div style="display:flex;flex-direction:column;gap:10px;margin-top:8px"><button class="btn" data-sx="deletego" style="background:rgba(240,140,90,.15);border:1px solid var(--bad);color:var(--bad)">Oui, supprimer mon compte</button><button class="btn ghost" data-close>Annuler</button></div>');
 }
 function deleteAccount(btn){
   btn.textContent='Suppression…';
@@ -1748,16 +1682,16 @@ function premiumView(){
   }
   // comparatif
   h+='<div class="glass" style="margin-top:22px;padding:6px 16px"><div class="row" style="justify-content:space-between;padding:10px 0;font-size:11px" ><span class="mono" style="color:var(--muted)">CE QUI EST INCLUS</span><span class="mono" style="display:flex;gap:16px"><span style="color:var(--muted);width:52px;text-align:center">GRATUIT</span><span style="color:var(--gold);width:58px;text-align:center">PREMIUM</span></span></div>';
-  [['Leçons','1 / jour','Illimitées'],['Quiz','1 / jour','Illimités'],['Révisions','1 / jour','Illimitées'],['Duels & Course au sommet','Illimités','Illimités'],['Podium & classements','✓','✓'],['Tenues & diplômes de rang','✓','✓'],['Prépa STAPS L1 & BPJEPS','1 chapitre','✓ + examens blancs'],['Examens & certificats','–','✓ bientôt'],['Récompenses réelles','–','✓ bientôt']].forEach(function(r){ h+='<div class="row" style="justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px"><span style="flex:1">'+r[0]+'</span><span style="display:flex;gap:16px;font-size:12px;text-align:center"><span style="width:52px;color:var(--muted)">'+r[1]+'</span><span style="width:58px;color:var(--gold);font-weight:700">'+r[2]+'</span></span></div>'; });
+  [['Leçons','1 / jour','Illimitées'],['Quiz','1 / jour','Illimités'],['Révisions','1 / jour','Illimitées'],['Duels & Course au sommet','Illimités','Illimités'],['Podium & classements','✓','✓'],['Carte d’athlète & ses 7 éditions','✓','✓'],['Prépa STAPS L1 & BPJEPS','1 chapitre','✓ + examens blancs'],['Examens & certificats','–','✓ bientôt'],['Récompenses réelles','–','✓ bientôt']].forEach(function(r){ h+='<div class="row" style="justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px"><span style="flex:1">'+r[0]+'</span><span style="display:flex;gap:16px;font-size:12px;text-align:center"><span style="width:52px;color:var(--muted)">'+r[1]+'</span><span style="width:58px;color:var(--gold);font-weight:700">'+r[2]+'</span></span></div>'; });
   h+='</div>';
   // récompenses
   h+='<div class="mono" style="color:var(--muted);margin:24px 0 10px">LES RÉCOMPENSES</div><div style="display:flex;flex-direction:column;gap:10px">';
-  [['🎖️','Dès aujourd’hui','Tenues d’avatar et diplômes à chaque rang, podium de la semaine partagé en story par Mathis.',0],
-   ['🎬','Rang Analyste','Ta question traitée par Mathis dans un Reel, avec mention de ton pseudo.',1],
+  [['🎖️','Dès aujourd’hui','Une nouvelle carte d’athlète à chaque palier, de Bronze à Icône MFC, et le podium de la semaine partagé en story par Mathis.',0],
+   ['🎬','Carte Élite (niveau 45)','Ta question traitée par Mathis dans un Reel, avec mention de ton pseudo.',1],
    ['💊','Bientôt : compléments alimentaires','Des produits et codes de réduction de marques partenaires pour les meilleurs joueurs Premium.',1],
-   ['👕','Bientôt : vêtements MFC','Tee-shirts et sweats MFC à gagner aux rangs les plus élevés et lors des événements.',1],
+   ['👕','Bientôt : vêtements MFC','Tee-shirts et sweats MFC à gagner avec les cartes les plus rares et lors des événements.',1],
    ['🏆','Bientôt : lots du podium','Chaque semaine, un lot pour le n° 1 du podium Premium.',1],
-   ['🧠','Bientôt : coaching avec Mathis','Une séance de coaching offerte pour les Légendes.',1]].forEach(function(r){ h+='<div class="glass" style="padding:14px 16px;display:flex;gap:12px;align-items:flex-start"><span style="font-size:28px;line-height:1">'+r[0]+'</span><div><b style="font-size:14.5px">'+r[1]+'</b><div style="font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:2px">'+r[2]+'</div></div></div>'; });
+   ['🧠','Bientôt : coaching avec Mathis','Une séance de coaching offerte aux cartes Légende.',1]].forEach(function(r){ h+='<div class="glass" style="padding:14px 16px;display:flex;gap:12px;align-items:flex-start"><span style="font-size:28px;line-height:1">'+r[0]+'</span><div><b style="font-size:14.5px">'+r[1]+'</b><div style="font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:2px">'+r[2]+'</div></div></div>'; });
   h+='</div><div style="font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:12px;text-align:center">Les récompenses « bientôt » arrivent progressivement, selon les partenariats. Leur règlement sera publié avant leur lancement.</div>';
   // code testeur
   if(!on) h+='<form id="tcf" style="margin-top:22px;display:flex;gap:8px"><input id="tci" class="sxinput" placeholder="Code testeur" autocapitalize="characters" autocomplete="off" style="height:46px;font-size:15px;text-transform:uppercase"><button class="btn ghost" type="submit" style="width:auto;height:46px;padding:0 16px">OK</button></form>';
@@ -1845,6 +1779,6 @@ sp.addEventListener('click',function(){ sp.classList.add('out'); setTimeout(func
 if(!NATIVE && 'serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
 })();
 </script>
-<script type="module" src="avatar.js"></script>
+
 </body>
 </html>
