@@ -1,0 +1,100 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MFC Quiz · Carte d'athlète (maquette)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{--bg:#050A16;--ink:#F2F4F7;--muted:#9AA4B5;--silver:#C9CED6;--gold:#D4AF37;--gold2:#F3D98A;--line:rgba(201,206,214,.12)}
+body{margin:0;min-height:100vh;background:radial-gradient(120% 60% at 50% 0%,#13265A,#050A16 70%);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:480px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 16px) 16px 50px}
+.k{font:700 11px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:1.5px;color:var(--gold)}
+h1{font:600 22px Unbounded,system-ui;margin:6px 0 4px}h2{font:600 17px Unbounded,system-ui;margin:0}
+p{color:var(--muted);font-size:13.5px;line-height:1.55;margin:6px 0}
+.hero{display:flex;justify-content:center;padding:22px 0 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button,.btn{border:1px solid rgba(201,206,214,.25);background:rgba(255,255,255,.06);color:var(--ink);border-radius:999px;padding:9px 14px;font:600 13px Inter,system-ui;cursor:pointer}
+button.on{background:rgba(212,175,55,.18);border-color:var(--gold);color:var(--gold2)}
+input[type=range]{width:100%;accent-color:var(--gold)}
+input[type=text]{width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(201,206,214,.25);border-radius:14px;color:var(--ink);padding:11px 14px;font:600 15px Inter,system-ui}
+.glass{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid var(--line);border-radius:22px;padding:16px;margin-top:14px}
+.sec{margin-top:34px;padding-top:6px;border-top:1px solid var(--line)}
+.bar{height:10px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#B8932A,#F3D98A);border-radius:99px}
+.coll{display:flex;gap:10px;overflow-x:auto;padding:12px 2px 6px;scroll-snap-type:x mandatory}.coll>*{scroll-snap-align:start}
+.rw{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px}.rw:first-child{border-top:0}
+.rw b{font-weight:700}.rw small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.vs{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px}
+.vs .x{font:700 22px Unbounded;color:var(--gold2);text-shadow:0 0 18px rgba(212,175,55,.6)}
+.score{display:flex;justify-content:space-around;margin-top:10px;font:700 28px Unbounded}
+.lb{display:flex;align-items:center;gap:12px;padding:9px 4px;border-top:1px solid var(--line)}.lb:first-child{border-top:0}
+.lb .pos{width:22px;text-align:center;font:700 13px 'JetBrains Mono';color:var(--muted)}.lb .n{flex:1;font-weight:700;font-size:14.5px}.lb .n small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.lb .xp{font:700 13px 'JetBrains Mono';color:var(--gold2)}
+.bdg{width:38px;height:46px;clip-path:polygon(12% 0,88% 0,100% 8%,100% 82%,50% 100%,0 82%,0 8%);display:flex;flex-direction:column;align-items:center;justify-content:center;font:700 14px/1 Unbounded;padding-bottom:5px;box-sizing:border-box;flex-shrink:0}
+.bdg small{font:700 6.5px 'JetBrains Mono';letter-spacing:.08em;margin-top:3px;opacity:.85}
+.me{background:rgba(212,175,55,.08);border-radius:14px}
+.note{font-size:12px;color:var(--muted);line-height:1.55;margin-top:26px}
+</style></head><body><div class="wrap">
+<div class="k">MAQUETTE · CARTE D'ATHLÈTE</div>
+<h1>Ta carte de joueur MFC</h1>
+<p>Elle remplace l'avatar. Ses notes viennent de tes réponses aux quiz, et elle change de matière en montant de niveau. Incline-la avec le doigt.</p>
+<div class="hero" id="hero"></div>
+
+<div class="k" style="margin-top:6px">NIVEAU (SIMULATION)</div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px"><span style="color:var(--muted);font-size:13px" id="xpl"></span><b style="font:700 24px Unbounded;color:var(--gold2)" id="lvl">1</b></div>
+<input type="range" id="level" min="1" max="100" value="42">
+<div class="row" id="tiers"></div>
+<div class="k" style="margin-top:18px">TON NOM SUR LA CARTE</div>
+<div class="row"><input type="text" id="name" value="Mathis" maxlength="14"></div>
+<div class="row"><label class="btn">📷 Mettre ma photo<input type="file" id="photo" accept="image/*" hidden></label><button id="nophoto">Sans photo</button></div>
+<p style="font-size:12px">La photo reste sur ton téléphone dans cette maquette. Sans photo, la carte affiche tes initiales.</p>
+
+<!-- ======== RANGS ======== -->
+<div class="sec"><div class="k">ÉCRAN « RANGS » (DEVIENT « MA CARTE »)</div>
+<div class="glass"><div style="display:flex;justify-content:space-between;align-items:baseline"><h2 id="r-t">Niveau 42</h2><span class="k" id="r-x"></span></div>
+<div class="bar"><i id="r-b"></i></div><p id="r-n" style="margin-top:8px"></p></div>
+<div class="k" style="margin-top:18px">MA COLLECTION DE CARTES</div>
+<div class="coll" id="coll"></div>
+<div class="glass" id="rew"></div>
+</div>
+
+<!-- ======== DÉFIS ======== -->
+<div class="sec"><div class="k">ÉCRAN « DÉFIS » · DUEL</div>
+<div class="vs" id="duel"></div>
+<div class="score"><span style="color:var(--gold2)">4</span><span style="color:var(--muted);font-size:14px;align-self:center">5 questions</span><span>3</span></div>
+<div class="k" style="margin-top:26px">CLASSEMENT DE LA SEMAINE</div>
+<div class="glass" id="lb" style="padding:8px 12px"></div>
+</div>
+
+<div class="note">Maquette de démonstration : rien n'est encore changé dans l'appli. Niveau 1 à 100 calculé à partir de tes XP actuels. Notes de 40 à 99 par thème, selon la part des questions maîtrisées. La note générale suit ton objectif (ex. « Prendre du muscle » compte plus le thème Muscle).</div>
+</div>
+<script src="carte.js"></script>
+<script>
+var C=window.MFCCard, $=function(i){return document.getElementById(i)};
+var S={level:42,name:'Mathis',photo:'',tier:null};
+function fakeStats(lv,seed){ var mods=['muscle','cardio','nutrition','sommeil','recup','sante'],o={},sum=0; mods.forEach(function(m,i){ var v=Math.round(40+(lv-1)*0.59+Math.sin(i*2.3+seed)*7*(lv<100?1:0)); v=Math.max(40,Math.min(99,v)); o[m]=v; sum+=v; }); return {s:o,ovr:Math.round(sum/6)}; }
+function card(lv,w,extra){ var f=fakeStats(lv,(extra&&extra.seed)||1); return C.html(Object.assign({name:S.name,level:lv,ovr:f.ovr,pos:'HYP',stats:f.s,photo:S.photo},extra||{}),{w:w}); }
+function badge(lv,ovr){ var T=C.tierOf(lv); return '<div class="bdg" style="background:linear-gradient(160deg,'+T.bg[2]+','+T.bg[1]+' 45%,'+T.bg[0]+');color:'+T.ink+';box-shadow:inset 0 0 0 2px '+T.frame[1]+'">'+ovr+'<small>'+T.n.split(' ')[0].toUpperCase().slice(0,6)+'</small></div>'; }
+var REW={bronze:'Ta première carte · ton nom et tes initiales',argent:'Carte Argent · 🎓 diplôme « Curieux »',or:'Carte Or · 🎓 diplôme « Initié »',elite:'Carte Élite bleu nuit et or · pose ta question, Mathis y répond en Reel',heros:'Carte Héros holographique · certificat « Expert MFC Quiz »',legende:'Carte Légende noire et or · ton nom au Hall of Fame',icone:'Carte Icône MFC animée · la plus rare de l’appli'};
+function draw(){
+  var lv=S.level, T=C.tierOf(lv);
+  $('hero').innerHTML=card(lv,280,{seed:1}); C.tilt($('hero').firstChild);
+  $('lvl').textContent=lv; $('xpl').textContent=C.xpFor(lv).toLocaleString('fr-FR')+' XP requis';
+  $('tiers').innerHTML=C.TIERS.map(function(t){ return '<button data-lv="'+t.from+'" class="'+(t===T?'on':'')+'">'+t.n+' · '+t.from+'</button>'; }).join('');
+  // rangs
+  var nx=lv<100?C.xpFor(lv+1):C.xpFor(100), cur=C.xpFor(lv), xp=Math.round(cur+(nx-cur)*0.6);
+  $('r-t').textContent='Niveau '+lv+' · '+T.n; $('r-x').textContent=xp.toLocaleString('fr-FR')+' XP';
+  $('r-b').style.width=(lv<100?60:100)+'%';
+  var nt=C.TIERS.filter(function(t){return t.from>lv;})[0];
+  $('r-n').innerHTML=lv<100?'Encore <b style="color:var(--gold2)">'+(nx-xp).toLocaleString('fr-FR')+' XP</b> pour le niveau '+(lv+1)+(nt?' · prochaine carte <b style="color:var(--gold2)">'+nt.n+'</b> au niveau '+nt.from:''):'👑 Niveau maximum : tu as la carte Icône MFC.';
+  $('coll').innerHTML=C.TIERS.map(function(t){ var f=fakeStats(t.from,1); return C.html({name:S.name,level:t.from,ovr:f.ovr,pos:'HYP',photo:S.photo,locked:lv<t.from},{w:104}); }).join('');
+  $('rew').innerHTML='<div class="k" style="margin-bottom:6px">RÉCOMPENSES PAR CARTE</div>'+C.TIERS.map(function(t){ var ok=lv>=t.from; return '<div class="rw">'+badge(t.from,fakeStats(t.from,1).ovr)+'<div style="flex:1'+(ok?'':';opacity:.6')+'"><b>'+t.n+'</b> <span class="k" style="font-size:10px;color:'+(ok?'#6EC896':'var(--muted)')+'">'+(ok?'✓ OBTENUE':'NIV. '+t.from)+'</span><small>'+REW[t.id]+'</small></div></div>'; }).join('');
+  // défis
+  $('duel').innerHTML=card(lv,150,{seed:1})+'<div class="x">VS</div>'+C.html({name:'Léa',level:58,ovr:fakeStats(58,4).ovr,pos:'END',stats:fakeStats(58,4).s},{w:150});
+  var rows=[['Inès','END',91,'2 340 XP'],['Hugo','SÈC',73,'1 980 XP'],[S.name,'HYP',lv,'1 720 XP',1],['Léa','END',58,'1 410 XP'],['Tom','VIT',27,'960 XP'],['Sam','SCI',12,'410 XP']];
+  $('lb').innerHTML=rows.map(function(r,i){ return '<div class="lb'+(r[4]?' me':'')+'"><span class="pos">'+(['🥇','🥈','🥉'][i]||(i+1))+'</span>'+badge(r[2],fakeStats(r[2],i).ovr)+'<span class="n">'+r[0]+'<small>'+r[1]+' · niv. '+r[2]+'</small></span><span class="xp">'+r[3]+'</span></div>'; }).join('');
+}
+$('level').oninput=function(e){ S.level=+e.target.value; draw(); };
+$('tiers').onclick=function(e){ var b=e.target.closest('button'); if(!b) return; S.level=+b.dataset.lv; $('level').value=S.level; draw(); };
+$('name').oninput=function(e){ S.name=e.target.value||'Athlète'; draw(); };
+$('photo').onchange=function(e){ var f=e.target.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(){ var im=new Image(); im.onload=function(){ var c=document.createElement('canvas'),s=Math.min(1,600/Math.max(im.width,im.height)); c.width=im.width*s; c.height=im.height*s; c.getContext('2d').drawImage(im,0,0,c.width,c.height); S.photo=c.toDataURL('image/jpeg',.85); draw(); }; im.src=r.result; }; r.readAsDataURL(f); };
+$('nophoto').onclick=function(){ S.photo=''; draw(); };
+draw(); document.title='done';
+</script></body></html>
