@@ -6,7 +6,7 @@ import { GLTFLoader } from './vendor/GLTFLoader.js';
 
 const BASE = (window.MFC_AV3_BASE || './av3/');
 const PAL = { navy: '#22346E', navy2: '#18254F', gold: '#D4AF37', goldL: '#F3D98A', white: '#EEF1F6', silver: '#B9C2D0', blue: '#2F7BFF', sole: '#E9ECF2' };
-const DEFAULT = { sex: 'h', skin: '#D9A07A', hair: 'court', hairColor: '#4A2C1A', level: 1, mus: 0.75 };
+const DEFAULT = { sex: 'h', skin: '#D9A07A', hair: 'court', hairColor: '#4A2C1A', eyes: '#5B3A22', level: 1, mus: 0.8 };
 
 /* ---------- composition des tenues (palier niveau 1 pour le prototype) ---------- */
 const HEADS = {
@@ -15,7 +15,7 @@ const HEADS = {
 };
 const OUTFIT1 = {
   h: { body: 'M_Casual_2_Body', legs: 'M_Casual_Hoodie_Legs', feet: 'M_Casual_Hoodie_Feet' },
-  f: { body: 'F_Punk_Body', legs: 'F_Adventurer_Legs', legs2: 'F_Formal_Legs', feet: 'F_Formal_Feet' }
+  f: { body: 'F_Punk_Body', legs: 'F_Adventurer_Legs', legs2: 'F_Formal_Legs', feet: 'F_Casual_Feet' }
 };
 /* rôle de chaque matériau d'origine → couleur MFC */
 const ROLE = {
@@ -25,7 +25,8 @@ const ROLE = {
   F_Punk_Body: { Pink: 'navy', Black: 'navy2' },
   F_Adventurer_Legs: { Skin: 'hide', White: 'hide', Brown_02: 'navy2', Brown2: 'navy', LightGreen: 'navy2', Gold: 'gold' },
   F_Formal_Legs: { LimeGreen: 'hide' },
-  F_Formal_Feet: { Red: 'navy' }
+  F_Casual_Feet: { Grey: 'navy', Skin: 'white' },
+  M_Casual_Hoodie_Feet: { Purple: 'navy', White: 'sole' }
 };
 
 const loader = new GLTFLoader();
@@ -34,11 +35,11 @@ function get(name) { return cache[name] || (cache[name] = loader.loadAsync(BASE 
 
 /* ---------- sculpture athlétique : on gonfle les muscles dans l'espace de chaque os ---------- */
 const MUS = { // os : [gonflement max, position du ventre musculaire 0..1, largeur]
-  'UpperArm.L': [0.62, 0.45, 0.30], 'UpperArm.R': [0.62, 0.45, 0.30],
-  'LowerArm.L': [0.40, 0.22, 0.28], 'LowerArm.R': [0.40, 0.22, 0.28],
-  'UpperLeg.L': [0.30, 0.32, 0.38], 'UpperLeg.R': [0.30, 0.32, 0.38],
-  'LowerLeg.L': [0.42, 0.26, 0.22], 'LowerLeg.R': [0.42, 0.26, 0.22],
-  'Chest': [0.22, 0.45, 0.55], 'Shoulder.L': [0.50, 0.85, 0.35], 'Shoulder.R': [0.50, 0.85, 0.35]
+  'UpperArmL': [0.62, 0.45, 0.30], 'UpperArmR': [0.62, 0.45, 0.30],
+  'LowerArmL': [0.40, 0.22, 0.28], 'LowerArmR': [0.40, 0.22, 0.28],
+  'UpperLegL': [0.30, 0.32, 0.38], 'UpperLegR': [0.30, 0.32, 0.38],
+  'LowerLegL': [0.42, 0.26, 0.22], 'LowerLegR': [0.42, 0.26, 0.22],
+  'Chest': [0.22, 0.45, 0.55], 'ShoulderL': [0.65, 0.85, 0.35], 'ShoulderR': [0.65, 0.85, 0.35]
 };
 function sculpt(mesh, mus) {
   const g = mesh.geometry, P = g.attributes.position, SI = g.attributes.skinIndex, SW = g.attributes.skinWeight;
@@ -62,7 +63,7 @@ function sculpt(mesh, mus) {
     }
     // V : épaules et dorsaux plus larges, taille plus fine (en espace monde de pose de liaison)
     const wy = v.y + acc.y, wx = v.x + acc.x;
-    const ty = Math.max(0, Math.min(1, (wy - 1.12) / 0.32)), ww = 1 + mus * (0.10 * ty - 0.05 * (1 - ty) * (wy > 0.95 ? 1 : 0));
+    const ty = Math.max(0, Math.min(1, (wy - 1.12) / 0.32)), ww = 1 + mus * (0.10 * ty * 1.6 - 0.06 * (1 - ty) * (wy > 0.95 ? 1 : 0));
     const tor = Math.abs(wx) < 0.26 ? ww : 1 + (ww - 1) * 0.6;
     P.setXYZ(k, wx * tor, wy, v.z + acc.z);
   }
@@ -77,7 +78,10 @@ function mat(color, opt = {}) {
   return MATS[k] || (MATS[k] = new THREE.MeshStandardMaterial(Object.assign({ color, flatShading: true, roughness: 0.62, metalness: 0.05 }, opt)));
 }
 function colorFor(part, matName, cfg) {
-  if (/^Skin/.test(matName)) return mat(cfg.skin);
+  const r0 = (ROLE[part] || {})[matName];
+  if (r0 === 'white') return cloth(PAL.white);
+  if (/_Head$/.test(part) && (matName === 'Eye' || (matName === 'Brown' && part[0] === 'F'))) return HIDE;
+  if (/^Skin/.test(matName)) return /_Head$/.test(part) ? mat(cfg.skin, { flatShading: false, roughness: 0.7 }) : mat(cfg.skin);
   if (/^Hair|Eyebrows|Moustache/.test(matName)) return mat(cfg.hairColor, { roughness: 0.8 });
   if (/^Eye$/.test(matName)) return mat('#1A1410', { roughness: 0.3 });
   const r = (ROLE[part] || {})[matName];
@@ -122,6 +126,39 @@ function accent(mesh, rule, goldMat) {
   ng.forEach((x) => ng2.addGroup(x.start, x.count, x.materialIndex));
   mesh.geometry = ng2; mesh.material = mats;
 }
+
+/* ---------- visage : vrais yeux (blanc, iris, pupille, reflet), sourcils, bouche ---------- */
+function findEyes(mesh, m, name) {
+  const want = name[0] === 'F' ? 'Brown' : 'Eye'; if (m.material.name !== want) return null;
+  mesh.skeleton.bones.forEach((b) => b.updateWorldMatrix(true, false)); mesh.skeleton.update(); mesh.updateWorldMatrix(true, false);
+  const P = mesh.geometry.attributes.position, pts = [];
+  for (let k = 0; k < P.count; k++) { const v = new THREE.Vector3().fromBufferAttribute(P, k); mesh.applyBoneTransform(k, v); pts.push(v.applyMatrix4(mesh.matrixWorld)); }
+  const side = (s) => { const a = pts.filter((p) => s * p.x > 0); const c = new THREE.Vector3(); a.forEach((p) => c.add(p)); c.multiplyScalar(1 / a.length);
+    let w = 0, h = 0; a.forEach((p) => { w = Math.max(w, Math.abs(p.x - c.x)); h = Math.max(h, Math.abs(p.y - c.y)); }); return { c, w, h }; };
+  return [side(1), side(-1)];
+}
+function addFace(head, spots, c, sx) {
+  window.__spots = spots.map((s) => [s.c.toArray().map((v) => +v.toFixed(4)), +s.w.toFixed(4), +s.h.toFixed(4)]);
+  const inv = new THREE.Matrix4().copy(head.matrixWorld).invert(), hs = head.getWorldScale(new THREE.Vector3()).x;
+  const white = mat('#F4F1EC', { flatShading: false, roughness: 0.35 }), iris = mat(c.eyes, { flatShading: false, roughness: 0.3 }), pup = mat('#0B0B0F', { flatShading: false, roughness: 0.2 });
+  const shine = new THREE.MeshBasicMaterial({ color: '#FFFFFF' }), brow = mat(sx === 'f' ? shade(c.hairColor, 0.8) : shade(c.hairColor, 0.7), { roughness: 0.9 });
+  spots.forEach((s, i) => {
+    const r = Math.max(0.012, Math.min(0.017, s.w * (sx === 'f' ? 0.9 : 1.08))), e = new THREE.Group(); e.position.copy(s.c).add(new THREE.Vector3(0, 0.001, r * 0.3)).applyMatrix4(inv);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(r * (window.DBG_EYE || 1), 16, 12), window.DBG_EYE ? new THREE.MeshBasicMaterial({ color: 'red', depthTest: false }) : white); ball.scale.set(1.15, 0.78, 0.7); e.add(ball);
+    const ir = new THREE.Mesh(new THREE.CircleGeometry(r * 0.55, 18), iris); ir.position.z = r * 0.705; e.add(ir);
+    const pu = new THREE.Mesh(new THREE.CircleGeometry(r * 0.26, 14), pup); pu.position.z = r * 0.71; e.add(pu);
+    const hl = new THREE.Mesh(new THREE.CircleGeometry(r * 0.11, 8), shine); hl.position.set(r * 0.18, r * 0.2, r * 0.715); e.add(hl);
+    if (sx === 'f') { const ln = new THREE.Mesh(new THREE.BoxGeometry(r * 2.5, r * 0.18, r * 0.2), pup); ln.position.set(0, r * 0.52, r * 0.55); ln.rotation.z = (i ? -1 : 1) * 0.12; e.add(ln); }
+    if (sx === 'f') { const b = new THREE.Mesh(new THREE.BoxGeometry(r * 2.6, r * (sx === 'f' ? 0.32 : 0.5), r * 0.5), brow); b.position.set((i ? -1 : 1) * r * 0.15, r * 1.35, r * 0.45); b.rotation.z = (i ? 1 : -1) * 0.12; e.add(b); }
+    e.userData.eye = true; head.add(e);
+  });
+  // bouche (homme seulement : la tête féminine en a déjà une)
+  if (sx === 'f') return;
+  const mc = spots[0].c.clone().add(spots[1].c).multiplyScalar(0.5); mc.y -= 0.068; mc.z += 0.004;
+  const mouth = new THREE.Mesh(new THREE.CapsuleGeometry(0.0035, 0.024, 4, 8), mat(shade(c.skin, sx === 'f' ? 0.62 : 0.68), { flatShading: false }));
+  mouth.rotation.z = Math.PI / 2; mouth.position.copy(mc).applyMatrix4(inv); head.add(mouth);
+}
+function shade(hex, k) { const c = new THREE.Color(hex); c.multiplyScalar(k); return '#' + c.getHexString(); }
 
 /* ---------- logo MFC (petit « M » doré en relief) ---------- */
 function logo(size) {
@@ -174,6 +211,9 @@ async function build(cfg) {
   const sk = base.scene.clone(true);
   const boneByName = {}; sk.traverse((n) => { if (n.name && !boneByName[n.name]) boneByName[n.name] = n; });
   root.add(sk);
+  if (boneByName.Head) boneByName.Head.scale.setScalar(0.92);
+  ['WristL', 'WristR'].forEach((n) => boneByName[n] && boneByName[n].scale.setScalar(0.8));
+  let eyeSpots = null; sk.updateMatrixWorld(true);
   parts.forEach((gl, idx) => {
     const name = names[idx];
     gl.scene.traverse((m) => {
@@ -185,16 +225,19 @@ async function build(cfg) {
       const mats = Array.isArray(m.material) ? m.material : [m.material];
       mesh.material = mats.map((mm) => colorFor(name, mm.name, c));
       if (!Array.isArray(m.material)) mesh.material = mesh.material[0];
+      if (/_Head$/.test(name)) { mesh.geometry.computeVertexNormals(); const es = findEyes(mesh, m, name); if (es) eyeSpots = es; }
       if (!/_Head$/.test(name)) sculpt(mesh, c.mus);
       if (c.level >= 5 && ACCENT[name]) accent(mesh, ACCENT[name], mat(PAL.gold, { metalness: 0.5, roughness: 0.35 }));
       mesh.frustumCulled = false; mesh.castShadow = false;
       sk.add(mesh);
     });
   });
+  // proportions héroïques : tête un peu plus petite, mains plus fines
+  if (eyeSpots && boneByName.Head) addFace(boneByName.Head, eyeSpots, c, sx);
   // logo MFC sur la poitrine et le short
   const chest = boneByName['Chest'];
   if (chest) { const L = logo(0.055); L.position.set(sx === 'f' ? 0.045 : 0.05, 0.10, 0.11); chest.add(L); }
-  const thigh = boneByName['UpperLeg.L'];
+  const thigh = boneByName['UpperLegL'];
   if (thigh) { const L2 = logo(0.04); L2.position.set(0.03, 0.12, 0.085); L2.rotation.set(Math.PI, 0, 0); thigh.add(L2); }
   // mise à l'échelle : 1,8 unité de haut environ
   const box = new THREE.Box3().setFromObject(root); const h = box.max.y - box.min.y || 1.8;
@@ -204,11 +247,30 @@ async function build(cfg) {
   return { root, sk, bones: boneByName, mixer, actions, cfg: c };
 }
 
+/* ---------- gestes MFC (par-dessus l'animation de repos) ---------- */
+const FR = (side, a) => ['Index1', 'Middle1', 'Ring1', 'Pinky1', 'Index2', 'Middle2', 'Ring2', 'Pinky2'].map((f) => [f + side, 'x', a]);
+const GESTES = {
+  cheer: { d: 1.3, j: 0.0, b: [['UpperArmR', 'x', 1.35], ['LowerArmR', 'x', 1.65], ['Head', 'x', -0.12], ...FR('R', 1.0)] },
+  victory: { d: 1.7, j: 0.12, b: [['UpperArmR', 'x', 2.4], ['UpperArmL', 'x', 2.4], ['LowerArmR', 'x', 0.3], ['LowerArmL', 'x', 0.3], ['Head', 'x', -0.2], ['Chest', 'x', -0.08]] },
+  sad: { d: 1.4, j: 0, b: [['Head', 'x', 0.32], ['Chest', 'x', 0.1], ['ShoulderR', 'z', 0.06], ['ShoulderL', 'z', -0.06]] },
+  flex: { d: 1.8, j: 0, b: [['UpperArmR', 'x', 1.45], ['UpperArmL', 'x', 1.45], ['LowerArmR', 'x', 1.9], ['LowerArmL', 'x', 1.9], ...FR('R', 1.0), ...FR('L', 1.0)] }
+};
+const AX = { x: new THREE.Vector3(1, 0, 0), y: new THREE.Vector3(0, 1, 0), z: new THREE.Vector3(0, 0, 1) };
+function applyGeste(r, now) {
+  const g = r.geste; if (!g) return; const t = (now - g.t0) / 1000, G = GESTES[g.name];
+  if (t > G.d) { r.geste = null; r.av.root.position.y = 0; return; }
+  const up = Math.min(1, t / 0.22), down = Math.min(1, (G.d - t) / 0.35), w = Math.min(up, down), e = w * w * (3 - 2 * w);
+  G.b.forEach(([bn, ax, an]) => { const b = r.av.bones[bn]; if (b) b.rotateOnAxis(AX[ax], an * e); });
+  r.av.root.position.y = G.j ? Math.max(0, Math.sin(Math.min(1, t / 0.5) * Math.PI)) * G.j : 0;
+}
+
 function frame() {
   const r = R; if (!r || !r.host) return; r.raf = requestAnimationFrame(frame);
   const dt = Math.min(0.05, r.clock.getDelta()), now = performance.now();
   if (r.av) {
     r.av.mixer.update(dt);
+    applyGeste(r, now);
+    if (window.DBG_POSE) window.DBG_POSE.forEach(([bn, ax, an]) => { const bb = r.av.bones[bn]; if (bb) bb.rotateOnAxis(new THREE.Vector3(ax === 'x' ? 1 : 0, ax === 'y' ? 1 : 0, ax === 'z' ? 1 : 0), an); });
     // respiration + léger transfert d'appui (par-dessus l'animation Idle)
     const b = r.av.bones, t = now / 1000;
     if (b.Chest) { const s = 1 + Math.sin(t * 1.6) * 0.012; b.Chest.scale.set(s, 1 + Math.sin(t * 1.6) * 0.008, s); }
@@ -223,6 +285,7 @@ function frame() {
 function frameCam(aspect) {
   const r = R, h = (r.av && r.av.root.userData.h) || 1.8; r.cam.aspect = aspect;
   const d = (h * 1.22) / Math.tan((r.cam.fov * Math.PI) / 360) / 2 / Math.min(1, aspect * 1.25);
+  if (window.MFC_AV3_FACE) { r.cam.position.set(0, h * 0.9, 1.1); r.cam.lookAt(0, h * 0.92, 0); r.cam.updateProjectionMatrix(); return; }
   r.cam.position.set(0, h * 0.55, d); r.cam.lookAt(0, h * 0.48, 0); r.cam.updateProjectionMatrix();
 }
 function resize() { const r = R; if (!r || !r.host) return; const w = r.host.clientWidth || 300, h = r.host.clientHeight || 400; r.renderer.setSize(w, h, false); frameCam(w / h); }
@@ -255,7 +318,10 @@ const api = {
     resize();
   },
   anim(name) {
-    const r = R; if (!r || !r.av) return; const a = r.av.actions[name]; if (!a) return;
+    const r = R; if (!r || !r.av) return;
+    if (name === 'good') name = (r._g = !r._g) ? 'cheer' : 'victory';
+    if (GESTES[name]) { r.geste = { name, t0: performance.now() }; return; }
+    const a = r.av.actions[name]; if (!a) return;
     const idle = r.av.actions.Idle; a.reset(); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = false; a.fadeIn(0.15).play();
     if (idle) idle.fadeOut(0.15);
     setTimeout(() => { a.fadeOut(0.3); if (idle) idle.reset().fadeIn(0.3).play(); }, a.getClip().duration * 1000 - 250);

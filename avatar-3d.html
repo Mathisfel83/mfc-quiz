@@ -19,7 +19,7 @@ button.on{background:rgba(212,175,55,.18);border-color:#D4AF37;color:#F3D98A}
 <div class="row" id="lvl"><button data-v="1" class="on">Niveau 1</button><button data-v="5">Niveau 5</button></div>
 <div class="row" id="hair"></div>
 <div class="row" id="skin"></div>
-<div class="row"><button id="a1">🙌 Bonne réponse</button><button id="a2">😕 Mauvaise réponse</button><button id="a3">👋 Salut</button></div>
+<div class="row"><button id="a1">🙌 Bonne réponse</button><button id="a2">😕 Mauvaise réponse</button><button id="a4">💪 Biceps</button><button id="a3">👋 Salut</button></div>
 <div class="note">Prototype de test : il ne modifie pas ton avatar actuel. Personnages de base : Quaternius (licence CC0, domaine public), recolorés et sculptés pour MFC.</div>
 </div>
 <script type="module">
@@ -32,7 +32,7 @@ function chips(){ document.getElementById('hair').innerHTML=HAIRS[cfg.sex].map(h
 async function go(){ document.getElementById('lv').textContent=cfg.level; chips(); await A.update(cfg); }
 function bind(id,key,cb){ document.getElementById(id).addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cfg[key]=key==='level'?+b.dataset.v:b.dataset.v; if(cb) cb(); [...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b)); go(); }); }
 bind('sex','sex',()=>{ cfg.hair=HAIRS[cfg.sex][0][0]; }); bind('lvl','level'); bind('hair','hair'); bind('skin','skin');
-document.getElementById('a1').onclick=()=>A.anim('Punch_Right'); document.getElementById('a2').onclick=()=>A.anim('HitRecieve'); document.getElementById('a3').onclick=()=>A.anim('Wave');
+document.getElementById('a1').onclick=()=>A.anim('good'); document.getElementById('a2').onclick=()=>A.anim('sad'); document.getElementById('a4').onclick=()=>A.anim('flex'); document.getElementById('a3').onclick=()=>A.anim('Wave');
 chips(); await A.mount(document.getElementById('stage'),cfg,{onReady:()=>document.getElementById('load').remove()});
 document.title='done';
 </script></body></html>
