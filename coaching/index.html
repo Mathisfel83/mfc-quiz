@@ -312,6 +312,7 @@ function vFiche(){
  var lc=lastCi(c.id);
  if(lc){h+='<section class="card hl"><div class="between"><span class="eyebrow gold">Dernier check-in</span><span class="xs muted">'+dLong(lc.date)+'</span></div><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;text-align:center">'+SCALES.map(function(sc){var v=lc[sc[0]];var low=(sc[0]==='fatigue')?v>=4:v<=2;return '<div class="col" style="align-items:center"><span style="font-family:Sora,sans-serif;font-size:18px;font-weight:600;color:'+(low?'var(--warn)':'var(--text)')+'">'+v+'/5</span><span class="xs muted">'+sc[1].split(' ')[0]+'</span></div>'}).join('')+'</div>'+(lc.note?'<span class="small" style="color:var(--silver);line-height:1.45">« '+esc(lc.note)+' »</span>':'')+'<span class="xs muted">'+(lc.poids?'Poids '+esc(lc.poids)+' kg · ':'')+'Douleur : '+esc(lc.douleur||'Aucune')+'</span></section>'}
  h+='<button class="btn" data-a="newSess" data-id="'+c.id+'">+ Nouvelle séance</button>';
+ h+=U.p.imp?'<div class="card hl"><span class="small b">Importer une séance</span><span class="xs muted" style="line-height:1.45">Colle ici le code préparé par Claude (il commence par MFC1:).</span><textarea id="impTxt" rows="5" class="txt" style="height:auto;padding:10px 12px;font-size:13px" placeholder="MFC1:…" aria-label="Code à importer"></textarea><div class="row"><button class="btn ghost" data-a="impClose">Annuler</button><button class="btn" data-a="impDo" data-id="'+c.id+'">Importer</button></div></div>':'<button class="btn ghost" data-a="impOpen">Importer une séance</button>';
  function card(s){var st=status(s);var open=U.p.open===s.id;return '<div class="card" style="padding:14px;gap:8px"><div class="between"><span class="small b">'+esc(s.name)+'</span><span class="xs" style="color:'+st[1]+'">'+st[0]+'</span></div><span class="xs muted">'+dLong(s.date)+' · '+s.exercises.length+' exercice(s)</span>'+(open?pvr(s):'')+'<div class="row" style="gap:8px;flex-wrap:wrap">'+(s.done?'<button class="btn ghost sm" data-a="open" data-id="'+s.id+'">'+(open?'Masquer':'Prévu vs réalisé')+'</button>':'')+'<button class="btn ghost sm" data-a="edit" data-id="'+s.id+'">Modifier</button><button class="btn ghost sm" data-a="nextWeek" data-id="'+s.id+'">Copier à S+1 · +2,5 kg</button></div></div>'}
  h+='<span class="eyebrow">À venir</span>'+(up.length?up.map(card).join(''):'<div class="empty">Aucune séance à venir.</div>');
  if(past.length)h+='<span class="eyebrow">Récent</span>'+past.map(card).join('');
@@ -353,6 +354,25 @@ function vSettings(){
  if(D.role==='client')h+='</div>'+tabs(CTABS);else h+='</div>'+tabs(KTABS);
  return h;
 }
+
+/* ---------- Import ---------- */
+function decodeImport(t){t=t.trim();if(/^MFC1:/i.test(t)){var b=t.slice(5).replace(/\s+/g,'');var bin=atob(b);var bytes=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);t=new TextDecoder().decode(bytes)}return JSON.parse(t)}
+function nv(v){return v===''||v==null||isNaN(+v)?'':+v}
+function importInto(cid,obj){
+ var list=Array.isArray(obj)?obj:(obj&&obj.sessions?obj.sessions:[obj]);var n=0;
+ list.forEach(function(s){
+  if(!s||!Array.isArray(s.exercises)||!s.exercises.length)return;
+  var done=!!s.done;var ex=[];var log=[];
+  s.exercises.forEach(function(e,i){
+   var t=e.unit==='min';
+   var x={name:String(e.name||'Exercice'),sets:t?1:(+e.sets||1),reps:+e.reps||0,kg:+e.kg||0,rpe:+e.rpe||0,rest:+e.rest||0,cue:String(e.cue||'')};if(t)x.unit='min';
+   var L=null;
+   if(Array.isArray(e.log)&&e.log.length){L=e.log.map(function(r){return Array.isArray(r)?{kg:+r[0]||0,reps:+r[1]||0,rpe:nv(r[2]),ok:true}:{kg:+r.kg||0,reps:+r.reps||0,rpe:nv(r.rpe),ok:true}});if(!t)x.sets=L.length}
+   else if(done){L=[];for(var k=0;k<x.sets;k++)L.push({kg:x.kg,reps:x.reps,rpe:x.rpe||'',ok:true})}
+   ex.push(x);log[i]=L||undefined});
+  if(!done)log=[];
+  D.sessions.push({id:uid(),clientId:cid,date:/^\d{4}-\d{2}-\d{2}$/.test(s.date||'')?s.date:TODAY,name:String(s.name||'Séance importée'),exercises:ex,done:done,log:log});n++});
+ return n}
 
 /* ---------- Minuteur de repos ---------- */
 var RT=null;
@@ -406,6 +426,12 @@ var A={
  delSess:function(){var E=U.edit;D.sessions=D.sessions.filter(function(x){return x.id!==E.id});var cid=E.clientId;U.edit=null;save();toast('Séance supprimée');go('fiche',{id:cid})},
  nextWeek:function(d){var s=D.sessions.find(function(x){return x.id===d.id});var n=clone(s);n.id=uid();n.date=add(s.date,7);n.done=false;n.log=[];delete n.doneAt;n.exercises.forEach(function(e){if(!isTime(e)&&e.kg>0)e.kg=Math.round((e.kg+2.5)*10)/10});D.sessions.push(n);save();toast('Programmée le '+dLong(n.date));render(true)},
  askReset:function(){U.p.confirmReset=true;render(true)},
+ impOpen:function(){U.p.imp=true;render(true)},
+ impClose:function(){U.p.imp=false;render(true)},
+ impDo:function(d){var el=$('#impTxt');var t=(el&&el.value||'').trim();if(!t){toast('Colle d’abord le code');return}
+  var n=0;try{n=importInto(d.id,decodeImport(t))}catch(e){toast('Code illisible : vérifie qu’il est copié en entier');return}
+  if(!n){toast('Aucune séance trouvée dans ce code');return}
+  U.p.imp=false;save();toast(n+' séance'+(n>1?'s importées':' importée'));render(true)},
  askEmpty:function(){U.p.confirmEmpty=true;render(true)},
  empty:function(){D={v:1,role:'coach',clientId:null,clients:[],sessions:[],checkins:[]};U={view:'clients',p:{},rest:null,ci:{},sel:null,edit:null,nc:{}};clearInterval(RT);save();toast('Appli vide : ajoute ton premier client');render();window.scrollTo(0,0)},
  reset:function(){var r=D.role,cid=D.clientId;D=seed();D.role=r;D.clientId=cid&&D.clients.some(function(c){return c.id===cid})?cid:'c1';U={view:r==='coach'?'clients':'home',p:{},rest:null,ci:{},sel:null,edit:null,nc:null};save();toast('Démo réinitialisée');render()}
