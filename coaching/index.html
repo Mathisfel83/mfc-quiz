@@ -154,14 +154,14 @@ function lastPerf(cid,name,before){var ss=sessFor(cid).filter(function(s){return
 function adherence(cid){var past=sessFor(cid).filter(function(s){return s.date<=TODAY&&s.date>=add(TODAY,-28)});var due=past.filter(function(s){return s.date<TODAY||s.done});if(!due.length)return null;return Math.round(due.filter(function(s){return s.done}).length/due.length*100)}
 function lastCi(cid){var a=D.checkins.filter(function(c){return c.clientId===cid}).sort(function(a,b){return a.date.localeCompare(b.date)});return a[a.length-1]}
 function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('on')},2400)}
-function logo(size){return '<span class="logo" style="width:'+size+'px;height:'+size+'px"><span class="silver" style="font-size:'+Math.round(size*0.27)+'px">MFC</span></span>'}
+function logo(h){return '<img src="logo-mark.png" alt="MFC" style="height:'+h+'px;width:auto;display:block">'}
 function tabs(items){return '<nav class="tabs" aria-label="Navigation" style="grid-template-columns:repeat('+items.length+',1fr)">'+items.map(function(t){var on=U.view===t[0];return '<button data-a="go" data-v="'+t[0]+'" class="'+(on?'on':'')+'"'+(on?' aria-current="page"':'')+'>'+ic(t[2])+t[1]+'</button>'}).join('')+'</nav>'}
 function top(title,backView,backId,right){return '<div class="top"><button class="icon-btn" data-a="go" data-v="'+backView+'"'+(backId?' data-id="'+backId+'"':'')+' aria-label="Retour">'+ic('back',22,'currentColor',2)+'</button><span style="flex:1;font-family:Sora,sans-serif;font-size:17px;font-weight:600">'+title+'</span>'+(right||'')+'</div>'}
 
 /* ---------- Écran d’entrée ---------- */
 function vRole(){
  var h='<div class="wrap" style="justify-content:center;align-items:stretch;padding-bottom:48px">';
- h+='<div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;margin-bottom:12px">'+logo(88)+'<h1>MFC Coaching</h1><span class="small muted">Construire un corps capable de tout faire</span></div>';
+ h+='<div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;margin-bottom:12px">'+'<img src="logo-full.png" alt="MFC – Mathis Félicité Coaching" style="width:min(280px,75vw);height:auto;display:block"><span class="small muted" style="margin-top:6px">Construire un corps capable de tout faire</span></div>';
  if(U.p.pick){
   h+='<span class="eyebrow">Choisis ton profil</span>';
   if(!D.clients.length)h+='<div class="empty">Aucun profil client pour l’instant. Crée-le d’abord dans l’espace coach avec « + Nouveau client ».</div>';
@@ -179,7 +179,7 @@ var CTABS=[['home','Accueil','home'],['prog','Programme','cal'],['progress','Pro
 function vHome(){
  var c=client();var ss=sessFor(c.id);
  var next=ss.find(function(s){return !s.done&&s.date>=TODAY});
- var h='<div class="wrap"><header class="row" style="justify-content:space-between"><div class="col" style="gap:4px"><span class="small muted">'+dLong(TODAY)+'</span><h1>Bonjour '+esc(c.name.split(' ')[0])+'</h1></div><button class="logo" style="width:44px;height:44px" data-a="go" data-v="settings" aria-label="Réglages"><span class="silver" style="font-size:12px">MFC</span></button></header>';
+ var h='<div class="wrap"><header class="row" style="justify-content:space-between"><div class="col" style="gap:4px"><span class="small muted">'+dLong(TODAY)+'</span><h1>Bonjour '+esc(c.name.split(' ')[0])+'</h1></div><button data-a="go" data-v="settings" aria-label="Réglages" style="background:none;border:none;padding:6px 0 6px 8px;min-height:44px">'+logo(26)+'</button></header>';
  if(c.phase){h+='<section class="card"><span class="eyebrow gold">'+esc(c.phase)+'</span><span class="small" style="color:var(--silver)">Objectif : '+esc(c.goal)+'</span></section>'}
  if(next){
   var isT=next.date===TODAY;
@@ -287,7 +287,7 @@ function vClients(){
  });
  var ads=D.clients.map(function(c){return adherence(c.id)}).filter(function(a){return a!=null});
  var unread=D.checkins.filter(function(x){return !x.seen}).length;
- var h='<div class="wrap"><header class="row" style="justify-content:space-between"><div class="col" style="gap:4px"><span class="eyebrow gold">Espace coach</span><h1>Mes clients</h1></div>'+logo(44)+'</header>';
+ var h='<div class="wrap"><header class="row" style="justify-content:space-between"><div class="col" style="gap:4px"><span class="eyebrow gold">Espace coach</span><h1>Mes clients</h1></div>'+logo(26)+'</header>';
  h+='<section style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px"><div class="kpi"><b>'+D.clients.length+'</b><span>Clients</span></div><div class="kpi"><b class="gold">'+unread+'</b><span>Check-ins à lire</span></div><div class="kpi"><b>'+(ads.length?Math.round(ads.reduce(function(a,b){return a+b},0)/ads.length)+' %':'—')+'</b><span>Assiduité</span></div></section>';
  if(alerts.length){h+='<section style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">À traiter</span>'+alerts.map(function(a){return '<button class="item" data-a="fiche" data-id="'+a.c.id+'"><span class="dot" style="background:'+a.col+'"></span><span class="col"><span class="small b">'+esc(a.c.name)+'</span><span class="xs muted">'+esc(a.t)+'</span></span>'+ic('chev',18,'#9AA3B5',2)+'</button>'}).join('')+'</section>'}
  h+='<section style="display:flex;flex-direction:column;gap:8px"><div class="between" style="align-items:center"><span class="eyebrow">Tous les clients</span><button class="btn ghost sm" data-a="newClient">+ Nouveau client</button></div>';
